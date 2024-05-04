@@ -6,14 +6,16 @@ RISC-V Trace profiler
 - Install JUCE and the Projucer (link)
 - JUCE requires some dependencies. In order to install them, run the command:
 
-`	sudo apt update
-	sudo apt install libasound2-dev libjack-jackd2-dev \
- 	   ladspa-sdk \
- 	   libcurl4-openssl-dev  \
- 	   libfreetype6-dev \
-  	  libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev \
-  	  libwebkit2gtk-4.0-dev \
-  	  libglu1-mesa-dev mesa-common-dev`
+```
+$ sudo apt update
+$ sudo apt install libasound2-dev libjack-jackd2-dev \
+	ladspa-sdk \
+ 	libcurl4-openssl-dev  \
+  	libfreetype6-dev \
+   	libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev \
+    	libwebkit2gtk-4.0-dev \
+     	libglu1-mesa-dev mesa-common-dev`
+```
 
 - Open the Projucer utility (located in JUCE folder)
 
@@ -39,13 +41,14 @@ In file RISCV_Trace/riscv-isa-sim/riscv/processor.cc set TRACE_INFO_FILEPATH glo
 
 Set RISCV environment variable to the RISC-V tools install path.
 
-`
+```
 $ apt-get install device-tree-compiler libboost-regex-dev
 $ mkdir build
 $ cd build
 $ ../configure --prefix=$RISCV
 $ make
-$ [sudo] make install`
+$ [sudo] make install
+```
 
 ### riscv-tests
 
@@ -55,11 +58,13 @@ Write the code of your program in file RISCV_Trace/riscv-tests/benchmarks/progra
 
 Set RISCV environment variable to the RISC-V tools install path.
 
-`$ cd riscv-tests
+```
+$ cd riscv-tests
 $ autoconf
 $ ./configure --prefix=$RISCV/target
 $ make
-$ make install`
+$ make install
+```
 
 ### Full usage pipeline
 
