@@ -1,0 +1,11 @@
+prefix=/Users/siemensixone/Documents/riscv_spike/riscv-isa-sim/build/../../install
+exec_prefix=/Users/siemensixone/Documents/riscv_spike/riscv-isa-sim/build/../../install
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: riscv-riscv
+Description: RISC-V
+Version: git
+Libs: -Wl,-rpath,${libdir} -L${libdir} -lriscv
+Cflags: -I${includedir}
+URL: http://riscv.org/download.html#tab_spike

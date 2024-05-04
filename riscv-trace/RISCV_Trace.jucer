@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="pOX650" name="RISCV_Trace" projectType="guiapp" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
+  <MAINGROUP id="SghTuz" name="RISCV_Trace">
+    <GROUP id="{EDAA3E03-AFD0-589E-C685-DC96070FECA2}" name="Source">
+      <FILE id="wg0Bcf" name="PerformanceAnalyzer.cpp" compile="1" resource="0"
+            file="Source/PerformanceAnalyzer.cpp"/>
+      <FILE id="Beq52r" name="PerformanceAnalyzer.h" compile="0" resource="0"
+            file="Source/PerformanceAnalyzer.h"/>
+      <FILE id="yBoRNr" name="CreateProjectWindow.h" compile="0" resource="0"
+            file="Source/CreateProjectWindow.h"/>
+      <FILE id="GCyGkU" name="CreateProjectWindow.cpp" compile="1" resource="0"
+            file="Source/CreateProjectWindow.cpp"/>
+      <FILE id="qxVn0t" name="CodeParser.cpp" compile="1" resource="0" file="Source/CodeParser.cpp"/>
+      <FILE id="eOGmBb" name="CodeParser.hpp" compile="0" resource="0" file="Source/CodeParser.hpp"/>
+      <FILE id="kysWF4" name="ProjectParser.cpp" compile="1" resource="0"
+            file="Source/ProjectParser.cpp"/>
+      <FILE id="CWvYZy" name="ProjectParser.hpp" compile="0" resource="0"
+            file="Source/ProjectParser.hpp"/>
+      <FILE id="wxMmYn" name="ObjdumpParser.cpp" compile="1" resource="0"
+            file="Source/ObjdumpParser.cpp"/>
+      <FILE id="EATt8o" name="ObjdumpParser.hpp" compile="0" resource="0"
+            file="Source/ObjdumpParser.hpp"/>
+      <FILE id="yEyKeQ" name="TraceComponent.cpp" compile="1" resource="0"
+            file="Source/TraceComponent.cpp"/>
+      <FILE id="jrctuH" name="TraceComponent.h" compile="0" resource="0"
+            file="Source/TraceComponent.h"/>
+      <FILE id="yey9nI" name="TraceParser.cpp" compile="1" resource="0" file="Source/TraceParser.cpp"/>
+      <FILE id="yaPLqM" name="TraceParser.hpp" compile="0" resource="0" file="Source/TraceParser.hpp"/>
+      <FILE id="UOZOc7" name="CodeComponent.cpp" compile="1" resource="0"
+            file="Source/CodeComponent.cpp"/>
+      <FILE id="ji7ZD5" name="CodeComponent.h" compile="0" resource="0" file="Source/CodeComponent.h"/>
+      <FILE id="Qh40sE" name="AssemblyTrace.cpp" compile="1" resource="0"
+            file="Source/AssemblyTrace.cpp"/>
+      <FILE id="APZguP" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="j5ovZk" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="EF6Zml" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_box2d" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="RISCV_Trace"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="RISCV_Trace"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_box2d" path="../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="1" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_box2d" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="../JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <VS2022 targetFolder="Builds/VisualStudio2022">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_box2d" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="..\..\..\..\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="../JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
