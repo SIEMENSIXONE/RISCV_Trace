@@ -48,12 +48,12 @@ TraceComponent::TraceLine::TraceFuncElement::TraceFuncElement(const std::string 
     fontSize = lineHeight;
     traceLine = &_traceLine;
     traceComp = &_traceComp;
-    addMouseListener(this, false);
+    //addMouseListener(this, false);
 }
 //
 TraceComponent::TraceLine::TraceFuncElement::~TraceFuncElement()
 {
-    removeMouseListener(this);
+    //removeMouseListener(this);
 }
 //
 void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
