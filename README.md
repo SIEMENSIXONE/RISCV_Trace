@@ -14,7 +14,7 @@ $ sudo apt install libasound2-dev libjack-jackd2-dev \
   	libfreetype6-dev \
    	libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev \
     	libwebkit2gtk-4.0-dev \
-     	libglu1-mesa-dev mesa-common-dev`
+     	libglu1-mesa-dev mesa-common-dev
 ```
 
 - Open the Projucer utility (located in JUCE folder)
@@ -47,8 +47,8 @@ $ make
 Set RISCV environment variable to the RISC-V tools install path.
 
 ```
-$ apt-get install device-tree-compiler libboost-regex-dev
-$ mkdir build
+$ apt-get install device-tree-compiler libboost-regex-dev libasio-dev
+$ mkdir -p build
 $ cd build
 $ ../configure --prefix=$RISCV
 $ make
