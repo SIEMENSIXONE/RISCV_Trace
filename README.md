@@ -3,7 +3,7 @@ RISC-V Trace profiler
 
 ### riscv-trace
 
-- Install JUCE and the Projucer (link)
+- Install JUCE and the Projucer [JUCE](https://juce.com/download/) 
 - JUCE requires some dependencies. In order to install them, run the command:
 
 ```
@@ -31,7 +31,12 @@ In Projucer:
 - Open Modules section and make sure that "Use global path" is ticked for each module. This is necessary for the Projucer to generate project files for Windows and macOS, as well as a Makefile for Linux.
 - Save changes (File -> Save)
 
-- In order to build the project, cd to RISCV_Trace/riscv-trace/Builds/LinuxMakefile, then type make
+- In order to build the project:
+
+```
+$ cd RISCV_Trace/riscv-trace/Builds/LinuxMakefile
+$ make
+```
 
 ### riscv-isa-sim
 
