@@ -54,7 +54,7 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string &code, map<string, 
             }
         }
         symbNum += buf.length() + 1;
-        lineNum +=count(buf.begin(), buf.end(), '\n');
+        lineNum += count(buf.begin(), buf.end(), '\n');
     }
     return result;
 }
