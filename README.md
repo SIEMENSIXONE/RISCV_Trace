@@ -37,9 +37,9 @@ In Projucer:
 
 **Build**
 
-In file RISCV_Trace/riscv-isa-sim/riscv/processor.cc set TRACE_INFO_FILEPATH global variable to the trace save path. Decoded commands will be written there.
+***In file RISCV_Trace/riscv-isa-sim/riscv/processor.cc set TRACE_INFO_FILEPATH global variable to the trace save path. Decoded commands will be written there.***
 
-Set RISCV environment variable to the RISC-V tools install path.
+***Set RISCV environment variable to the RISC-V tools install path.***
 
 ```
 $ apt-get install device-tree-compiler libboost-regex-dev
@@ -52,8 +52,6 @@ $ [sudo] make install
 
 ### riscv-tests
 
-Write the code of your program in file RISCV_Trace/riscv-tests/benchmarks/program/program_main.c
-
 **Build**
 
 Set RISCV environment variable to the RISC-V tools install path.
@@ -65,8 +63,34 @@ $ ./configure --prefix=$RISCV/target
 $ make
 $ make install
 ```
+Write the code of your program in file RISCV_Trace/riscv-tests/benchmarks/program/program_main.c
+***RISCV-V cross compiler is required!***
+In order to compile your code:
+
+```
+$ cd benchmarks
+$ make
+```
 
 ### Full usage pipeline
 
-
-почему то файл с трассой не сохраняется в модифицированном спайке на линуксе...
+- Get trace info file:
+    - Write your code in program_main.c
+    - Compile it
+    - Run it with SPIKE:
+    
+    ```
+    $ spike -d program.riscv
+    $ run
+    ```
+- Get objdump info file:
+    - Decompile executable file:
+    
+    ```
+    $ riscv64-unknown-elf-objdump -fhd program.riscv > objdump.txt
+    ```
+- RISCV Trace profiler usage:
+    - Launch RISCV_Trace
+    - File -> New
+    - In opened menu set paths to trace info file, objdump file and code file. Choose where to save project file.
+    - Open created project file
