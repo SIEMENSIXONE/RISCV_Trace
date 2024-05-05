@@ -39,7 +39,7 @@ In Projucer:
 
 ***In file RISCV_Trace/riscv-isa-sim/riscv/processor.cc set TRACE_INFO_FILEPATH global variable to the trace save path. Decoded commands will be written there.***
 
-***Set RISCV environment variable to the RISC-V tools install path.***
+Set RISCV environment variable to the RISC-V tools install path.
 
 ```
 $ apt-get install device-tree-compiler libboost-regex-dev
@@ -64,7 +64,9 @@ $ make
 $ make install
 ```
 Write the code of your program in file RISCV_Trace/riscv-tests/benchmarks/program/program_main.c
+
 ***RISCV-V cross compiler is required!***
+
 In order to compile your code:
 
 ```
@@ -79,12 +81,14 @@ $ make
     - Compile it
     - Run it with SPIKE:
     
+    
     ```
     $ spike -d program.riscv
     $ run
     ```
 - Get objdump info file:
     - Decompile executable file:
+    
     
     ```
     $ riscv64-unknown-elf-objdump -fhd program.riscv > objdump.txt
