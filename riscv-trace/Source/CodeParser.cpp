@@ -27,10 +27,10 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string &code, map<string, 
             string funcName = *it;
             //
             if (result.functions.find(funcName) == result.functions.end()) {
-                int findResult = buf.find(funcName);
+                int findResult = (int) buf.find(funcName);
                 if (findResult != -1) {
                     //нашли название функции в строке
-                    int ctr = findResult + funcName.length();
+                    int ctr = findResult + (int) funcName.length();
                     //
                     while (ctr < buf.length()) {
                         if (buf[ctr] == ';') break; // сюда вроде не попадаем в любом случае

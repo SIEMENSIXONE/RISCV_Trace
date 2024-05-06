@@ -23,7 +23,6 @@ CodeComponent::CodeComponent(std::string &code, map<string, string>& funcAddrMap
     codeEditor->setScrollbarThickness(10);
     codeEditor->loadContent(code);
     codeEditor->setReadOnly(true);
-    int tmp = codeEditor->getTotalNumChars();
     ////////////////////////////////////////////////////////////////
     juce::CodeEditorComponent::ColourScheme  myColourScheme;
     myColourScheme.set("Error", juce::Colours::darkred);
@@ -77,7 +76,7 @@ void CodeComponent::selectFunc(const string& funcName) {
     if ((line - 1) >= 0) line = line - 1;
     codeEditor->scrollToLine(line);
     //
-    juce::Range<int> range(pos, pos + funcName.length());
+    juce::Range<int> range(pos, pos + (int) funcName.length());
     codeEditor->setHighlightedRegion(range);
     return;
 }

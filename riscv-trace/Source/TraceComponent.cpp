@@ -72,15 +72,6 @@ void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
     if (funcNameVisibility) g.drawText (text, getLocalBounds(), textJustification, true);
 }
 //
-void TraceComponent::TraceLine::TraceFuncElement::mouseDown(const juce::MouseEvent& event) {
-    //traceComp->clearSelections();
-    //if (traceLine->getFuncName() != "") traceLine->isLineSelected = true;
-    //traceComp->repaint();
-    //traceComp->resized();
-    //traceComp->jumpToSelectedLine();
-    //
-}
-//
 TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, juce::Colour &curFuncColour, TraceComponent& _traceComp){
     traceComp = &_traceComp;
     lineInfo = lineInfoIn;
@@ -261,7 +252,7 @@ vector<int> TraceComponent::getFuncLines(const string &funcName){
 void TraceComponent::setTopLine(int val) {
     int height = viewport->getHeight();
     int maxLinesOnScreen = height / lineHeight;
-    int totalLines = FTraceLines->size();
+    int totalLines = (int) FTraceLines->size();
     //
     if (val < 0) topLine = 0;
     else if (val > totalLines - maxLinesOnScreen)  topLine = totalLines - maxLinesOnScreen;
@@ -278,7 +269,7 @@ int TraceComponent::getTopLine() {
 }
 //
 void TraceComponent::setSelectedLine(int lineNumber) {
-    int totalLines = FTraceLines->size();
+    int totalLines = (int) FTraceLines->size();
     if ((lineNumber < 0) || (lineNumber >= totalLines)) return;
     //
     if (FTraceLines->at(lineNumber)->getFuncName() != "") {

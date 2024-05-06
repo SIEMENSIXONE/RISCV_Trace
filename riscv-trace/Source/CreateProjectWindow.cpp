@@ -202,7 +202,7 @@ void CreateProjectPanel::saveProject() {
 }
 //
 void CreateProjectPanel::buttonClicked(Button* button) {
-    if (button = saveProjectButton) {
+    if (button == saveProjectButton) {
         saveProject();
     }
 }

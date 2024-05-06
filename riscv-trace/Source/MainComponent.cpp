@@ -370,7 +370,7 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
     execTimeMapTotalSelf = new map<string, int>();
     execTimeMapOneInstance = new map<string, int>();
     //
-    int totalTime = lines->size();
+    int totalTime = (int) lines->size();
     std::vector<string> funcNameVector;
     for (map<string, vector<string>>::iterator it = _funcAddrMap.begin(); it != _funcAddrMap.end(); it++) funcNameVector.push_back(it->first);
     //
@@ -389,7 +389,6 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
                     execTimeMapTotal->insert({ funcTmp, 1 });
                 }
                 else {
-                    int tmp = execTimeMapTotal->at(funcTmp);
                     execTimeMapTotal->at(funcTmp)++;
                 }
             }
@@ -399,7 +398,6 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
                     execTimeMapTotal->insert({ it->func, 1 });
                 }
                 else {
-                    int tmp = execTimeMapTotal->at(it->func);
                     execTimeMapTotal->at(it->func)++;
                 }
             }
@@ -416,7 +414,6 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
             if (timesCalledMap->find(funcName) == timesCalledMap->end()) {
                 timesCalledMap->insert({funcName, 1});
             }else{
-                int tmp = timesCalledMap->at(funcName);
                 timesCalledMap->at(funcName)++;
             }
         }
@@ -427,7 +424,6 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
                 execTimeMapTotalSelf->insert({ funcName, 1 });
             }
             else {
-                int tmp = execTimeMapTotalSelf->at(funcName);
                 execTimeMapTotalSelf->at(funcName)++;
             }
 
@@ -511,24 +507,8 @@ void MainComponent::AnalyzerSubComponent::paint(Graphics& g) {
 }
 //
 void MainComponent::AnalyzerSubComponent::resized() {
-    int width = table->getWidth();
-    int height = table->getHeight();
     table->setSize(getWidth(), getHeight());
 }
-//
-//int MainComponent::AnalyzerSubComponent::countTotalExecTime(const string& funcName) {
-//    if (callingMap->find(funcName) != callingMap->end()) {
-//        vector<string> calledFuncs = callingMap->at(funcName);
-//        if (calledFuncs.size() != 0) {
-//            for (vector<string>::iterator it = calledFuncs.begin(); it != calledFuncs.end(); it++) {
-//                string calledFunc = *it;
-//            }
-//        }
-//        else {
-//            execTimeMapOneInstance->at(funcName);
-//        }
-//    }
-//}
 //
 MainComponent::AnalyzerSubComponent::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data) {
     data = &_data;
@@ -537,15 +517,20 @@ MainComponent::AnalyzerSubComponent::ProfileTable::ProfileTable(vector<array<std
     box.setColour(ListBox::backgroundColourId, Colour::greyLevel(0.2f));
     box.setRowHeight(30);
     //
-    box.getHeader().addColumn("Name", 1, 100);
-    box.getHeader().addColumn("Time", 2, 50);
-    box.getHeader().addColumn("Time (%)", 3, 50);
-    box.getHeader().addColumn("Called", 4, 50);
-    box.getHeader().addColumn("Children (%)", 5, 50);
-    box.getHeader().addColumn("Self (%)", 6, 50);
+    box.getHeader().addColumn("Name", 1, 1.5 * singleColumnWidth);
+    box.getHeader().addColumn("Time", 2, singleColumnWidth);
+    box.getHeader().addColumn("Time (%)", 3, singleColumnWidth);
+    box.getHeader().addColumn("Called", 4, singleColumnWidth);
+    box.getHeader().addColumn("Children (%)", 5, singleColumnWidth);
+    box.getHeader().addColumn("Self (%)", 6, singleColumnWidth);
+    box.getHeader().setLookAndFeel(&myLookAndFeel);
     //
     addAndMakeVisible(box);
     //
+}
+//
+MainComponent::AnalyzerSubComponent::ProfileTable::~ProfileTable() {
+    box.getHeader().setLookAndFeel(nullptr);
 }
 //
 void MainComponent::AnalyzerSubComponent::ProfileTable::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected)
@@ -561,10 +546,13 @@ void MainComponent::AnalyzerSubComponent::ProfileTable::paintRowBackground(Graph
 void MainComponent::AnalyzerSubComponent::ProfileTable::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/)
 {
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
-    Font font{ 14.0f };
+    juce::String fontTypeface = "Courier New";
+    float fontSize = (float) (TraceComponent::lineHeight - 6);
+    juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
+    juce::Font font(fontTypeface, fontSize, fontStyle);
     g.setFont(font);
     std::string val = (data->at(rowNumber)).at(columnId - 1);
-    g.drawText(val, 2, 0, width - 4, height, Justification::centredLeft, true);
+    g.drawText(val, 2, 0, width - 4, height, Justification::centred, true);
 
     g.setColour(getLookAndFeel().findColour(ListBox::backgroundColourId));
     g.fillRect(width - 1, 0, 1, height);
@@ -648,7 +636,7 @@ void MainComponent::AnalyzerSubComponent::ProfileTable::sortOrderChanged(int new
 }
 //
 int MainComponent::AnalyzerSubComponent::ProfileTable::getNumRows() {
-    return data->size();
+    return (int) data->size();
 }
 //
 void MainComponent::AnalyzerSubComponent::ProfileTable::resized() {
@@ -717,7 +705,7 @@ void MainComponent::resized()
     if (projectOpened){
         Grid grid;
         grid.templateRows = {Track (Fr (1)), Track (Fr (20)) };
-        grid.templateColumns = { Track (Fr (3)), Track (Fr (4)), Track(Fr(2))};
+        grid.templateColumns = { Track (Fr (3)), Track (Fr (4)), Track(Fr(3))};
         grid.items = {GridItem (asPanelTitle), GridItem (codePanelTitle), GridItem(analyzerPanelTitle), GridItem (asPanel), GridItem (codePanel), GridItem(analyzerPanel)};
         grid.performLayout (workspaceArea);
     }else{

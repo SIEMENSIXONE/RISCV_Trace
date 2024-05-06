@@ -19,7 +19,7 @@
 */
 //
 //
-class TraceComponent  : public juce::Component, public juce::Component::MouseListener
+class TraceComponent  : public juce::Component
 {
 public:
     const static int lineHeight = 18;
@@ -52,7 +52,7 @@ public:
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLineElement)
         };
         //
-        class TraceFuncElement : public TraceLineElement, juce::Component::MouseListener
+        class TraceFuncElement : public TraceLineElement
         {
         public:
             TraceFuncElement(const std::string &, TraceLine &, TraceComponent &);
@@ -60,7 +60,6 @@ public:
             void paint (juce::Graphics&) override;
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceFuncElement)
         private:
-            void mouseDown(const juce::MouseEvent& event) override;
             TraceComponent* traceComp;
             TraceLine* traceLine;
         };

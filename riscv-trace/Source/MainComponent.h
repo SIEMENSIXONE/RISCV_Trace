@@ -158,6 +158,7 @@ public:
         public:
             //
             ProfileTable(vector<array<std::string, 6>>& _data);
+            ~ProfileTable() override;
             void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
             void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override;
             void sortOrderChanged(int newSortColumnId, bool isForwards) override;
@@ -167,8 +168,57 @@ public:
             //
         private:
             //
+            class MyLookAndFeel : public LookAndFeel_V4
+            {
+            public:
+                MyLookAndFeel()
+                {
+                    setColour (juce::Slider::thumbColourId, juce::Colours::red);
+                }
+                //
+                void drawTableHeaderColumn (Graphics& g, TableHeaderComponent& header,
+                                                        const String& columnName, int /*columnId*/,
+                                                        int width, int height, bool isMouseOver, bool isMouseDown,
+                                                        int columnFlags) override
+                {
+                auto highlightColour = header.findColour (TableHeaderComponent::highlightColourId);
+
+                if (isMouseDown)
+                    g.fillAll (highlightColour);
+                else if (isMouseOver)
+                    g.fillAll (highlightColour.withMultipliedAlpha (0.625f));
+
+                Rectangle<int> area (width, height);
+                area.reduce (4, 0);
+
+                if ((columnFlags & (TableHeaderComponent::sortedForwards | TableHeaderComponent::sortedBackwards)) != 0)
+                {
+                    Path sortArrow;
+                    sortArrow.addTriangle (0.0f, 0.0f,
+                                           0.5f, (columnFlags & TableHeaderComponent::sortedForwards) != 0 ? -0.8f : 0.8f,
+                                           1.0f, 0.0f);
+
+                    g.setColour (Colour (0x99000000));
+                    g.fillPath (sortArrow, sortArrow.getTransformToScaleToFit (area.removeFromRight (height / 2).reduced (2).toFloat(), true));
+                }
+
+                g.setColour (header.findColour (TableHeaderComponent::textColourId));
+                //
+                juce::String fontTypeface = "Courier New";
+                float fontSize = (float) (TraceComponent::lineHeight - 8);
+                juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
+                Font font(fontTypeface, fontSize, fontStyle);
+                g.setFont (font);
+                //
+                g.drawFittedText (columnName, area, Justification::centred, 1);
+                }
+            };
+            //
             TableListBox box;
+            MyLookAndFeel myLookAndFeel;
             vector<array<std::string, 6>>* data;
+            int singleColumnWidth = 66;
+            
         };
         //
         vector<TraceParser::TraceLineStruct> *lines = nullptr;
