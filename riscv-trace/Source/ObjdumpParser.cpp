@@ -138,6 +138,7 @@ map<string, std::vector<string>> TObjdumpParser::getCallersMap() {
 }
 map<string, std::vector<string>> TObjdumpParser::getCallingMap() {
     return *FCallingMap;
+    //
 }
 //
 bool TObjdumpParser::isADigitHex(const char &c){

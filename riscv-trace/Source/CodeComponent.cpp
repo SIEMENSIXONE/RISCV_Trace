@@ -20,7 +20,7 @@ CodeComponent::CodeComponent(std::string &code, map<string, string>& funcAddrMap
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::lineNumberTextId, juce::Colours::white);
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::highlightColourId, juce::Colours::hotpink);
     codeEditor->getLookAndFeel().setColour(juce::ScrollBar::thumbColourId, juce::Colours::grey);
-    codeEditor->setScrollbarThickness(5);
+    codeEditor->setScrollbarThickness(10);
     codeEditor->loadContent(code);
     codeEditor->setReadOnly(true);
     int tmp = codeEditor->getTotalNumChars();

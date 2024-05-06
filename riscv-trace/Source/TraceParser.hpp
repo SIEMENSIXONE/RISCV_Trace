@@ -30,6 +30,7 @@ public:
         string func = "";
         string instr = "";
         bool isFirstLine = false;
+        bool isLastLine = false;
         //
         friend ostream& operator<< (std::ostream& stream, const TraceLineStruct& traceLine);
     };
@@ -40,6 +41,7 @@ public:
     void parseTrace(const string& traceFilepath);
     void addFuncAddresses(map<string, string> &);
     void markFirstLines(map<string, string>&);
+    void markLastLines(map<string, string>&);
     friend ostream& operator<< (std::ostream& stream, const TraceParser& traceLine);
     //
 private:

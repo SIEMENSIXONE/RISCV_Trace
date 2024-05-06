@@ -112,6 +112,15 @@ void TraceParser::markFirstLines(map<string, string>& firstLineAddrMap) {
     }
 }
 //
+void TraceParser::markLastLines(map<string, string>& lastLineAddrMap) {
+    for (vector<TraceLineStruct>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
+        string addr = it->addr;
+        if (lastLineAddrMap.find(addr) != lastLineAddrMap.end()) {
+            it->isLastLine = true;
+        }
+    }
+}
+//
 ostream& operator<< (std::ostream& stream, const TraceParser& traceLine){
     for( auto it = traceLine.FTraceLines->begin(); it != traceLine.FTraceLines->end(); ++it )
     {

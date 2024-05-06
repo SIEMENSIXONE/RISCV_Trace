@@ -366,7 +366,49 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
     callersMap = &_callersMap;
     //
     timesCalledMap = new map<string, int>();
-    execTimeMap = new map<string, int>();
+    execTimeMapTotal = new map<string, int>();
+    execTimeMapTotalSelf = new map<string, int>();
+    execTimeMapOneInstance = new map<string, int>();
+    //
+    int totalTime = lines->size();
+    std::vector<string> funcNameVector;
+    for (map<string, vector<string>>::iterator it = _funcAddrMap.begin(); it != _funcAddrMap.end(); it++) funcNameVector.push_back(it->first);
+    //
+    vector<string> curFuncs;
+    for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
+        bool flag = false;
+        if (it->func != "") {
+            if (it->isFirstLine) 
+                curFuncs.push_back(it->func);
+            //
+            for (int i = 0; i < curFuncs.size(); i++) {
+                string funcTmp = curFuncs.at(i);
+                if (it->func == funcTmp) flag = true;
+                //
+                if (execTimeMapTotal->find(funcTmp) == execTimeMapTotal->end()) {
+                    execTimeMapTotal->insert({ funcTmp, 1 });
+                }
+                else {
+                    int tmp = execTimeMapTotal->at(funcTmp);
+                    execTimeMapTotal->at(funcTmp)++;
+                }
+            }
+            //
+            if (!flag) {
+                if (execTimeMapTotal->find(it->func) == execTimeMapTotal->end()) {
+                    execTimeMapTotal->insert({ it->func, 1 });
+                }
+                else {
+                    int tmp = execTimeMapTotal->at(it->func);
+                    execTimeMapTotal->at(it->func)++;
+                }
+            }
+            //
+            if (it->isLastLine) {
+                curFuncs.pop_back();
+            }
+        }
+    }
     //
     for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
         if (it->isFirstLine) {
@@ -376,40 +418,74 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
             }else{
                 int tmp = timesCalledMap->at(funcName);
                 timesCalledMap->at(funcName)++;
-                int tmp1 = timesCalledMap->at(funcName);
-                int tmp2 = 0;
             }
+        }
+        //
+        if (it->func != "") {
+            string funcName = it->func;
+            if (execTimeMapTotalSelf->find(funcName) == execTimeMapTotalSelf->end()) {
+                execTimeMapTotalSelf->insert({ funcName, 1 });
+            }
+            else {
+                int tmp = execTimeMapTotalSelf->at(funcName);
+                execTimeMapTotalSelf->at(funcName)++;
+            }
+
         }
     }
     //
-    std::vector<string> funcNameVector;
-    for (map<string, vector<string>>::iterator it = _funcAddrMap.begin(); it != _funcAddrMap.end(); it++) funcNameVector.push_back(it->first);
+    for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
+        string funcName = *it;
+        if (execTimeMapTotalSelf->find(funcName) != execTimeMapTotalSelf->end()) {
+            int fullExecTime = execTimeMapTotalSelf->at(funcName);
+            int timesCalled = 1;
+            if (timesCalledMap->find(funcName) != timesCalledMap->end()) {
+                if (timesCalledMap->at(funcName) > 1) timesCalled = timesCalledMap->at(funcName);
+            }
+            //
+            execTimeMapOneInstance->insert({ funcName, fullExecTime / timesCalled});
+        }
+    }
     //
-    const int columnsNum = 7;
+    const int columnsNum = 6;
     vector<array<std::string, columnsNum>> *tableData = new vector<array<std::string, columnsNum>>();
     //
     for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
         string funcName = *it;
         array<std::string, columnsNum> newRow;
         newRow.fill("-");
+        //
         //name
         newRow.at(0) = funcName;
-        //called
-        string timesCalled = "0";
-        if (timesCalledMap->find(funcName) != timesCalledMap->end()) {
-            timesCalled = to_string(timesCalledMap->at(funcName));
-        }
-        newRow.at(3) = timesCalled;
-        //calls
-        string calls = "";
-        if (callingMap->find(funcName) != callingMap->end()) {
-            vector<string> tmp = callingMap->at(funcName);
-            for (vector<string>::iterator it = tmp.begin(); it != tmp.end(); it++) {
-                calls += *it + '\n';
-            }
-        }
-        newRow.at(4) = calls;
         //
+        //time
+        int totalExecTime = 0;
+        if (execTimeMapTotal->find(funcName) != execTimeMapTotal->end()) totalExecTime = execTimeMapTotal->at(funcName);
+        newRow.at(1) = "-";
+        if (totalExecTime!=0) newRow.at(1) = to_string(totalExecTime);
+        //
+        //time %
+        newRow.at(2) = "-";
+        if (totalExecTime != 0) newRow.at(2) = to_string((totalExecTime * 100) / totalTime);
+        //
+        //called
+        int timesCalled = 0;
+        if (timesCalledMap->find(funcName) != timesCalledMap->end()) timesCalled = timesCalledMap->at(funcName);
+        newRow.at(3) = "-";
+        if (timesCalled != 0) newRow.at(3) = to_string(timesCalled);
+        //
+        //self
+        if (execTimeMapTotalSelf->find(funcName) != execTimeMapTotalSelf->end()) {
+
+            //// от общего времени
+            //newRow.at(4) = to_string(((totalExecTime - execTimeMapTotalSelf->at(funcName)) * 100 ) / totalTime) + "%";
+            //newRow.at(5) = to_string((execTimeMapTotalSelf->at(funcName) * 100) / totalTime) + "%";
+
+
+            // от собственного времени функции
+            newRow.at(4) = to_string(((totalExecTime - execTimeMapTotalSelf->at(funcName)) * 100) / totalExecTime);
+            newRow.at(5) = to_string((execTimeMapTotalSelf->at(funcName) * 100) / totalExecTime);
+        }
         //
         tableData->push_back(newRow);
     }
@@ -422,7 +498,7 @@ MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::Tr
 MainComponent::AnalyzerSubComponent::~AnalyzerSubComponent() {
     if (table != nullptr) delete(table);
     delete(timesCalledMap);
-    delete(execTimeMap);
+    delete(execTimeMapTotalSelf);
 }
 //
 void MainComponent::AnalyzerSubComponent::paint(Graphics& g) {
@@ -440,7 +516,21 @@ void MainComponent::AnalyzerSubComponent::resized() {
     table->setSize(getWidth(), getHeight());
 }
 //
-MainComponent::AnalyzerSubComponent::ProfileTable::ProfileTable(vector<array<std::string, 7>>& _data) {
+//int MainComponent::AnalyzerSubComponent::countTotalExecTime(const string& funcName) {
+//    if (callingMap->find(funcName) != callingMap->end()) {
+//        vector<string> calledFuncs = callingMap->at(funcName);
+//        if (calledFuncs.size() != 0) {
+//            for (vector<string>::iterator it = calledFuncs.begin(); it != calledFuncs.end(); it++) {
+//                string calledFunc = *it;
+//            }
+//        }
+//        else {
+//            execTimeMapOneInstance->at(funcName);
+//        }
+//    }
+//}
+//
+MainComponent::AnalyzerSubComponent::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data) {
     data = &_data;
     //
     box.setModel(this);
@@ -451,9 +541,8 @@ MainComponent::AnalyzerSubComponent::ProfileTable::ProfileTable(vector<array<std
     box.getHeader().addColumn("Time", 2, 50);
     box.getHeader().addColumn("Time (%)", 3, 50);
     box.getHeader().addColumn("Called", 4, 50);
-    box.getHeader().addColumn("Calls", 5, 50);
-    box.getHeader().addColumn("Children", 6, 50);
-    box.getHeader().addColumn("Self", 7, 50);
+    box.getHeader().addColumn("Children (%)", 5, 50);
+    box.getHeader().addColumn("Self (%)", 6, 50);
     //
     addAndMakeVisible(box);
     //
@@ -480,7 +569,84 @@ void MainComponent::AnalyzerSubComponent::ProfileTable::paintCell(Graphics& g, i
     g.setColour(getLookAndFeel().findColour(ListBox::backgroundColourId));
     g.fillRect(width - 1, 0, 1, height);
 }
-
+//
+void MainComponent::AnalyzerSubComponent::ProfileTable::sortOrderChanged(int newSortColumnId, bool isForwards)
+{
+    if (newSortColumnId != 0)
+    {
+		bool changesFlag = true;
+		while (changesFlag) {
+			changesFlag = false;
+			for (int i = 0; i < data->size() - 1; i++) {
+                if (isForwards) 
+                {
+                    if (newSortColumnId == 1) {
+                        string val1 = data->at(i)[newSortColumnId - 1];
+                        string val2 = data->at(i + 1)[newSortColumnId - 1];
+                        //
+                        if (val1 < val2) {
+                            array<std::string, 6> tmp = data->at(i);
+                            data->at(i) = data->at(i + 1);
+                            data->at(i + 1) = tmp;
+                            //
+                            changesFlag = true;
+                        }
+                    }
+                    else
+                    {
+                        string val1 = data->at(i)[newSortColumnId - 1];
+                        string val2 = data->at(i + 1)[newSortColumnId - 1];
+                        int compVal1 = -1;
+                        int compVal2 = -1;
+                        if (val1 != "-") compVal1 = stoi(val1);
+                        if (val2 != "-") compVal2 = stoi(val2);
+                        if (compVal1 < compVal2) {
+                            array<std::string, 6> tmp = data->at(i);
+                            data->at(i) = data->at(i + 1);
+                            data->at(i + 1) = tmp;
+                            //
+                            changesFlag = true;
+                        }
+                    }
+                }
+                else 
+                {
+                    if (newSortColumnId == 1) {
+                        string val1 = data->at(i)[newSortColumnId - 1];
+                        string val2 = data->at(i + 1)[newSortColumnId - 1];
+                        //
+                        if (val1 > val2) {
+                            array<std::string, 6> tmp = data->at(i);
+                            data->at(i) = data->at(i + 1);
+                            data->at(i + 1) = tmp;
+                            //
+                            changesFlag = true;
+                        }
+                    }
+                    else
+                    {
+                        string val1 = data->at(i)[newSortColumnId - 1];
+                        string val2 = data->at(i + 1)[newSortColumnId - 1];
+                        int compVal1 = -1;
+                        int compVal2 = -1;
+                        if (val1 != "-") compVal1 = stoi(val1);
+                        if (val2 != "-") compVal2 = stoi(val2);
+                        if (compVal1 > compVal2) {
+                            array<std::string, 6> tmp = data->at(i);
+                            data->at(i) = data->at(i + 1);
+                            data->at(i + 1) = tmp;
+                            //
+                            changesFlag = true;
+                        }
+                    }
+                }
+			}
+		}
+        //
+        box.updateContent();
+    }
+}
+//
 int MainComponent::AnalyzerSubComponent::ProfileTable::getNumRows() {
     return data->size();
 }
@@ -589,6 +755,12 @@ void MainComponent::openProjectFile(const string filepath) {
     map<string, string> firstFuncAddrMap = parser->getFirstFuncAddrMap();
     map<string, string> addrFuncMap = parser->getAddrFuncMap();
     map<string, vector<string>> funcAddrMap = parser->getFuncAddrMap();
+    //
+    map<string, string> lastFuncAddrMap;
+    for (map<string, vector<string>>::iterator it = funcAddrMap.begin(); it != funcAddrMap.end(); it++) {
+        lastFuncAddrMap.insert({ (it->second).at((it->second).size() - 1), it->first});
+    }
+    //
     map<string, vector<string>> callingMap = parser->getCallingMap();
     map<string, vector<string>> callersMap = parser->getCallersMap();
     //
@@ -598,7 +770,7 @@ void MainComponent::openProjectFile(const string filepath) {
     traceParser.parseTrace(project.trace);
     traceParser.addFuncAddresses(addrFuncMap);
     traceParser.markFirstLines(firstFuncAddrMap);
-    //
+    traceParser.markLastLines(lastFuncAddrMap);
     codePanel = new CodeSubComponent(project.code, firstFuncAddrMap);
     asPanel = new AsSubComponent(*vec, *codePanel);
     //vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap
@@ -636,6 +808,7 @@ void MainComponent::saveProject(){
 void MainComponent::closeProjectFile(){
     if (asPanelTitle != nullptr) delete(asPanelTitle);
     if (codePanelTitle != nullptr) delete(codePanelTitle);
+    if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
     if (asPanel != nullptr) delete(asPanel);
     if (codePanel != nullptr) delete(codePanel);
     if (analyzerPanel != nullptr) delete(analyzerPanel);

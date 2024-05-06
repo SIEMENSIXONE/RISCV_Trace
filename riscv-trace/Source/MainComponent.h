@@ -151,21 +151,24 @@ public:
         ~AnalyzerSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
+        //int countTotalExecTime(const string&);
     private:
         //
         class ProfileTable : public Component, public TableListBoxModel {
         public:
             //
-            ProfileTable(vector<array<std::string, 7>>& _data);
+            ProfileTable(vector<array<std::string, 6>>& _data);
             void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
             void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override;
+            void sortOrderChanged(int newSortColumnId, bool isForwards) override;
+
             int getNumRows() override;
             void resized() override;
             //
         private:
             //
             TableListBox box;
-            vector<array<std::string, 7>>* data;
+            vector<array<std::string, 6>>* data;
         };
         //
         vector<TraceParser::TraceLineStruct> *lines = nullptr;
@@ -174,7 +177,10 @@ public:
         map<string, vector<string>> *callersMap = nullptr;
         //
         map<string, int> *timesCalledMap;
-        map<string, int> *execTimeMap;
+        map<string, string>* lastAddrMap;
+        map<string, int>* execTimeMapTotal;
+        map<string, int> *execTimeMapTotalSelf;
+        map<string, int> *execTimeMapOneInstance;
         //
         ProfileTable* table;
         //
