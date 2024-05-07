@@ -20,6 +20,71 @@ class MainComponent  : public Component, /*public ApplicationCommandTarget,*/ pu
 {
 public:
     //==============================================================================
+    class PerformanceAnalyzer : public juce::Component
+    {
+    public:
+        //
+        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, MainComponent&);
+        ~PerformanceAnalyzer() override;
+        void paint(juce::Graphics&) override;
+        void resized() override;
+        void tableSetSelectedRow(const string&);
+        //
+    private:
+        //
+        class ProfileTable : public Component, public TableListBoxModel {
+        public:
+            //
+            ProfileTable(vector<array<std::string, 6>>& _data, MainComponent &);
+            ~ProfileTable() override;
+            void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
+            void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override;
+            void sortOrderChanged(int newSortColumnId, bool isForwards) override;
+            int getNumRows() override;
+            void resized() override;
+            void setSelectedRow(int);
+            void setSelectedRow(const string&);
+            void clearSelection();
+            //
+        private:
+            //
+            class MyLookAndFeel : public LookAndFeel_V4
+            {
+            public:
+                MyLookAndFeel();
+                //
+                void drawTableHeaderColumn(Graphics& g, TableHeaderComponent& header, const String& columnName, int /*columnId*/, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags) override;
+            };
+            //
+            void cellClicked(int rowNumber, int columnId, const MouseEvent&) override;
+            void selectedRowsChanged(int lastRowSelected) override;
+            //
+            MainComponent *mainComponent;
+            TableListBox box;
+            MyLookAndFeel myLookAndFeel;
+            vector<array<std::string, 6>>* data;
+            string selectedFunc = "";
+            int selectedRow = -1;
+
+        };
+        //
+        MainComponent* mainComponent;
+        //
+        vector<TraceParser::TraceLineStruct>* lines = nullptr;
+        map<string, vector<string>>* funcAddrMap = nullptr;
+        map<string, vector<string>>* callingMap = nullptr;
+        map<string, vector<string>>* callersMap = nullptr;
+        //
+        map<string, int>* timesCalledMap;
+        map<string, int>* execTimeMapTotal;
+        map<string, int>* execTimeMapTotalSelf;
+        map<string, int>* execTimeMapOneInstance;
+        //
+        ProfileTable* table;
+        //
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PerformanceAnalyzer)
+    };
+    //
     class TitlePanel: public Component
     {
     public:
@@ -54,6 +119,22 @@ public:
         //Viewport* CodeViewport;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CodeSubComponent)
+    };
+    //
+    class AnalyzerSubComponent : public Component
+    {
+    public:
+        //
+        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, MainComponent&);
+        ~AnalyzerSubComponent() override;
+        void paint(Graphics&) override;
+        void resized() override;
+        void setSelectedFunc(const string&);
+    private:
+        MainComponent* mainComponent;
+        PerformanceAnalyzer* performanceAnalyzer;
+        //
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnalyzerSubComponent)
     };
     //
     class AsSubComponent: public Component, public TextEditor::Listener
@@ -125,7 +206,7 @@ public:
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OccurancesPanel)
         };
-        AsSubComponent(vector<TraceParser::TraceLineStruct> &vec, CodeSubComponent&);
+        AsSubComponent(vector<TraceParser::TraceLineStruct> &vec, MainComponent&);
         ~AsSubComponent() override;
         void paint (Graphics&) override;
         void resized() override;
@@ -139,7 +220,7 @@ public:
         void decrCurrentSelectedOccurance();
     private:
         void textEditorTextChanged(TextEditor&) override;
-        CodeSubComponent* codeWindow;
+        MainComponent* mainComponent;
         OccurancesPanel* occurancesPanel;
         TextEditor* searchField;
         ComboBox* functionsComboBox;
@@ -150,20 +231,6 @@ public:
         map<string, int> *comboBoxItemID;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AsSubComponent)
-    };
-    //
-    class AnalyzerSubComponent : public Component
-    {
-    public:
-        //
-        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct> &, map<string, vector<string>> &, map<string, vector<string>> &, map<string, vector<string>> &);
-        ~AnalyzerSubComponent() override;
-        void paint(Graphics&) override;
-        void resized() override;
-    private:
-        PerformanceAnalyzer* performanceAnalyzer;
-        //
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnalyzerSubComponent)
     };
     //
     class PlaceholderSubComponent: public Component
@@ -178,12 +245,15 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaceholderSubComponent)
     };
     //
+
+    //
     MainComponent();
     ~MainComponent() override;
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
-
+    void setSelectedFunc(const string&, int callerID);
+    //
 private:
     void createProjectFile();
     void openProjectFile(const string);
@@ -218,3 +288,4 @@ private:
     //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
+//
