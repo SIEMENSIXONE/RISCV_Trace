@@ -59,8 +59,7 @@ void TObjdumpParser::parseFile(const string &filename){
                         FFuncAddrMap->insert({ curFuncName, vecTmp });
                     }
                     else {
-                        vector<string>* vecTmp = &(FFuncAddrMap->at(curFuncName));
-                        vecTmp->push_back(tmp);
+                        (FFuncAddrMap->at(curFuncName)).push_back(tmp);
                     }
                     //
                     string calledFunc = parseFuncName(buf);
@@ -73,8 +72,7 @@ void TObjdumpParser::parseFile(const string &filename){
                             FCallersMap->insert({ calledFunc, tmp });
                         }
                         else {
-                            vector<string>* tmp = &(FCallersMap->at(calledFunc));
-                            tmp->push_back(curFuncName);
+                            (FCallersMap->at(calledFunc)).push_back(curFuncName);
                         }
                         //
                         if (FCallingMap->find(curFuncName) == FCallingMap->end()) {
@@ -83,8 +81,7 @@ void TObjdumpParser::parseFile(const string &filename){
                             FCallingMap->insert({ curFuncName, tmp });
                         }
                         else {
-                            vector<string>* tmp = &(FCallingMap->at(curFuncName));
-                            tmp->push_back(calledFunc);
+                            (FCallingMap->at(curFuncName)).push_back(calledFunc);
                         }
                     }
                 }
