@@ -134,7 +134,6 @@
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\PerformanceAnalyzer.cpp" />
     <ClCompile Include="..\..\Source\CreateProjectWindow.cpp" />
     <ClCompile Include="..\..\Source\CodeParser.cpp" />
     <ClCompile Include="..\..\Source\ProjectParser.cpp" />
@@ -1643,7 +1642,6 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_osc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\PerformanceAnalyzer.h" />
     <ClInclude Include="..\..\Source\CreateProjectWindow.h" />
     <ClInclude Include="..\..\Source\CodeParser.hpp" />
     <ClInclude Include="..\..\Source\ProjectParser.hpp" />

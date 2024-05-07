@@ -314,9 +314,8 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::setSelectedRow(const stri
     for (int i = 0; i < data->size(); i++) {
         array<std::string, 6> row = data->at(i);
         if (row.at(0) == name) {
-            setSelectedRow(i);
             selectedFunc = name;
-            selectedRow = i;
+            setSelectedRow(i);
         }
     }
 }
@@ -373,8 +372,9 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::cellClicked(int rowNumber, int columnId, const MouseEvent&) {
-    //mainComponent->setSelectedFunc(data->at(rowNumber).at(0));
-    selectedRowsChanged(rowNumber);
+    setSelectedRow(rowNumber);
+    array<std::string, 6> row = data->at(rowNumber);
+    selectedFunc = row.at(0);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::selectedRowsChanged(int lastRowSelected) {

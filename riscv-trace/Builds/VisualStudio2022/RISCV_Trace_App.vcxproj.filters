@@ -273,9 +273,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\PerformanceAnalyzer.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Source\CreateProjectWindow.cpp">
       <Filter>RISCV_Trace\Source</Filter>
     </ClCompile>
@@ -1814,9 +1811,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\PerformanceAnalyzer.h">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Source\CreateProjectWindow.h">
       <Filter>RISCV_Trace\Source</Filter>
     </ClInclude>

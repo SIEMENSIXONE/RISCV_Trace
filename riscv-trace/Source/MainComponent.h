@@ -6,7 +6,6 @@
 #include "TraceComponent.h"
 #include "CodeComponent.h"
 #include "CreateProjectWindow.h"
-#include "PerformanceAnalyzer.h"
 #include <array>
 
 //==============================================================================
