@@ -12,8 +12,10 @@
 #include "CodeComponent.h"
 
 //==============================================================================
-CodeComponent::CodeComponent(std::string &code, map<string, string>& funcAddrMap)
+CodeComponent::CodeComponent(std::string& _filename, std::string &code, map<string, string>& funcAddrMap)
 {
+    filename = _filename;
+    //
     codeEditor = new juce::CodeEditorComponent(codeDocument, &cppTokeniser);
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colours::whitesmoke);
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::lineNumberBackgroundId, juce::Colours::grey);
@@ -65,9 +67,13 @@ void CodeComponent::resized()
     codeEditor->setSize(getWidth(), getHeight());
 }
 //
-void CodeComponent::selectFunc(const string& funcName) {
+string CodeComponent::getFilename() {
+    return filename;
+}
+//
+bool CodeComponent::selectFunc(const string& funcName) {
     if (codeInfo.functions.find(funcName) == codeInfo.functions.end()) {
-        return;
+        return false;
     }
     //
     pair<int, int> funcInfo = codeInfo.functions.at(funcName);
@@ -78,5 +84,5 @@ void CodeComponent::selectFunc(const string& funcName) {
     //
     juce::Range<int> range(pos, pos + (int) funcName.length());
     codeEditor->setHighlightedRegion(range);
-    return;
+    return true;
 }

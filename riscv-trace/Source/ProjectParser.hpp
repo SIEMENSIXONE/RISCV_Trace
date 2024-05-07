@@ -9,9 +9,11 @@
 #define ProjectParser_hpp
 //
 #include <stdio.h>
+#include <sstream>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "JSON/json.h"
 //
 using namespace std;
@@ -22,7 +24,7 @@ public:
     struct Project{
         string trace;
         string objdump;
-        string code;
+        vector<string> code;
     };
     //
     TProjectParser();

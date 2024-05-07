@@ -50,7 +50,16 @@ TProjectParser::Project TProjectParser::getProjectFromFile(const string &filenam
         //
         if (flag == OBJDUMP_FLAG) project.objdump = val;
         //
-        if (flag == CODE_FLAG) project.code = val;
+        if (flag == CODE_FLAG) {
+            char delim = ';';
+            std::vector<std::string> elems;
+            std::stringstream ss(val);
+            std::string item;
+            while (getline(ss, item, delim)) {
+                elems.push_back(item);
+            }
+            project.code = elems;
+        }
     }
     //
     fin.close();
@@ -62,10 +71,17 @@ bool TProjectParser::saveProjectToFile(Project &project, const string &filename)
     file.open(filename, std::ios::out);
     //
     if (file.is_open()){
+        string codePaths = "";
+        for (int i = 0; i < project.code.size(); i++) {
+            codePaths += project.code.at(i);
+            codePaths += ';';
+        }
+        //
         file
         << TRACE_FLAG << '|' << project.trace << std::endl
         << OBJDUMP_FLAG << '|' << project.objdump << std::endl
-        << CODE_FLAG << '|' << project.code << std::endl;
+        << CODE_FLAG << '|' << codePaths << std::endl;
+
     }else{
         return false;
     }

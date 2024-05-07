@@ -11,20 +11,33 @@
 #include <JuceHeader.h>
 #include "CreateProjectWindow.h"
 //==============================================================================
-CreateProjectPanel::SetPathPanel::SetPathPanel(string& _val, CreateProjectPanel& _parent)
+CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProjectPanel& _parent, bool multipleFilesFlag)
 {
     parent = &_parent;
-    val = &_val;
-    chooseFileButton = new TextButton("Choose...");
-    chooseFileButton->addListener(this);
-    addAndMakeVisible(chooseFileButton);
+    vals = &_val;
+    if (multipleFilesFlag) {
+        chooseFilesButton = new TextButton("Choose...");
+        chooseFilesButton->addListener(this);
+        addAndMakeVisible(chooseFilesButton);
+    }
+    else {
+        chooseFileButton = new TextButton("Choose...");
+        chooseFileButton->addListener(this);
+        addAndMakeVisible(chooseFileButton);
+    }
 }
 //
 CreateProjectPanel::SetPathPanel::~SetPathPanel()
 {
-    chooseFileButton->removeListener(this);
     //
-    delete(chooseFileButton);
+    if (chooseFileButton != nullptr) {
+        chooseFileButton->removeListener(this);
+        delete(chooseFileButton);
+    }
+    if (chooseFilesButton != nullptr) {
+        chooseFilesButton->removeListener(this);
+        delete(chooseFilesButton);
+    }
 }
 //
 void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
@@ -36,10 +49,16 @@ void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
 
     g.setColour(juce::Colours::black);
     g.setFont(14.0f);
-    string text;
+    string text = "";
+    int pathsNum = vals->size();
     //
-    if (*val == "") text = "Choose...";
-    else text = *val;
+    if (pathsNum == 0) text = "Choose...";
+    else {
+        for (int i = 0; i < pathsNum; i++) {
+            text += vals->at(i);
+            if (i < pathsNum - 1) text += ", ";
+        }
+    }
     //
     g.drawText(text, getLocalBounds(),
         juce::Justification::left, true);   // draw some placeholder text
@@ -48,22 +67,39 @@ void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
 void CreateProjectPanel::SetPathPanel::resized()
 {
     int val = 5;
-    chooseFileButton->setBounds(getWidth() - getWidth()/val, 0, getWidth() / val, getHeight());
+    if (chooseFileButton != nullptr) chooseFileButton->setBounds(getWidth() - getWidth()/val, 0, getWidth() / val, getHeight());
+    if (chooseFilesButton != nullptr) chooseFilesButton->setBounds(getWidth() - getWidth() / val, 0, getWidth() / val, getHeight());
 }
 //
-void CreateProjectPanel::SetPathPanel::setPath(const string& filepath) {
-    *val = filepath;
+void CreateProjectPanel::SetPathPanel::addPath(const string& filepath) {
+    vals->push_back(filepath);
+    parent->refresh();
 }
 //
 void CreateProjectPanel::SetPathPanel::chooseProjectFile() {
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.c;*.cpp;*.txt");
+    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.c;*.h;*.txt");
     auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
         {
             auto file = fc.getResult();
             if (file != File{}) {
-                setPath((file.getFullPathName().toStdString()));
+                addPath((file.getFullPathName().toStdString()));
                 parent->refresh();
+            }
+        });
+}
+//
+void CreateProjectPanel::SetPathPanel::chooseProjectFiles() {
+    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.c;*.h;*.txt");
+    auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectMultipleItems;
+    chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
+        {
+            Array< File > files = fc.getResults();
+            for (File file : files) {
+                if (file != File{}) {
+                    addPath((file.getFullPathName().toStdString()));
+                    parent->refresh();
+                }
             }
         });
 }
@@ -73,6 +109,11 @@ void CreateProjectPanel::SetPathPanel::buttonClicked(Button * button)
     if (button == chooseFileButton)
     {
         chooseProjectFile();
+    }
+    //
+    if (button == chooseFilesButton)
+    {
+        chooseProjectFiles();
     }
 }
 //
@@ -101,9 +142,13 @@ void CreateProjectPanel::TitlePanel::resized()
 //
 CreateProjectPanel::CreateProjectPanel()
 {
+    codePaths = new vector<string>();
+    tracePath = new vector<string>();
+    objdumpPath = new vector<string>();
+    //
     spacerPanel = new TitlePanel("");
     titleTracePanel = new TitlePanel("Choose trace file:");
-    titleCodePanel = new TitlePanel("Choose code file:");
+    titleCodePanel = new TitlePanel("Choose code files:");
     titleObjdumpPanel = new TitlePanel("Choose objdump file:");
     //
     addAndMakeVisible(spacerPanel);
@@ -111,9 +156,9 @@ CreateProjectPanel::CreateProjectPanel()
     addAndMakeVisible(titleCodePanel);
     addAndMakeVisible(titleObjdumpPanel);
     //
-    setTracePathPanel = new SetPathPanel(tracePath, *this);
-    setCodePathPanel = new SetPathPanel(codePath, *this);
-    setObjdumpPathPanel = new SetPathPanel(objdumpPath, *this);
+    setTracePathPanel = new SetPathPanel(*tracePath, *this);
+    setCodePathPanel = new SetPathPanel(*codePaths, *this, true);
+    setObjdumpPathPanel = new SetPathPanel(*objdumpPath, *this);
     //
     addAndMakeVisible(setTracePathPanel);
     addAndMakeVisible(setCodePathPanel);
@@ -178,7 +223,7 @@ void CreateProjectPanel::refresh() {
     resized();
     repaint();
     //
-    if ((tracePath != "") && (codePath != "") && (objdumpPath != "")) {
+    if ((tracePath->size() == 1) && (codePaths->size() > 0) && (objdumpPath->size() == 1)) {
         saveProjectButton->setEnabled(true);
     }
 }
@@ -192,9 +237,9 @@ void CreateProjectPanel::saveProject() {
             if (file != File{})
             {
                 TProjectParser::Project project;
-                project.code = codePath;
-                project.trace = tracePath;
-                project.objdump = objdumpPath;
+                project.code = *codePaths;
+                project.trace = tracePath->at(0);
+                project.objdump = objdumpPath->at(0);
                 TProjectParser::saveProjectToFile(project, file.getFullPathName().toStdString());
                 getParentComponent()->setVisible(false);
             }

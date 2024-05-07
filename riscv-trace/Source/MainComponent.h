@@ -36,13 +36,21 @@ public:
     class CodeSubComponent : public Component
     {
     public:
-        CodeSubComponent(const std::string&, map<string, string>);
+        CodeSubComponent(const std::vector<std::string>&, map<string, string>);
         ~CodeSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
         void selectFunc(const string&);
     private:
-        CodeComponent* CodeWindow;
+        struct MyTabbedComponent final : public TabbedComponent
+        {
+            MyTabbedComponent(vector<CodeComponent*>&);
+            //
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyTabbedComponent)
+        };
+        MyTabbedComponent *tabs;
+        //CodeComponent* CodeWindow;
+        vector<CodeComponent*> *codeWindows;
         //Viewport* CodeViewport;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CodeSubComponent)

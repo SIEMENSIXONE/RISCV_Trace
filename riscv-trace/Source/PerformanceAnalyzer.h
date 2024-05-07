@@ -25,7 +25,7 @@ public:
 	~PerformanceAnalyzer() override;
 	void paint(juce::Graphics&) override;
 	void resized() override;
-
+	//
 private:
 	//
 	class ProfileTable : public Component, public TableListBoxModel {

@@ -336,27 +336,65 @@ void MainComponent::AsSubComponent::textEditorTextChanged(TextEditor& editor) {
     setSelectedFunc(editor.getText().toStdString());
 }
 //
-MainComponent::CodeSubComponent::CodeSubComponent(const std::string &filepath, map<string, string> map){
-    std::string file_content;
-    std::getline(std::ifstream(filepath), file_content, '\0');
-    CodeWindow = new CodeComponent(file_content, map);
-    addAndMakeVisible(CodeWindow);
-    CodeWindow->setSize(5, getParentHeight());
+MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>&filepaths, map<string, string> map){
+    std::vector<std::string> filesContentVector;
+    std::vector<std::string> filesNamesVector;
+    std::vector<std::string> filepathsVector = filepaths;
+    //
+    for (std::vector<std::string>::iterator it = filepathsVector.begin(); it != filepathsVector.end(); it++) {
+        string content;
+        std::getline(std::ifstream(*it), content, '\0');
+        filesContentVector.push_back(content);
+        filesNamesVector.push_back(it->substr(it->find_last_of("/\\") + 1));
+    }
+    //
+    codeWindows = new vector<CodeComponent*>();
+    //
+    for (int i = 0; i < min(filesContentVector.size(), filesNamesVector.size()); i++) {
+        codeWindows->push_back(new CodeComponent(filesNamesVector.at(i), filesContentVector.at(i), map));
+    }
+    //
+    tabs = new MyTabbedComponent(*codeWindows);
+    tabs->setBounds(0, 0, getWidth(), getHeight());
+    addAndMakeVisible(tabs);
 }
 //
 MainComponent::CodeSubComponent::~CodeSubComponent(){
-    delete(CodeWindow);
+    //delete(CodeWindow);
+    delete(codeWindows);
+    delete(tabs);
 }
 //
 void MainComponent::CodeSubComponent::paint (Graphics& g){
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 }
 void MainComponent::CodeSubComponent::resized(){
-    CodeWindow->setSize(getWidth(), CodeWindow->getHeight());
+    //
+    for (vector<CodeComponent*>::iterator it = codeWindows->begin(); it != codeWindows->end(); it++) {
+        (*it)->setSize(getWidth(), getHeight());
+    }
+    //
+    tabs->setBounds(0, 0, getWidth(), getHeight());
 }
 //
 void MainComponent::CodeSubComponent::selectFunc(const string& funcName) {
-    CodeWindow->selectFunc(funcName);
+    int tabIndex = 0;
+    //
+    for (vector<CodeComponent*>::iterator it = codeWindows->begin(); it != codeWindows->end(); it++) {
+        if ((*it)->selectFunc(funcName)) tabs->setCurrentTabIndex(tabIndex);
+        tabIndex++;
+    }
+}
+//
+MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<CodeComponent*>& codeComponents)
+    : TabbedComponent(TabbedButtonBar::TabsAtTop)
+{
+    //auto colour = findColour(ResizableWindow::backgroundColourId);
+    auto colour = juce::Colours::black;
+    //
+    for (vector<CodeComponent*>::iterator it = codeComponents.begin(); it != codeComponents.end(); it++) {
+        addTab((*it)->getFilename(), colour, *it, true);
+    }
 }
 //
 MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap) {
@@ -497,9 +535,10 @@ void MainComponent::openProjectFile(const string filepath) {
     traceParser.addFuncAddresses(addrFuncMap);
     traceParser.markFirstLines(firstFuncAddrMap);
     traceParser.markLastLines(lastFuncAddrMap);
+    //
     codePanel = new CodeSubComponent(project.code, firstFuncAddrMap);
+    //
     asPanel = new AsSubComponent(*vec, *codePanel);
-    //vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap
     analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap);
     addAndMakeVisible(asPanel);
     addAndMakeVisible(codePanel);

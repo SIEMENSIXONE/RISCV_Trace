@@ -23,19 +23,21 @@ public:
     class SetPathPanel : public Component, Button::Listener
     {
     public:
-        SetPathPanel(string &, CreateProjectPanel &);
+        SetPathPanel(vector<string>&, CreateProjectPanel &, bool multipleFilesFlag = false);
         ~SetPathPanel() override;
         void paint(Graphics&) override;
         void resized() override;
     private:
-        void setPath(const string&);
+        void addPath(const string&);
         void chooseProjectFile();
+        void chooseProjectFiles();
         void buttonClicked(Button* button) override;
         File parentDirecory = File::getCurrentWorkingDirectory()/*.getParentDirectory().getParentDirectory()*/;
         String defaultFilepath = parentDirecory.getFullPathName();
         std::unique_ptr<juce::FileChooser> chooser;
-        TextButton* chooseFileButton;
-        string* val;
+        TextButton* chooseFileButton = nullptr;
+        TextButton* chooseFilesButton = nullptr;
+        vector<string> *vals;
         CreateProjectPanel* parent;
         //
 
@@ -61,9 +63,9 @@ public:
     void refresh();
     void saveProject();
     //
-    string tracePath = "";
-    string codePath = "";
-    string objdumpPath = "";
+    vector<string>* tracePath;
+    vector<string> *codePaths;
+    vector<string>* objdumpPath;
     //
 private:
     void buttonClicked(Button* button) override;

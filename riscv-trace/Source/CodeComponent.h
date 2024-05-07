@@ -19,14 +19,17 @@
 class CodeComponent  : public juce::Component
 {
 public:
-    CodeComponent(std::string &, map<string, string>&);
+    CodeComponent(std::string&, std::string &, map<string, string>&);
     ~CodeComponent() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
-    void selectFunc(const string&);
+    string getFilename();
+    bool selectFunc(const string&);
 
 private:
+    string filename;
+    //
     juce::CodeDocument codeDocument;
     juce::CPlusPlusCodeTokeniser cppTokeniser;
     juce::CodeEditorComponent *codeEditor;
