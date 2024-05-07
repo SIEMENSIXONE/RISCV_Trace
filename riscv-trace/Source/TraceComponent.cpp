@@ -64,7 +64,7 @@ void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
     //
     bool funcNameVisibility = traceLine->getLineInfo().isFirstLine;
     g.setColour(borderColor);
-    if (funcNameVisibility) g.drawLine(0, 0, getWidth(), 0);
+    if (funcNameVisibility) g.drawLine(0, 0, (float) getWidth(), 0);
     //
     g.setColour (textColor);
     juce::Font font(fontTypeface, fontSize, fontStyle);
@@ -237,7 +237,7 @@ void TraceComponent::resized()
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
     for (int i = 0; i < FTraceLines->size(); i++){
-        fb.items.add(juce::FlexItem (*FTraceLines->at(i)).withMinWidth (getWidth()).withMinHeight (lineHeight).withMaxHeight (lineHeight));
+        fb.items.add(juce::FlexItem (*FTraceLines->at(i)).withMinWidth ((float) getWidth()).withMinHeight (lineHeight).withMaxHeight (lineHeight));
     }
     //
     fb.performLayout (getLocalBounds());
@@ -306,7 +306,7 @@ int TraceComponent::getViewPosition() {
     return viewport->getViewPositionY();
 }
 //
-void TraceComponent::mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) {
+void TraceComponent::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
     if (wheel.deltaY < 0) setTopLine((topLine + scrollStep));
     if (wheel.deltaY > 0) setTopLine((topLine - scrollStep));
 }

@@ -517,7 +517,7 @@ MainComponent::AnalyzerSubComponent::ProfileTable::ProfileTable(vector<array<std
     box.setColour(ListBox::backgroundColourId, Colour::greyLevel(0.2f));
     box.setRowHeight(30);
     //
-    box.getHeader().addColumn("Name", 1, 1.5 * singleColumnWidth);
+    box.getHeader().addColumn("Name", 1, (int) (1.5 * singleColumnWidth));
     box.getHeader().addColumn("Time", 2, singleColumnWidth);
     box.getHeader().addColumn("Time (%)", 3, singleColumnWidth);
     box.getHeader().addColumn("Called", 4, singleColumnWidth);
@@ -815,7 +815,7 @@ StringArray MainComponent::getMenuBarNames(){
     return {"File"};
 }
 //
-PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& menuName){
+PopupMenu MainComponent::getMenuForIndex (int, const String&){
     PopupMenu menu;
     //
     std::function<void()> createProjFunc = [this]() { createProjectFile(); };
@@ -831,5 +831,5 @@ PopupMenu MainComponent::getMenuForIndex (int menuIndex, const String& menuName)
     return menu;
 }
 //
-void MainComponent::menuItemSelected (int menuItemID, int topLevelMenuIndex){}
+void MainComponent::menuItemSelected (int, int){}
 
