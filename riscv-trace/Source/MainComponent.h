@@ -218,6 +218,8 @@ public:
         void incrCurrentSelectedOccurance();
         void decrCurrentSelectedOccurance();
     private:
+        string defaultSearchfieldText = "Search...";
+        //
         void textEditorTextChanged(TextEditor&) override;
         MainComponent* mainComponent;
         OccurancesPanel* occurancesPanel;

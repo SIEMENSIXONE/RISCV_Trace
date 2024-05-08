@@ -604,7 +604,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
     searchField->setColour(TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::hotpink);
     searchField->setColour(TextEditor::ColourIds::shadowColourId, juce::Colours::grey);
     //
-    searchField->setText("Search...");
+    searchField->setText(defaultSearchfieldText);
 
     addAndMakeVisible(searchField);
     //
@@ -633,7 +633,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
     functionsComboBox->onChange = [this] { 
         selectedFunction = functionsComboBox->getText().toStdString();
         mainComponent->setSelectedFunc(selectedFunction, 1);
-        searchField->setText("Search...");
+        searchField->setText(defaultSearchfieldText);
     };
     //functionsComboBox->getItem
     //functionsComboBox->setSelectedId(1);
@@ -680,6 +680,8 @@ void MainComponent::AsSubComponent::setSelectedFunc(const string& funcName) {
         selectedFunction = funcName;
         selectedFuncOccurance = 0;
         scrollableWindow->scrollToFunc(selectedFunction, selectedFuncOccurance);
+        functionsComboBox->setSelectedId(comboBoxItemID->at(selectedFunction), juce::dontSendNotification());
+        searchField->setText(defaultSearchfieldText, false);
         //mainComponent->setSelectedFunc(selectedFunction);
         occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
         return;

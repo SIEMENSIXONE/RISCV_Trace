@@ -73,6 +73,9 @@ string CodeComponent::getFilename() {
 //
 bool CodeComponent::selectFunc(const string& funcName) {
     if (codeInfo.functions.find(funcName) == codeInfo.functions.end()) {
+        juce::Range<int> range(0, 0);
+        codeEditor->setHighlightedRegion(range);
+        //
         return false;
     }
     //
