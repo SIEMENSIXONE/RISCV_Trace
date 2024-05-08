@@ -30,6 +30,7 @@ public:
     map<string, std::vector<string>> getFuncAddrMap();
     map<string, std::vector<string>> getCallersMap();
     map<string, std::vector<string>> getCallingMap();
+    map<string, pair<string, string>> getAddrCallerCalled();
     //
 protected:
     static bool isADigitHex(const char &);
@@ -40,6 +41,7 @@ protected:
     map<string, std::vector<string>>* FFuncAddrMap;
     map<string, std::vector<string>>* FCallersMap; // called - [callers]
     map<string, std::vector<string>>* FCallingMap; // caller - [called]
+    map<string, pair<string, string>> *FAddrCallerCalled; // call_addr - {caller, called}
 };
 //
 #endif /* ObjdumpParser_hpp */

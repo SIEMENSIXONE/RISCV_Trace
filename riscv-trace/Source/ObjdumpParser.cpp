@@ -13,6 +13,7 @@ TObjdumpParser::TObjdumpParser(){
     FFuncAddrMap = new map<string, vector<string>>();
     FCallersMap = new map<string, vector<string>>();
     FCallingMap = new map<string, vector<string>>();
+    FAddrCallerCalled = new map<string, pair<string, string>>();
 }
 //
 TObjdumpParser::~TObjdumpParser(){
@@ -21,6 +22,7 @@ TObjdumpParser::~TObjdumpParser(){
     delete(FFuncAddrMap);
     delete(FCallersMap);
     delete(FCallingMap);
+    delete(FAddrCallerCalled);
 }
 //
 void TObjdumpParser::parseFile(const string &filename){
@@ -83,6 +85,8 @@ void TObjdumpParser::parseFile(const string &filename){
                         else {
                             (FCallingMap->at(curFuncName)).push_back(calledFunc);
                         }
+                        //
+                        FAddrCallerCalled->insert({tmp, make_pair(curFuncName, calledFunc)});
                     }
                 }
 
@@ -135,7 +139,10 @@ map<string, std::vector<string>> TObjdumpParser::getCallersMap() {
 }
 map<string, std::vector<string>> TObjdumpParser::getCallingMap() {
     return *FCallingMap;
-    //
+}
+//
+map<string, pair<string, string>> TObjdumpParser::getAddrCallerCalled() {
+    return *FAddrCallerCalled;
 }
 //
 bool TObjdumpParser::isADigitHex(const char &c){

@@ -783,7 +783,7 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
     }
 }
 //
-MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, MainComponent& _mainComponent) {
+MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, MainComponent& _mainComponent) {
     mainComponent = &_mainComponent;
     performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, *mainComponent);
     addAndMakeVisible(performanceAnalyzer);
@@ -924,6 +924,7 @@ void MainComponent::openProjectFile(const string filepath) {
     //
     map<string, vector<string>> callingMap = parser->getCallingMap();
     map<string, vector<string>> callersMap = parser->getCallersMap();
+    map<string, pair<string, string>> addrCallerCalled = parser->getAddrCallerCalled();
     //
     //Trace parsing
     vector<TraceParser::TraceLineStruct> *vec = new vector<TraceParser::TraceLineStruct>();
@@ -935,7 +936,7 @@ void MainComponent::openProjectFile(const string filepath) {
     //
     codePanel = new CodeSubComponent(project.code, firstFuncAddrMap);
     //
-    analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, *this);
+    analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, *this);
     asPanel = new AsSubComponent(*vec, *this);
     addAndMakeVisible(asPanel);
     addAndMakeVisible(codePanel);

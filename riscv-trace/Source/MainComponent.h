@@ -124,7 +124,7 @@ public:
     {
     public:
         //
-        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, MainComponent&);
+        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, MainComponent&);
         ~AnalyzerSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
