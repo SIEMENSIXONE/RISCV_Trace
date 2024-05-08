@@ -441,6 +441,10 @@ void MainComponent::AsSubComponent::ScrollableWindow::scrollToFunc(const string 
     }
 }
 //
+void MainComponent::AsSubComponent::ScrollableWindow::clearSelection() {
+    TraceWindow->clearSelections();
+}
+//
 int MainComponent::AsSubComponent::ScrollableWindow::getNumberOfOccurances(const string &funcName){
     vector<int> linesVector = TraceWindow->getFuncLines(funcName);
     return (int) linesVector.size();
@@ -554,6 +558,7 @@ void MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::setNu
 //
 void MainComponent::AsSubComponent::OccurancesPanel::setPanelNumbers(int num, int max){
     numPanel->setNumber(num);
+    if (max <= 0) numPanel->setNumber(-1);
     totalPanel->setNumber(max-1);
     repaint();
     resized();
@@ -674,6 +679,11 @@ int MainComponent::AsSubComponent::getFuncOccuranceNumber(const string& funcName
 //
 void MainComponent::AsSubComponent::setSelectedFunc(const string& funcName) {
     if (funcOccurances->find(funcName) == funcOccurances->end()) {
+        selectedFunction = "";
+        scrollableWindow->clearSelection();
+        functionsComboBox->setSelectedId(0);
+        functionsComboBox->setText("<No entries>");
+        occurancesPanel->setPanelNumbers(0, 0);
         return;
     }
     else {
@@ -682,7 +692,6 @@ void MainComponent::AsSubComponent::setSelectedFunc(const string& funcName) {
         scrollableWindow->scrollToFunc(selectedFunction, selectedFuncOccurance);
         functionsComboBox->setSelectedId(comboBoxItemID->at(selectedFunction), juce::dontSendNotification());
         searchField->setText(defaultSearchfieldText, false);
-        //mainComponent->setSelectedFunc(selectedFunction);
         occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
         return;
     }

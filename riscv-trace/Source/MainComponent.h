@@ -147,6 +147,7 @@ public:
             void paint (Graphics&) override;
             void resized() override;
             void scrollToFunc(const string &, int);
+            void clearSelection();
             int getNumberOfOccurances(const string &);
         private:
             TraceComponent* TraceWindow;

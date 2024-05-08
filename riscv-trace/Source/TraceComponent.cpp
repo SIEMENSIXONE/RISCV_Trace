@@ -300,6 +300,8 @@ void TraceComponent::clearSelections() {
     for (vector<std::unique_ptr<TraceLine>>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
         it->get()->setSelected(false);
     }
+    repaint();
+    resized();
 }
 //
 int TraceComponent::getViewPosition() {
