@@ -271,35 +271,17 @@
     <Filter Include="JUCE Library Code">
       <UniqueIdentifier>{7ED5A90E-41AF-A1EF-659B-37CEEAB9BA61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RISCV_Trace\Source\Source">
+      <UniqueIdentifier>{84e4e735-6a17-4b81-924e-c248e03611c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RISCV_Trace\Source\Headers">
+      <UniqueIdentifier>{2e6f4290-4f81-423b-8b3f-15a854994715}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RISCV_Trace\Source\JSON">
+      <UniqueIdentifier>{d1a6b323-ddf2-4eb1-98ec-4a945fb65359}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Source\CreateProjectWindow.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\CodeParser.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ProjectParser.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\ObjdumpParser.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TraceComponent.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\TraceParser.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\CodeComponent.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\Main.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Source\MainComponent.cpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2ChainShape.cpp">
       <Filter>JUCE Modules\juce_box2d\box2d\Collision\Shapes</Filter>
     </ClCompile>
@@ -1809,32 +1791,35 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_osc.cpp">
       <Filter>JUCE Library Code</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\CodeComponent.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CodeParser.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\CreateProjectWindow.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Main.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\MainComponent.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ObjdumpParser.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ProjectParser.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TraceComponent.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\TraceParser.cpp">
+      <Filter>RISCV_Trace\Source\Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\CreateProjectWindow.h">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\CodeParser.hpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ProjectParser.hpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\ObjdumpParser.hpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\TraceComponent.h">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\TraceParser.hpp">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\CodeComponent.h">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Source\MainComponent.h">
-      <Filter>RISCV_Trace\Source</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2ChainShape.h">
       <Filter>JUCE Modules\juce_box2d\box2d\Collision\Shapes</Filter>
     </ClInclude>
@@ -3481,6 +3466,33 @@
     </ClInclude>
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h">
       <Filter>JUCE Library Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TraceParser.hpp">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\TraceComponent.h">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ProjectParser.hpp">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ObjdumpParser.hpp">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\MainComponent.h">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CreateProjectWindow.h">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CodeParser.hpp">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\CodeComponent.h">
+      <Filter>RISCV_Trace\Source\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\JSON\json.hpp">
+      <Filter>RISCV_Trace\Source\JSON</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

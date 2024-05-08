@@ -945,7 +945,7 @@ void MainComponent::openProjectFile(const string filepath) {
 }
 //
 void MainComponent::chooseProjectFile(){
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.traceproj");
+    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.JSON");
     auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
     {
@@ -955,7 +955,7 @@ void MainComponent::chooseProjectFile(){
 }
 //
 void MainComponent::saveProject(){
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.traceproj");
+    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.JSON");
     auto chooserFlags = FileBrowserComponent::saveMode;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
     {

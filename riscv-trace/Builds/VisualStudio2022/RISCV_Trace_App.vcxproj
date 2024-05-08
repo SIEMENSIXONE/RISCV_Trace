@@ -1644,6 +1644,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\CreateProjectWindow.h" />
     <ClInclude Include="..\..\Source\CodeParser.hpp" />
+    <ClInclude Include="..\..\Source\JSON\json.hpp" />
     <ClInclude Include="..\..\Source\ProjectParser.hpp" />
     <ClInclude Include="..\..\Source\ObjdumpParser.hpp" />
     <ClInclude Include="..\..\Source\TraceComponent.h" />

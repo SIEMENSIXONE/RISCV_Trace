@@ -6,17 +6,21 @@
 //
 //
 #include "ProjectParser.hpp"
+#include <sstream>
 //
 //
-string TRACE_FLAG = "TRAC";
-string OBJDUMP_FLAG = "OBJD";
-string CODE_FLAG = "CODE";
+string TRACE_FLAG = "Trace";
+string OBJDUMP_FLAG = "Objdump";
+string CODE_FLAG = "Code";
+//
+using json = nlohmann::json;
 //
 TProjectParser::TProjectParser() {}
 //
 TProjectParser::~TProjectParser() {}
 //
 TProjectParser::Project TProjectParser::getProjectFromFile(const string &filename) {
+    //
     //
     Project project;
     //
@@ -32,59 +36,36 @@ TProjectParser::Project TProjectParser::getProjectFromFile(const string &filenam
         cout<< "-----------------------------------" <<endl;
         return project;
     }
+    std::ifstream i(filename);
+    json j;
+    i >> j;
+    if (!j.contains(TRACE_FLAG)) return project;
+    if (!j.contains(OBJDUMP_FLAG)) return project;
+    if (!j.contains(CODE_FLAG)) return project;
     //
-    while (getline(fin, buf)){
-        string flag;
-        string val;
-        int flagLength = (int) min(min(TRACE_FLAG.length(), OBJDUMP_FLAG.length()), CODE_FLAG.length());
-        //
-        for(int i = 0; i < flagLength; i++){
-            flag+=buf[i];
-        }
-        //
-        for(int i = flagLength + 1; i < buf.length(); i++){
-            val+=buf[i];
-        }
-        //
-        if (flag == TRACE_FLAG) project.trace = val;
-        //
-        if (flag == OBJDUMP_FLAG) project.objdump = val;
-        //
-        if (flag == CODE_FLAG) {
-            char delim = ';';
-            std::vector<std::string> elems;
-            std::stringstream ss(val);
-            std::string item;
-            while (getline(ss, item, delim)) {
-                elems.push_back(item);
-            }
-            project.code = elems;
-        }
-    }
+    project.trace = j[TRACE_FLAG];
+    project.objdump = j[OBJDUMP_FLAG];
+    project.code = j[CODE_FLAG];
     //
     fin.close();
     return project;
 }
-
+//
 bool TProjectParser::saveProjectToFile(Project &project, const string &filename) {
     std::ofstream file;
     file.open(filename, std::ios::out);
     //
-    if (file.is_open()){
-        string codePaths = "";
-        for (int i = 0; i < project.code.size(); i++) {
-            codePaths += project.code.at(i);
-            codePaths += ';';
-        }
-        //
-        file
-        << TRACE_FLAG << '|' << project.trace << std::endl
-        << OBJDUMP_FLAG << '|' << project.objdump << std::endl
-        << CODE_FLAG << '|' << codePaths << std::endl;
-
-    }else{
+    if (file.is_open()) {
+        json j;
+        j[TRACE_FLAG] = project.trace;
+        j[OBJDUMP_FLAG] = project.objdump;
+        j[CODE_FLAG] = project.code;
+        file << std::setw(4) << j << std::endl;
+    }
+    else {
         return false;
     }
+    //
     file.close();
     return true;
 }

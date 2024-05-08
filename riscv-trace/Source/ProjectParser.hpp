@@ -14,7 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "JSON/json.h"
+#include "JSON/json.hpp"
 //
 using namespace std;
 //

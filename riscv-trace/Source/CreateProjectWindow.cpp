@@ -229,7 +229,7 @@ void CreateProjectPanel::refresh() {
 }
 //
 void CreateProjectPanel::saveProject() {
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.traceproj");
+    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.JSON");
     auto chooserFlags = FileBrowserComponent::saveMode;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
         {
