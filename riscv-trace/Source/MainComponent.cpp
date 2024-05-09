@@ -690,7 +690,7 @@ void MainComponent::AsSubComponent::setSelectedFunc(const string& funcName) {
         selectedFunction = funcName;
         selectedFuncOccurance = 0;
         scrollableWindow->scrollToFunc(selectedFunction, selectedFuncOccurance);
-        functionsComboBox->setSelectedId(comboBoxItemID->at(selectedFunction), juce::dontSendNotification());
+        functionsComboBox->setSelectedId(comboBoxItemID->at(selectedFunction), juce::NotificationType::dontSendNotification);
         searchField->setText(defaultSearchfieldText, false);
         occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
         return;
