@@ -67,15 +67,17 @@ public:
             setUsingNativeTitleBar (true);
             setContentOwned (new MainComponent(), true);
 
-           #if JUCE_IOS || JUCE_ANDROID
-            setFullScreen (true);
+           #if JUCE_MAC
+            setFullScreen (false);
+            setResizable(true, true);
+            centreWithSize(getWidth(), getHeight());
            #else
-            setResizable (true, true);
-            centreWithSize (getWidth(), getHeight());
-           #endif
-
-            setVisible (true);
+            setResizable(true, true);
             setFullScreen(true);
+           #endif
+            //
+            setVisible (true);
+            setResizeLimits(1280, 720, 1920, 1080);
         }
 
         void closeButtonPressed() override
