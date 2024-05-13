@@ -6,6 +6,8 @@
 #include "TraceComponent.h"
 #include "CodeComponent.h"
 #include "CreateProjectWindow.h"
+#include "SettingsWindow.h"
+#include "AboutWindow.h"
 #include <array>
 
 //==============================================================================
@@ -15,10 +17,11 @@
 */
 using namespace juce;
 //
-class MainComponent  : public Component, /*public ApplicationCommandTarget,*/ public MenuBarModel
+class MainComponent  : public Component, public MenuBarModel, public ComponentListener, public Button::Listener
 {
 public:
     //==============================================================================
+    //
     class PerformanceAnalyzer : public juce::Component
     {
     public:
@@ -29,6 +32,7 @@ public:
         void resized() override;
         void tableSetSelectedRow(const string&);
         //
+        void setFontSize(const int);
     private:
         //
         class ProfileTable : public Component, public TableListBoxModel {
@@ -44,6 +48,8 @@ public:
             void setSelectedRow(int);
             void setSelectedRow(const string&);
             void clearSelection();
+            //
+            void setFontSize(const int);
             //
         private:
             //
@@ -64,6 +70,8 @@ public:
             vector<array<std::string, 6>>* data;
             string selectedFunc = "";
             int selectedRow = -1;
+            //
+            int fontSize = 5;
 
         };
         //
@@ -100,11 +108,13 @@ public:
     class CodeSubComponent : public Component
     {
     public:
-        CodeSubComponent(const std::vector<std::string>&, map<string, string>);
+        CodeSubComponent(const std::vector<std::string>&, map<string, string>, MainComponent&);
         ~CodeSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
         void selectFunc(const string&);
+        //
+        void setFontSize(const int);
     private:
         struct MyTabbedComponent final : public TabbedComponent
         {
@@ -112,6 +122,7 @@ public:
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyTabbedComponent)
         };
+        MainComponent* mainComponent;
         MyTabbedComponent *tabs;
         //CodeComponent* CodeWindow;
         vector<CodeComponent*> *codeWindows;
@@ -129,6 +140,8 @@ public:
         void paint(Graphics&) override;
         void resized() override;
         void setSelectedFunc(const string&);
+        //
+        void setFontSize(const int);
     private:
         MainComponent* mainComponent;
         PerformanceAnalyzer* performanceAnalyzer;
@@ -149,12 +162,15 @@ public:
             void scrollToFunc(const string &, int);
             void clearSelection();
             int getNumberOfOccurances(const string &);
+            //
+            void setFontSize(const int);
         private:
             TraceComponent* TraceWindow;
             Viewport* TraceViewport;
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScrollableWindow)
         };
+        //
         class OccurancesPanel: public Component, public Button::Listener
         {
         public:
@@ -210,7 +226,7 @@ public:
         ~AsSubComponent() override;
         void paint (Graphics&) override;
         void resized() override;
-
+        //
         void selectFuncInCombobox(const string&);
         int getFuncOccuranceNumber(const string&);
         void setSelectedFunc(const string&);
@@ -218,6 +234,8 @@ public:
         int getCurrentSelectedOccurance();
         void incrCurrentSelectedOccurance();
         void decrCurrentSelectedOccurance();
+        //
+        void setFontSize(const int);
     private:
         string defaultSearchfieldText = "Search...";
         //
@@ -256,18 +274,31 @@ public:
     void resized() override;
     void setSelectedFunc(const string&, int callerID);
     //
+    TSettingsParser::Settings currentSettings;
+    //
 private:
+    void loadSettings();
     void createProjectFile();
     void openProjectFile(const string);
     void chooseProjectFile();
     void saveProject();
     void closeProjectFile();
+    void openSettingsWindow();
+    void openAboutWindow();
+    void updateCurrentSettings();
+    void setFontSizes();
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
     //
+    void buttonClicked(Button*) override;
+    //
+    void componentVisibilityChanged(Component& component) override;
+    //
     //==============================================================================
     TProjectParser::Project project;
+    //
+    TextButton *saveSettingsButton = nullptr;
     //
     MenuBarComponent *menuBar = nullptr;
     TitlePanel *asPanelTitle = nullptr;
@@ -280,10 +311,12 @@ private:
     PlaceholderSubComponent *placeholderPanel = nullptr;
     //
     CreateProjectWindow* createProjWindow = nullptr;
+    SettingsWindow* settingsWindow = nullptr;
+    AboutWindow* aboutWindow = nullptr;
     //
     std::unique_ptr<juce::FileChooser> chooser;
-    File parentDirecory = File::getCurrentWorkingDirectory()/*.getParentDirectory().getParentDirectory()*/;
-    String defaultFilepath = parentDirecory.getFullPathName();
+    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    String defaultFilepath = parentDirecory.getFullPathName() + "/Projects/";
     //
     int menuHeight = 20;
     bool projectOpened = false;

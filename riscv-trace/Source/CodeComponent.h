@@ -26,7 +26,7 @@ public:
     void resized() override;
     string getFilename();
     bool selectFunc(const string&);
-
+    void setFontSize(const int);
 private:
     string filename;
     //

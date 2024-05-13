@@ -6,7 +6,6 @@
 //
 //
 #include "ProjectParser.hpp"
-#include <sstream>
 //
 //
 string TRACE_FLAG = "Trace";

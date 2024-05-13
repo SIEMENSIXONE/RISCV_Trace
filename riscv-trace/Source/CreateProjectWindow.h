@@ -32,8 +32,8 @@ public:
         void chooseProjectFile();
         void chooseProjectFiles();
         void buttonClicked(Button* button) override;
-        File parentDirecory = File::getCurrentWorkingDirectory()/*.getParentDirectory().getParentDirectory()*/;
-        String defaultFilepath = parentDirecory.getFullPathName();
+        File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+        String defaultFilepath = parentDirecory.getFullPathName() +"/Resources/Files/";
         std::unique_ptr<juce::FileChooser> chooser;
         TextButton* chooseFileButton = nullptr;
         TextButton* chooseFilesButton = nullptr;
@@ -63,6 +63,10 @@ public:
     void refresh();
     void saveProject();
     //
+    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    String defaultSaveFilepath = parentDirecory.getFullPathName() + "/Projects/";
+    String defaultFilepath = parentDirecory.getFullPathName();
+    //
     vector<string>* tracePath;
     vector<string> *codePaths;
     vector<string>* objdumpPath;
@@ -71,8 +75,6 @@ private:
     void buttonClicked(Button* button) override;
     //
     TextButton* saveProjectButton;
-    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
-    String defaultFilepath = parentDirecory.getFullPathName();
     std::unique_ptr<juce::FileChooser> chooser;
     //
     TitlePanel* spacerPanel;
@@ -96,7 +98,7 @@ public:
     {
         setUsingNativeTitleBar(true);
         setContentOwned(new CreateProjectPanel(), true);
-        setResizable(true, true);
+        setResizable(false, false);
         centreWithSize(getWidth(), getHeight());
 
         setSize(500, 300);

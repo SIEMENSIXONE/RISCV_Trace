@@ -167,6 +167,12 @@ void MainComponent::PerformanceAnalyzer::tableSetSelectedRow(const string& funcN
     table->setSelectedRow(funcName);
 }
 //
+void MainComponent::PerformanceAnalyzer::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    table->setFontSize(size);
+}
+//
 MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, MainComponent & _mainComponent) {
     data = &_data;
     mainComponent = &_mainComponent;
@@ -207,9 +213,9 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, in
 {
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
     juce::String fontTypeface = "Courier New";
-    float fontSize = (float)(TraceComponent::lineHeight - 6);
+    //float fontSize = (float)(TraceComponent::lineHeight - 6);
     juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
-    juce::Font font(fontTypeface, fontSize, fontStyle);
+    juce::Font font(fontTypeface, (float) fontSize, fontStyle);
     g.setFont(font);
     std::string val = (data->at(rowNumber)).at(columnId - 1);
     g.drawText(val, 2, 0, width - 4, height, Justification::centred, true);
@@ -326,6 +332,12 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::clearSelection() {
     box.setSelectedRows(sparseSet);
 }
 //
+void MainComponent::PerformanceAnalyzer::ProfileTable::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    fontSize = size;
+}
+//
 MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::MyLookAndFeel()
 {
     setColour(juce::Slider::thumbColourId, juce::Colours::hotpink);
@@ -361,9 +373,9 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
     //
     g.setColour(juce::Colours::white);
     juce::String fontTypeface = "Courier New";
-    float fontSize = (float)(TraceComponent::lineHeight - 8);
+    float headerFontSize = (float)(TraceComponent::lineHeight - 8);
     juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
-    Font font(fontTypeface, fontSize, fontStyle);
+    Font font(fontTypeface, headerFontSize, fontStyle);
     g.setFont(font);
     //
     g.drawFittedText(columnName, area, Justification::centred, 1);
@@ -448,6 +460,12 @@ void MainComponent::AsSubComponent::ScrollableWindow::clearSelection() {
 int MainComponent::AsSubComponent::ScrollableWindow::getNumberOfOccurances(const string &funcName){
     vector<int> linesVector = TraceWindow->getFuncLines(funcName);
     return (int) linesVector.size();
+}
+//
+void MainComponent::AsSubComponent::ScrollableWindow::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    TraceWindow->setFontSize(size);
 }
 //
 MainComponent::AsSubComponent::OccurancesPanel::OccurancesPanel(AsSubComponent &asComp){
@@ -717,12 +735,19 @@ void MainComponent::AsSubComponent::decrCurrentSelectedOccurance(){
     occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
 }
 //
+void MainComponent::AsSubComponent::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    scrollableWindow->setFontSize(size);
+}
 //
 void MainComponent::AsSubComponent::textEditorTextChanged(TextEditor& editor) {
     mainComponent->setSelectedFunc(editor.getText().toStdString(), 1);
 }
 //
-MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>&filepaths, map<string, string> map){
+MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>&filepaths, map<string, string> map, MainComponent& _mainComponent){
+    mainComponent = &_mainComponent;
+    //
     std::vector<std::string> filesContentVector;
     std::vector<std::string> filesNamesVector;
     std::vector<std::string> filepathsVector = filepaths;
@@ -772,6 +797,14 @@ void MainComponent::CodeSubComponent::selectFunc(const string& funcName) {
     }
 }
 //
+void MainComponent::CodeSubComponent::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    for (vector<CodeComponent*>::iterator it = codeWindows->begin(); it != codeWindows->end(); it++) {
+        (*it)->setFontSize(size);
+    }
+}
+//
 MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<CodeComponent*>& codeComponents)
     : TabbedComponent(TabbedButtonBar::TabsAtTop)
 {
@@ -810,6 +843,12 @@ void MainComponent::AnalyzerSubComponent::setSelectedFunc(const string & funcNam
     performanceAnalyzer->tableSetSelectedRow(funcName);
 }
 //
+void MainComponent::AnalyzerSubComponent::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    performanceAnalyzer->setFontSize(size);
+}
+//
 MainComponent::PlaceholderSubComponent::PlaceholderSubComponent(){}
 //
 MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent(){}
@@ -827,6 +866,12 @@ void MainComponent::PlaceholderSubComponent::resized(){}
 //
 MainComponent::MainComponent()
 {
+    currentSettings;
+    loadSettings();
+    //
+    saveSettingsButton = new TextButton("Save");
+    saveSettingsButton->addListener(this);
+    //
     menuBar = new MenuBarComponent(this);
     addAndMakeVisible(menuBar);
     //
@@ -848,6 +893,10 @@ MainComponent::~MainComponent()
     if (codePanel != nullptr) delete(codePanel);
     if (analyzerPanel != nullptr) delete(analyzerPanel);
     if (createProjWindow != nullptr) delete(createProjWindow);
+    if (settingsWindow != nullptr) delete(settingsWindow);
+    if (aboutWindow != nullptr) delete(aboutWindow);
+    //
+    if (saveSettingsButton != nullptr) delete(saveSettingsButton);
 }
 
 //==============================================================================
@@ -884,6 +933,11 @@ void MainComponent::setSelectedFunc(const string& funcName, int callerID) {
     if (callerID != 1) asPanel->setSelectedFunc(funcName);
     if (callerID != 2) codePanel->selectFunc(funcName);
     if (callerID != 3) analyzerPanel->setSelectedFunc(funcName);
+}
+//
+void MainComponent::loadSettings() {
+    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    currentSettings = TSettingsParser::getSettingsFromFile(workingDirectory.getFullPathName().toStdString() + "/config.JSON");
 }
 //
 void MainComponent::createProjectFile() {
@@ -934,10 +988,13 @@ void MainComponent::openProjectFile(const string filepath) {
     traceParser.markFirstLines(firstFuncAddrMap);
     traceParser.markLastLines(lastFuncAddrMap);
     //
-    codePanel = new CodeSubComponent(project.code, firstFuncAddrMap);
     //
+    codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
     analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, *this);
     asPanel = new AsSubComponent(*vec, *this);
+    setFontSizes();
+    //
+    //
     addAndMakeVisible(asPanel);
     addAndMakeVisible(codePanel);
     addAndMakeVisible(analyzerPanel);
@@ -986,26 +1043,89 @@ void MainComponent::closeProjectFile(){
     projectOpened = false;
 }
 //
-StringArray MainComponent::getMenuBarNames(){
-    return {"File"};
+void MainComponent::openSettingsWindow() {
+    if (settingsWindow != nullptr) delete(settingsWindow);
+    settingsWindow = new SettingsWindow("Settings", *saveSettingsButton);
+    settingsWindow->setVisible(false);
+    settingsWindow->addComponentListener(this);
+    settingsWindow->setVisible(true);
+    
 }
 //
-PopupMenu MainComponent::getMenuForIndex (int, const String&){
+void MainComponent::openAboutWindow() {
+    if (aboutWindow != nullptr) delete(aboutWindow);
+    aboutWindow = new AboutWindow("About");
+    aboutWindow->setVisible(true);
+}
+//
+void MainComponent::updateCurrentSettings() {
+    if (projectOpened) {
+        setFontSizes();
+    }
+}
+//
+void MainComponent::setFontSizes() {
+    analyzerPanel->setFontSize(currentSettings.analyzerFontSize);
+    codePanel->setFontSize(currentSettings.codeFontSize);
+    asPanel->setFontSize(currentSettings.traceFontSize);
+    repaint();
+    resized();
+}
+//
+StringArray MainComponent::getMenuBarNames(){
+    return {"File", "Settings", "Help" };
+}
+//
+PopupMenu MainComponent::getMenuForIndex (int index, const String&){
     PopupMenu menu;
+    //File
+    if (index == 0) {
+        //
+        std::function<void()> createProjFunc = [this]() { createProjectFile(); };
+        std::function<void()> chooseProjFunc = [this]() { chooseProjectFile(); };
+        std::function<void()> saveProjFunc = [this]() { saveProject(); };
+        std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
+        //
+        menu.addItem(String("New"), createProjFunc);
+        menu.addItem(String("Open..."), chooseProjFunc);
+        menu.addItem(String("Save..."), saveProjFunc);
+        menu.addItem(String("Close"), closeProjFunc);
+    }
     //
-    std::function<void()> createProjFunc = [this]() { createProjectFile(); };
-    std::function<void()> chooseProjFunc = [this]() { chooseProjectFile(); };
-    std::function<void()> saveProjFunc = [this]() { saveProject(); };
-    std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
+    //Settings
+    else if (index == 1) {
+        std::function<void()> openGeneralSettings = [this]() { openSettingsWindow(); };
+        //
+        menu.addItem(String("General"), openGeneralSettings);
+    }
     //
-    menu.addItem(String("New"), createProjFunc);
-    menu.addItem(String("Open..."), chooseProjFunc);
-    menu.addItem(String("Save..."), saveProjFunc);
-    menu.addItem(String("Close"), closeProjFunc);
-    //
+    //Help
+    else if (index == 2) {
+        std::function<void()> openAboutProgram = [this]() { openAboutWindow(); };
+        //
+        menu.addItem(String("About"), openAboutProgram);
+    }
     return menu;
 }
 //
-void MainComponent::menuItemSelected (int, int){}
+void MainComponent::menuItemSelected (int	menuItemID, int	topLevelMenuIndex){}
 //
+void MainComponent::buttonClicked(Button* button) {
+    if (button == saveSettingsButton) {
+        loadSettings();
+        updateCurrentSettings();
+    }
+}
 
+//
+void MainComponent::componentVisibilityChanged(Component& component) {
+    if (component.isVisible()) {
+        //visible
+        //need to disable frame somehow
+    }
+    else {
+        //not visible
+        //loadSettings();
+        //updateCurrentSettings();
+    }
+}

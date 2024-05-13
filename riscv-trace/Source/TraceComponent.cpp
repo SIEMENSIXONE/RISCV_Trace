@@ -13,7 +13,8 @@
 
 //==============================================================================
 //
-TraceComponent::TraceLine::TraceLineElement::TraceLineElement(const std::string &str){
+TraceComponent::TraceLine::TraceLineElement::TraceLineElement(const std::string &str, TraceComponent& _traceComp){
+    traceComp = &_traceComp;
     text = str;
 }
 //
@@ -27,7 +28,7 @@ void TraceComponent::TraceLine::TraceLineElement::paint (juce::Graphics& g){
     g.drawRect (getLocalBounds(), 1);
     //
     g.setColour (textColor);
-    juce::Font font(fontTypeface, fontSize, fontStyle);
+    juce::Font font(fontTypeface, traceComp->fontSize, fontStyle);
     g.setFont(font);
     
     g.drawText (text, textXOffset, 0, getWidth(), getHeight(), textJustification, true);
@@ -43,11 +44,11 @@ string TraceComponent::TraceLine::TraceLineElement::getText() {
 }
 //
 TraceComponent::TraceLine::TraceFuncElement::TraceFuncElement(const std::string &str, TraceLine &_traceLine, TraceComponent &_traceComp)
-:TraceLineElement(str)
+:TraceLineElement(str, _traceComp)
 {
-    fontSize = lineHeight;
+    //fontSize = lineHeight;
     traceLine = &_traceLine;
-    traceComp = &_traceComp;
+    //traceComp = &_traceComp;
     //addMouseListener(this, false);
 }
 //
@@ -67,7 +68,7 @@ void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
     if (funcNameVisibility) g.drawLine(0, 0, (float) getWidth(), 0);
     //
     g.setColour (textColor);
-    juce::Font font(fontTypeface, fontSize, fontStyle);
+    juce::Font font(fontTypeface, traceComp->fontSize, fontStyle);
     g.setFont(font);
     if (funcNameVisibility) g.drawText (text, getLocalBounds(), textJustification, true);
 }
@@ -82,10 +83,10 @@ TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, j
     defaultFuncTextColour = juce::Colours::white;
     selectedFuncTextColour = juce::Colours::hotpink;
     //
-    time = new TraceLineElement(std::to_string(lineInfo.time));
-    addr = new TraceLineElement("0x" + lineInfo.addr);
+    time = new TraceLineElement(std::to_string(lineInfo.time), *traceComp);
+    addr = new TraceLineElement("0x" + lineInfo.addr, *traceComp);
     func = new TraceFuncElement(lineInfo.func, *this, *traceComp);
-    instr = new TraceLineElement(lineInfo.instr);
+    instr = new TraceLineElement(lineInfo.instr, *traceComp);
     //
     time->backgroundColor = juce::Colours::grey;
     time->borderColor = defaultBorderColour;
@@ -306,6 +307,12 @@ void TraceComponent::clearSelections() {
 //
 int TraceComponent::getViewPosition() {
     return viewport->getViewPositionY();
+}
+//
+void TraceComponent::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    fontSize = size;
 }
 //
 void TraceComponent::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {

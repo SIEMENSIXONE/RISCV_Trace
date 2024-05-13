@@ -1,0 +1,7 @@
+{
+    "Code": [
+        "C:\\Users\\veselyaev\\Documents\\RISCV_Trace\\riscv-trace\\Resources\\Files\\main.c"
+    ],
+    "Objdump": "C:\\Users\\veselyaev\\Documents\\RISCV_Trace\\riscv-trace\\Resources\\Files\\objdump.txt",
+    "Trace": "C:\\Users\\veselyaev\\Documents\\RISCV_Trace\\riscv-trace\\Resources\\Files\\instructions_output.txt"
+}

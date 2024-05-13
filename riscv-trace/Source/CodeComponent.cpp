@@ -39,7 +39,6 @@ CodeComponent::CodeComponent(std::string& _filename, std::string &code, map<stri
     myColourScheme.set("Punctuation", juce::Colours::black);
     myColourScheme.set("Preprocessor Text", juce::Colours::darkorange);
     codeEditor->setColourScheme(myColourScheme);
-    ////////////////////////////////////////////////////////////////
     //
     codeInfo = TCodeParser::getCodeFromFile(code, funcAddrMap);
     //
@@ -88,4 +87,12 @@ bool CodeComponent::selectFunc(const string& funcName) {
     juce::Range<int> range(pos, pos + (int) funcName.length());
     codeEditor->setHighlightedRegion(range);
     return true;
+}
+//
+void CodeComponent::setFontSize(const int size) {
+    if (size < 0) return;
+    //
+    juce::Font font = codeEditor->getFont();
+    font.setHeight(size);
+    codeEditor->setFont(font);
 }

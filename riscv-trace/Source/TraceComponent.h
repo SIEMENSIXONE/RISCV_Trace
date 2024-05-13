@@ -30,14 +30,14 @@ public:
         class TraceLineElement : public juce::Component
         {
         public:
-            TraceLineElement(const std::string &);
+            TraceLineElement(const std::string &, TraceComponent&);
             ~TraceLineElement();
             void paint (juce::Graphics&) override;
             void resized() override;
             string getText();
             //
             juce::String fontTypeface = "Courier New";
-            float fontSize = (float) (lineHeight - 4);
+            //float fontSize = (float) (lineHeight - 4);
             juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::plain;
             //
             juce::Colour borderColor = juce::Colours::black;
@@ -46,6 +46,7 @@ public:
             //
             juce::Justification textJustification = juce::Justification::centred;
             int textXOffset = 0;
+            TraceComponent* traceComp;
         protected:
             std::string text;
             //
@@ -60,7 +61,6 @@ public:
             void paint (juce::Graphics&) override;
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceFuncElement)
         private:
-            TraceComponent* traceComp;
             TraceLine* traceLine;
         };
         //
@@ -103,6 +103,9 @@ public:
     void jumpToSelectedLine();
     void clearSelections();
     int getViewPosition();
+    void setFontSize(const int);
+    //
+    int fontSize = 5;
 private:
     void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     juce::Colour headerBackgroundColour = juce::Colours::grey;

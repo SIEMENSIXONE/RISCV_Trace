@@ -4,10 +4,16 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="SghTuz" name="RISCV_Trace">
     <GROUP id="{EDAA3E03-AFD0-589E-C685-DC96070FECA2}" name="Source">
-      <FILE id="wg0Bcf" name="PerformanceAnalyzer.cpp" compile="1" resource="0"
-            file="Source/PerformanceAnalyzer.cpp"/>
-      <FILE id="Beq52r" name="PerformanceAnalyzer.h" compile="0" resource="0"
-            file="Source/PerformanceAnalyzer.h"/>
+      <FILE id="EcktmO" name="AboutWindow.h" compile="0" resource="0" file="Source/AboutWindow.h"/>
+      <FILE id="mC6fIu" name="AboutWindow.cpp" compile="1" resource="0" file="Source/AboutWindow.cpp"/>
+      <FILE id="TKs9CJ" name="SettingsParser.hpp" compile="0" resource="0"
+            file="Source/SettingsParser.hpp"/>
+      <FILE id="hOma5N" name="SettingsParser.cpp" compile="1" resource="0"
+            file="Source/SettingsParser.cpp"/>
+      <FILE id="k4yYS4" name="SettingsWindow.h" compile="0" resource="0"
+            file="Source/SettingsWindow.h"/>
+      <FILE id="cLSBKM" name="SettingsWindow.cpp" compile="1" resource="0"
+            file="Source/SettingsWindow.cpp"/>
       <FILE id="yBoRNr" name="CreateProjectWindow.h" compile="0" resource="0"
             file="Source/CreateProjectWindow.h"/>
       <FILE id="GCyGkU" name="CreateProjectWindow.cpp" compile="1" resource="0"
@@ -31,8 +37,6 @@
       <FILE id="UOZOc7" name="CodeComponent.cpp" compile="1" resource="0"
             file="Source/CodeComponent.cpp"/>
       <FILE id="ji7ZD5" name="CodeComponent.h" compile="0" resource="0" file="Source/CodeComponent.h"/>
-      <FILE id="Qh40sE" name="AssemblyTrace.cpp" compile="1" resource="0"
-            file="Source/AssemblyTrace.cpp"/>
       <FILE id="APZguP" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="j5ovZk" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="EF6Zml" name="MainComponent.cpp" compile="1" resource="0"
