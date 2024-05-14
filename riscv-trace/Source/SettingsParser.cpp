@@ -21,7 +21,7 @@ TSettingsParser::~TSettingsParser() {}
 TSettingsParser::Settings TSettingsParser::getSettingsFromFile(const string &filename) {
     //
     //
-    Settings settings;
+    Settings settings = *new Settings();
     //
     string result;
     string buf;

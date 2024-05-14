@@ -210,7 +210,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
     box.getHeader().setLookAndFeel(nullptr);
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int /*rowNumber*/, int width, int height, bool rowIsSelected)
 {
     g.setColour(juce::Colours::white);
     if (rowIsSelected) g.setColour(juce::Colours::hotpink);
@@ -420,7 +420,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
     g.drawRect(0, 0, width, height);
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileTable::cellClicked(int rowNumber, int columnId, const MouseEvent&) {
+void MainComponent::PerformanceAnalyzer::ProfileTable::cellClicked(int rowNumber, int /*columnId*/, const MouseEvent&) {
     setSelectedRow(rowNumber);
     array<std::string, 6> row = data->at(rowNumber);
     selectedFunc = row.at(0);
@@ -861,7 +861,7 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
     }
 }
 //
-MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent) {
+MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& /*_addrCallingCalledMap*/, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent) {
     mainComponent = &_mainComponent;
     performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _funcColoursMap, *mainComponent);
     addAndMakeVisible(performanceAnalyzer);
@@ -1158,7 +1158,7 @@ PopupMenu MainComponent::getMenuForIndex (int index, const String&){
     return menu;
 }
 //
-void MainComponent::menuItemSelected (int	menuItemID, int	topLevelMenuIndex){}
+void MainComponent::menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/){}
 //
 void MainComponent::buttonClicked(Button* button) {
     if (button == saveSettingsButton) {

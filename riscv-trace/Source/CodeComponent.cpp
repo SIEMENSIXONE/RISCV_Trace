@@ -93,6 +93,6 @@ void CodeComponent::setFontSize(const int size) {
     if (size < 0) return;
     //
     juce::Font font = codeEditor->getFont();
-    font.setHeight(size);
+    font.setHeight((float) size);
     codeEditor->setFont(font);
 }

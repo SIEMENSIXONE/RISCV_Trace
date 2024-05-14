@@ -69,18 +69,18 @@ void TObjdumpParser::parseFile(const string &filename){
                     if (calledFunc != "") {
                         //
                         if (FCallersMap->find(calledFunc) == FCallersMap->end()) {
-                            vector<string> tmp;
-                            tmp.push_back(curFuncName);
-                            FCallersMap->insert({ calledFunc, tmp });
+                            vector<string> tmpVec;
+                            tmpVec.push_back(curFuncName);
+                            FCallersMap->insert({ calledFunc, tmpVec });
                         }
                         else {
                             (FCallersMap->at(calledFunc)).push_back(curFuncName);
                         }
                         //
                         if (FCallingMap->find(curFuncName) == FCallingMap->end()) {
-                            vector<string> tmp;
-                            tmp.push_back(calledFunc);
-                            FCallingMap->insert({ curFuncName, tmp });
+                            vector<string> tmpVec;
+                            tmpVec.push_back(calledFunc);
+                            FCallingMap->insert({ curFuncName, tmpVec });
                         }
                         else {
                             (FCallingMap->at(curFuncName)).push_back(calledFunc);

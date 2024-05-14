@@ -50,7 +50,7 @@ void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
     g.setColour(juce::Colours::black);
     g.setFont(14.0f);
     string text = "";
-    int pathsNum = vals->size();
+    int pathsNum = (int) vals->size();
     //
     if (pathsNum == 0) text = "Choose...";
     else {

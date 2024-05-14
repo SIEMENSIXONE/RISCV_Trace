@@ -28,7 +28,7 @@ void TraceComponent::TraceLine::TraceLineElement::paint (juce::Graphics& g){
     g.drawRect (getLocalBounds(), 1);
     //
     g.setColour (textColor);
-    juce::Font font(fontTypeface, traceComp->fontSize, fontStyle);
+    juce::Font font(fontTypeface, (float) traceComp->fontSize, fontStyle);
     g.setFont(font);
     
     g.drawText (text, textXOffset, 0, getWidth(), getHeight(), textJustification, true);
@@ -68,7 +68,7 @@ void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
     if (funcNameVisibility) g.drawLine(0, 0, (float) getWidth(), 0);
     //
     g.setColour (textColor);
-    juce::Font font(fontTypeface, traceComp->fontSize, fontStyle);
+    juce::Font font(fontTypeface, (float) traceComp->fontSize, fontStyle);
     g.setFont(font);
     if (funcNameVisibility) g.drawText (text, getLocalBounds(), textJustification, true);
 }
