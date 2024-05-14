@@ -181,8 +181,9 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
     box.setColour(ListBox::backgroundColourId, Colour::greyLevel(0.2f));
     box.setRowHeight(30);
     //
-    int width = getParentWidth();
-    int singleColumnWidth = (3 * (width / 10)) / 7;
+    int width = getWidth();
+    if (width <= 0) width = 7;
+    int singleColumnWidth = width / 7;
     //
     box.getHeader().addColumn("Name", 1, (int)(2 * singleColumnWidth));
     box.getHeader().addColumn("Time", 2, singleColumnWidth);
@@ -207,6 +208,8 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphi
     g.fillRect(0, 0, width, height);
     g.setColour(juce::Colours::white);
     g.drawRect(0, 0, width, height);
+    //!!!
+    box.getHorizontalScrollBar().setVisible(false);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/)
@@ -306,7 +309,16 @@ int MainComponent::PerformanceAnalyzer::ProfileTable::getNumRows() {
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::resized() {
+    //
     box.setBounds(getLocalBounds());
+    int width = getWidth();
+    int singleColumnWidth = width / 7;
+    //
+    for (int i = 0; i < box.getHeader().getNumColumns(true); i++) {
+        int columnId = box.getHeader().getColumnIdOfIndex(i, true);
+        if (columnId == 1) box.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth);
+        else box.getHeader().setColumnWidth(columnId, singleColumnWidth);
+    }
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::setSelectedRow(int index) {
@@ -921,7 +933,7 @@ void MainComponent::resized()
     if (projectOpened){
         Grid grid;
         grid.templateRows = {Track (Fr (1)), Track (Fr (20)) };
-        grid.templateColumns = { Track (Fr (3)), Track (Fr (4)), Track(Fr(3))};
+        grid.templateColumns = { Track (Fr (2)), Track (Fr (4)), Track(Fr(2))};
         grid.items = {GridItem (asPanelTitle), GridItem (codePanelTitle), GridItem(analyzerPanelTitle), GridItem (asPanel), GridItem (codePanel), GridItem(analyzerPanel)};
         grid.performLayout (workspaceArea);
     }else{
