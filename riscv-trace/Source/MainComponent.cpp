@@ -149,9 +149,9 @@ MainComponent::PerformanceAnalyzer::~PerformanceAnalyzer()
 //
 void MainComponent::PerformanceAnalyzer::paint(juce::Graphics& g)
 {
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll(juce::Colours::white);
 
-    g.setColour(juce::Colours::grey);
+    g.setColour(juce::Colours::white);
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour(juce::Colours::white);
@@ -191,13 +191,16 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
     if (width <= 0) width = 7;
     int singleColumnWidth = width / 7;
     //
-    box.getHeader().addColumn("Name", 1, (int)(2 * singleColumnWidth));
+    box.getHeader().addColumn("Name", 1, 2 * singleColumnWidth);
     box.getHeader().addColumn("Time", 2, singleColumnWidth);
     box.getHeader().addColumn("Time (%)", 3, singleColumnWidth);
     box.getHeader().addColumn("Called", 4, singleColumnWidth);
     box.getHeader().addColumn("Children (%)", 5, singleColumnWidth);
     box.getHeader().addColumn("Self (%)", 6, singleColumnWidth);
     box.getHeader().setLookAndFeel(&myLookAndFeel);
+    //
+    box.getVerticalScrollBar().setVisible(true);
+    box.getVerticalScrollBar().setAutoHide(false);
     //
     addAndMakeVisible(box);
     //
@@ -220,7 +223,6 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, in
 {
     g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
     juce::String fontTypeface = "Courier New";
-    //float fontSize = (float)(TraceComponent::lineHeight - 6);
     juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
     juce::Font font(fontTypeface, (float) fontSize, fontStyle);
     g.setFont(font);
@@ -323,10 +325,11 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::resized() {
     box.setBounds(getLocalBounds());
     int width = getWidth();
     int singleColumnWidth = width / 7;
+    int scrollbarWidth = box.getVerticalScrollBar().getWidth();
     //
     for (int i = 0; i < box.getHeader().getNumColumns(true); i++) {
         int columnId = box.getHeader().getColumnIdOfIndex(i, true);
-        if (columnId == 1) box.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth);
+        if (columnId == 1) box.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth - scrollbarWidth);
         else box.getHeader().setColumnWidth(columnId, singleColumnWidth);
     }
 }
@@ -407,7 +410,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
     //
     g.setColour(juce::Colours::white);
     juce::String fontTypeface = "Courier New";
-    float headerFontSize = (float)(TraceComponent::lineHeight - 8);
+    float headerFontSize = (float)(11);
     juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
     Font font(fontTypeface, headerFontSize, fontStyle);
     g.setFont(font);
@@ -870,9 +873,9 @@ MainComponent::AnalyzerSubComponent::~AnalyzerSubComponent() {
 //
 void MainComponent::AnalyzerSubComponent::paint(Graphics& g) {
     g.fillAll(juce::Colours::white);
-    g.setColour(juce::Colours::black);
+    g.setColour(juce::Colours::white);
     g.drawRect(getLocalBounds(), 1);
-    g.setColour(juce::Colours::black);
+    g.setColour(juce::Colours::white);
     g.setFont(22.0f);
     g.drawText("AnalyzerSubComponent", getLocalBounds(), juce::Justification::centred, true);
 }
