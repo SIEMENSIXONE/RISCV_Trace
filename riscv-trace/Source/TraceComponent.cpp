@@ -176,7 +176,7 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::
     funcLines = new map<string, vector<int>>();
     //
     for (int i = 0; i < (&vec)->size(); i++) {
-        if ((&vec)->at(i).func != "") funcColours->insert({(&vec)->at(i).func, juce::Colour((rand() % 255), (rand() % 255), (rand() % 255))});
+        if ((&vec)->at(i).func != "") funcColours->insert({(&vec)->at(i).func, juce::Colour((rand() % 180), (rand() % 180), (rand() % 180))});
     }
     //
     FTraceLines = new std::vector<std::unique_ptr<TraceLine>>();
@@ -313,6 +313,10 @@ void TraceComponent::setFontSize(const int size) {
     if (size < 0) return;
     //
     fontSize = size;
+}
+//
+map<string, juce::Colour> TraceComponent::getFuncColoursMap() {
+    return *funcColours;
 }
 //
 void TraceComponent::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {

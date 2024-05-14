@@ -26,7 +26,7 @@ public:
     {
     public:
         //
-        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, MainComponent&);
+        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, juce::Colour>&, MainComponent&);
         ~PerformanceAnalyzer() override;
         void paint(juce::Graphics&) override;
         void resized() override;
@@ -38,7 +38,7 @@ public:
         class ProfileTable : public Component, public TableListBoxModel {
         public:
             //
-            ProfileTable(vector<array<std::string, 6>>& _data, MainComponent &);
+            ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>&, MainComponent &);
             ~ProfileTable() override;
             void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
             void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override;
@@ -48,6 +48,7 @@ public:
             void setSelectedRow(int);
             void setSelectedRow(const string&);
             void clearSelection();
+            void refreshRowsColoursMap();
             //
             void setFontSize(const int);
             //
@@ -67,8 +68,10 @@ public:
             MainComponent *mainComponent;
             TableListBox box;
             MyLookAndFeel myLookAndFeel;
-            vector<array<std::string, 6>>* data;
+            vector<array<std::string, 6>> *data;
             string selectedFunc = "";
+            map<string, juce::Colour> funcColoursMap;
+            map<int, juce::Colour> rowsColoursMap;
             int selectedRow = -1;
             //
             int fontSize = 5;
@@ -86,6 +89,8 @@ public:
         map<string, int>* execTimeMapTotal;
         map<string, int>* execTimeMapTotalSelf;
         map<string, int>* execTimeMapOneInstance;
+        //
+        map<string, juce::Colour>* funcColoursMap;
         //
         ProfileTable* table;
         //
@@ -135,7 +140,7 @@ public:
     {
     public:
         //
-        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, MainComponent&);
+        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour> &, MainComponent&);
         ~AnalyzerSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
@@ -162,6 +167,7 @@ public:
             void scrollToFunc(const string &, int);
             void clearSelection();
             int getNumberOfOccurances(const string &);
+            map<string, juce::Colour> getFuncColoursMap();
             //
             void setFontSize(const int);
         private:
@@ -234,6 +240,7 @@ public:
         int getCurrentSelectedOccurance();
         void incrCurrentSelectedOccurance();
         void decrCurrentSelectedOccurance();
+        map<string, juce::Colour> getFuncColoursMap();
         //
         void setFontSize(const int);
     private:

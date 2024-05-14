@@ -104,6 +104,7 @@ public:
     void clearSelections();
     int getViewPosition();
     void setFontSize(const int);
+    map<string, juce::Colour> getFuncColoursMap();
     //
     int fontSize = 5;
 private:
