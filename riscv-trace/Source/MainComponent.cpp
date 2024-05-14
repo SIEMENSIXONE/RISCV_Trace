@@ -1055,6 +1055,8 @@ void MainComponent::openSettingsWindow() {
 void MainComponent::openAboutWindow() {
     if (aboutWindow != nullptr) delete(aboutWindow);
     aboutWindow = new AboutWindow("About");
+    aboutWindow->setVisible(false);
+    aboutWindow->addComponentListener(this);
     aboutWindow->setVisible(true);
 }
 //
@@ -1078,32 +1080,34 @@ StringArray MainComponent::getMenuBarNames(){
 //
 PopupMenu MainComponent::getMenuForIndex (int index, const String&){
     PopupMenu menu;
-    //File
-    if (index == 0) {
+    if (isEnabled()) {
+        //File
+        if (index == 0) {
+            //
+            std::function<void()> createProjFunc = [this]() { createProjectFile(); };
+            std::function<void()> chooseProjFunc = [this]() { chooseProjectFile(); };
+            std::function<void()> saveProjFunc = [this]() { saveProject(); };
+            std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
+            //
+            menu.addItem(String("New"), createProjFunc);
+            menu.addItem(String("Open..."), chooseProjFunc);
+            menu.addItem(String("Save..."), saveProjFunc);
+            menu.addItem(String("Close"), closeProjFunc);
+        }
         //
-        std::function<void()> createProjFunc = [this]() { createProjectFile(); };
-        std::function<void()> chooseProjFunc = [this]() { chooseProjectFile(); };
-        std::function<void()> saveProjFunc = [this]() { saveProject(); };
-        std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
+        //Settings
+        else if (index == 1) {
+            std::function<void()> openGeneralSettings = [this]() { openSettingsWindow(); };
+            //
+            menu.addItem(String("General"), openGeneralSettings);
+        }
         //
-        menu.addItem(String("New"), createProjFunc);
-        menu.addItem(String("Open..."), chooseProjFunc);
-        menu.addItem(String("Save..."), saveProjFunc);
-        menu.addItem(String("Close"), closeProjFunc);
-    }
-    //
-    //Settings
-    else if (index == 1) {
-        std::function<void()> openGeneralSettings = [this]() { openSettingsWindow(); };
-        //
-        menu.addItem(String("General"), openGeneralSettings);
-    }
-    //
-    //Help
-    else if (index == 2) {
-        std::function<void()> openAboutProgram = [this]() { openAboutWindow(); };
-        //
-        menu.addItem(String("About"), openAboutProgram);
+        //Help
+        else if (index == 2) {
+            std::function<void()> openAboutProgram = [this]() { openAboutWindow(); };
+            //
+            menu.addItem(String("About"), openAboutProgram);
+        }
     }
     return menu;
 }
@@ -1121,11 +1125,17 @@ void MainComponent::buttonClicked(Button* button) {
 void MainComponent::componentVisibilityChanged(Component& component) {
     if (component.isVisible()) {
         //visible
-        //need to disable frame somehow
+        component.setAlwaysOnTop(true);
+        this->setEnabled(false);
+        //
+        repaint();
+        resized();
     }
     else {
         //not visible
-        //loadSettings();
-        //updateCurrentSettings();
+        this->setEnabled(true);
+        //
+        repaint();
+        resized();
     }
 }
