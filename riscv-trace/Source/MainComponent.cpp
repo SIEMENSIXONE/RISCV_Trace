@@ -159,7 +159,7 @@ void MainComponent::PerformanceAnalyzer::paint(juce::Graphics& g)
 //
 void MainComponent::PerformanceAnalyzer::resized()
 {
-    int borderSize = 10;
+    int borderSize = 0;
     table->setBounds(borderSize, borderSize, getWidth() - 2 * borderSize, getHeight() - 2 * borderSize);
     //table->setSize(getWidth(), getHeight());
 }
@@ -441,8 +441,8 @@ MainComponent::TitlePanel::~TitlePanel(){
 void MainComponent::TitlePanel::paint (Graphics& g)
 {
     g.fillAll (Colour(187, 148, 174));   // clear the background
-    g.setColour (Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    g.setColour (Colour(37, 11, 46));
+    g.drawRect (getLocalBounds(), 2);   // draw an outline around the component
     g.setColour (Colours::white);
     g.setFont (14.0f);
     g.drawText (text, getLocalBounds(), Justification::centred, true);   // draw some placeholder text
@@ -660,6 +660,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
     functionsComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
     functionsComboBox->setEditableText(false);
     //
+    //
     searchField = new TextEditor("searchField");
     searchField->setMultiLine(false);
     searchField->addListener(this);
@@ -697,6 +698,10 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
         }
  
     }
+    //
+    lf;
+    lf.setColour(PopupMenu::ColourIds::backgroundColourId, Colour(37, 11, 46));
+    functionsComboBox->getRootMenu()->setLookAndFeel(&lf);
     //
     functionsComboBox->onChange = [this] { 
         selectedFunction = functionsComboBox->getText().toStdString();
@@ -827,14 +832,16 @@ MainComponent::CodeSubComponent::~CodeSubComponent(){
 //
 void MainComponent::CodeSubComponent::paint (Graphics& g){
     g.fillAll (Colour(94, 60, 82));
+    g.setColour(Colour(37, 11, 46));
+    g.drawRect(getLocalBounds(), borderThickness);
 }
 void MainComponent::CodeSubComponent::resized(){
     //
     for (vector<CodeComponent*>::iterator it = codeWindows->begin(); it != codeWindows->end(); it++) {
-        (*it)->setSize(getWidth(), getHeight());
+        (*it)->setSize(getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness);
     }
     //
-    tabs->setBounds(0, 0, getWidth(), getHeight());
+    tabs->setBounds(borderThickness, borderThickness, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness);
 }
 //
 void MainComponent::CodeSubComponent::selectFunc(const string& funcName) {
@@ -877,15 +884,15 @@ MainComponent::AnalyzerSubComponent::~AnalyzerSubComponent() {
 //
 void MainComponent::AnalyzerSubComponent::paint(Graphics& g) {
     g.fillAll(juce::Colours::white);
-    g.setColour(juce::Colours::white);
-    g.drawRect(getLocalBounds(), 1);
+    g.setColour(Colour(37, 11, 46));
+    g.drawRect(getLocalBounds(), borderThickness);
     g.setColour(juce::Colours::white);
     g.setFont(22.0f);
     g.drawText("AnalyzerSubComponent", getLocalBounds(), juce::Justification::centred, true);
 }
 //
 void MainComponent::AnalyzerSubComponent::resized() {
-    performanceAnalyzer->setSize(getWidth(), getHeight());
+    performanceAnalyzer->setBounds(borderThickness, borderThickness, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness);
 }
 //
 void MainComponent::AnalyzerSubComponent::setSelectedFunc(const string & funcName) {
@@ -1145,8 +1152,11 @@ PopupMenu MainComponent::getMenuForIndex (int index, const String&){
             //
             menu.addItem(String("New"), createProjFunc);
             menu.addItem(String("Open..."), chooseProjFunc);
-            menu.addItem(String("Save..."), saveProjFunc);
-            menu.addItem(String("Close"), closeProjFunc);
+            //
+            if (projectOpened) {
+                menu.addItem(String("Save..."), saveProjFunc);
+                menu.addItem(String("Close"), closeProjFunc);
+            }
         }
         //
         //Settings

@@ -131,7 +131,8 @@ public:
         MyTabbedComponent *tabs;
         //CodeComponent* CodeWindow;
         vector<CodeComponent*> *codeWindows;
-        //Viewport* CodeViewport;
+        //
+        int borderThickness = 2;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CodeSubComponent)
     };
@@ -150,6 +151,7 @@ public:
     private:
         MainComponent* mainComponent;
         PerformanceAnalyzer* performanceAnalyzer;
+        int borderThickness = 2;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnalyzerSubComponent)
     };
@@ -256,6 +258,8 @@ public:
         int selectedFuncOccurance = -1;
         map<string, int> *funcOccurances;
         map<string, int> *comboBoxItemID;
+        //
+        LookAndFeel_V4 lf;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AsSubComponent)
     };
