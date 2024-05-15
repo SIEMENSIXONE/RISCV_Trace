@@ -2,6 +2,9 @@
 
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="RISCV_Trace\JSON">
+      <UniqueIdentifier>{9BF4FC6A-E8CF-7A19-B91D-892AC1AF49F3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="RISCV_Trace\Include">
       <UniqueIdentifier>{BB95F3D9-E5E5-68A6-C957-8C9848E64569}</UniqueIdentifier>
     </Filter>
@@ -1947,6 +1950,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\JSON\json.hpp">
+      <Filter>RISCV_Trace\JSON</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\SettingsParser.hpp">
       <Filter>RISCV_Trace\Include</Filter>
     </ClInclude>

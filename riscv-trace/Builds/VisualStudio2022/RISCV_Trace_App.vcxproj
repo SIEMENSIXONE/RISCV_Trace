@@ -1654,6 +1654,7 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_osc.cpp"/>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Source\JSON\json.hpp"/>
     <ClInclude Include="..\..\Source\SettingsParser.hpp"/>
     <ClInclude Include="..\..\Source\SettingsWindow.h"/>
     <ClInclude Include="..\..\Source\CreateProjectWindow.h"/>

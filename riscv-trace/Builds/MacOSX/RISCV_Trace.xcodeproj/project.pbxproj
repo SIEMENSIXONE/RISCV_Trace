@@ -47,6 +47,7 @@
 		036034FA2ECF043C202043C8 /* TraceComponent.h */ /* TraceComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TraceComponent.h; path = ../../Source/TraceComponent.h; sourceTree = SOURCE_ROOT; };
 		0786D55DFDA867BAF37A9822 /* juce_gui_basics */ /* juce_gui_basics */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_gui_basics; path = "~/JUCE/modules/juce_gui_basics"; sourceTree = "<absolute>"; };
 		09CF694A61AE18D4B7A52E68 /* MetalKit.framework */ /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		10FD669C1727C9954E545727 /* json.hpp */ /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = json.hpp; path = ../../Source/JSON/json.hpp; sourceTree = SOURCE_ROOT; };
 		1AE140FE562BA843BC2DC436 /* include_juce_graphics.mm */ /* include_juce_graphics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_graphics.mm; path = ../../JuceLibraryCode/include_juce_graphics.mm; sourceTree = SOURCE_ROOT; };
 		1D5F2BADBE429250C6962CBA /* MainComponent.h */ /* MainComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainComponent.h; path = ../../Source/MainComponent.h; sourceTree = SOURCE_ROOT; };
 		264BB4C12504A9F443175186 /* WebKit.framework */ /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
@@ -159,6 +160,14 @@
 			name = Source;
 			sourceTree = "<group>";
 		};
+		4E3246EF972851717BC16BBC /* JSON */ = {
+			isa = PBXGroup;
+			children = (
+				10FD669C1727C9954E545727,
+			);
+			name = JSON;
+			sourceTree = "<group>";
+		};
 		6BF4B9788C5DD654A3A1B167 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +213,7 @@
 		B2761886965CEB26E5BFD3F9 /* RISCV_Trace */ = {
 			isa = PBXGroup;
 			children = (
+				4E3246EF972851717BC16BBC,
 				AB5CDE72CB712B991DDB1DF4,
 				403BD05D252180EA02DAA2D2,
 				6BF4B9788C5DD654A3A1B167,
