@@ -64,6 +64,7 @@ public:
                                                           .findColour (juce::ResizableWindow::backgroundColourId),
                               DocumentWindow::allButtons)
         {
+            String appName = String("RISC-V Trace Viewer");
             setUsingNativeTitleBar (true);
             setContentOwned (new MainComponent(), true);
 

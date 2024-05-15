@@ -35,10 +35,11 @@ TSettingsParser::Settings TSettingsParser::getSettingsFromFile(const string &fil
         cout<< "-----------------------------------" <<endl;
         return settings;
     }
+    //
     std::ifstream i(filename);
     json j;
     i >> j;
-
+    //
     if (!j.contains(TRACE_FONT_FLAG)) return settings;
     if (!j.contains(CODE_FONT_FLAG)) return settings;
     if (!j.contains(ANALYZER_FONT_FLAG)) return settings;

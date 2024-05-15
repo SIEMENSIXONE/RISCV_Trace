@@ -900,11 +900,12 @@ MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent(){}
 //
 void MainComponent::PlaceholderSubComponent::paint (Graphics& g){
     g.fillAll (juce::Colours::white);
-    g.setColour (juce::Colours::black);
-    g.drawRect (getLocalBounds(), 1);
-    g.setColour (juce::Colours::black);
-    g.setFont (22.0f);
-    g.drawText ("Empty! Choose a project or create a new one.", getLocalBounds(), juce::Justification::centred, true);
+    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    String pictureFileath = parentDirecory.getFullPathName() + "/Resources/Icons/placeholder.png";
+    File pictureFile(pictureFileath);
+    Image picture = ImageCache::getFromFile(pictureFile);
+    g.setOpacity(1.0f);
+    g.drawImage(picture, 0, 0, getWidth(), getHeight(), 0, 0, picture.getWidth(), picture.getHeight());
 }
 //
 void MainComponent::PlaceholderSubComponent::resized(){}

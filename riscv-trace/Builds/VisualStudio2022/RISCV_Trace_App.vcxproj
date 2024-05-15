@@ -153,6 +153,7 @@
     <ClCompile Include="..\..\Source\CodeComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
+    <ClCompile Include="..\..\Resources\Files\main.c"/>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2ChainShape.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -1638,6 +1639,7 @@
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_osc\juce_osc.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="..\..\JuceLibraryCode\BinaryData.cpp"/>
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_box2d.cpp"/>
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_core.cpp">
       <AdditionalOptions> /bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -1652,7 +1654,6 @@
     <ClCompile Include="..\..\JuceLibraryCode\include_juce_osc.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Source\AboutWindow.h"/>
     <ClInclude Include="..\..\Source\SettingsParser.hpp"/>
     <ClInclude Include="..\..\Source\SettingsWindow.h"/>
     <ClInclude Include="..\..\Source\CreateProjectWindow.h"/>
@@ -1663,6 +1664,7 @@
     <ClInclude Include="..\..\Source\TraceParser.hpp"/>
     <ClInclude Include="..\..\Source\CodeComponent.h"/>
     <ClInclude Include="..\..\Source\MainComponent.h"/>
+    <ClInclude Include="..\..\Source\AboutWindow.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2ChainShape.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2CircleShape.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2EdgeShape.h"/>
@@ -2211,13 +2213,18 @@
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_osc\osc\juce_OSCTimeTag.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_osc\osc\juce_OSCTypes.h"/>
     <ClInclude Include="..\..\..\..\..\..\..\JUCE\modules\juce_osc\juce_osc.h"/>
+    <ClInclude Include="..\..\JuceLibraryCode\BinaryData.h"/>
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Resources\Files\instructions_output.txt"/>
+    <None Include="..\..\Resources\Files\objdump.txt"/>
+    <None Include="..\..\Resources\Icons\appIcon.png"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\README.txt"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\native\java\README.txt"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\image_formats\jpglib\changes to libjpeg for JUCE.txt"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_graphics\image_formats\pnglib\libpng_readme.txt"/>
+    <None Include=".\icon.ico"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include=".\resources.rc"/>
