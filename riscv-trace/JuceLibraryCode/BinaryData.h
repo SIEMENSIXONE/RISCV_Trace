@@ -8,17 +8,11 @@
 
 namespace BinaryData
 {
-    extern const char*   instructions_output_txt;
-    const int            instructions_output_txtSize = 36272;
-
-    extern const char*   objdump_txt;
-    const int            objdump_txtSize = 47388;
-
     extern const char*   appIcon_png;
     const int            appIcon_pngSize = 24755;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 3;
+    const int namedResourceListSize = 1;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

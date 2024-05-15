@@ -11,9 +11,6 @@
     <Filter Include="RISCV_Trace\Source">
       <UniqueIdentifier>{564B5A5F-724B-550F-5739-4A7A39E5A07E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RISCV_Trace\Resources\Files">
-      <UniqueIdentifier>{B8470673-4759-87C0-20BF-410024ABD0E8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="RISCV_Trace\Resources\Icons">
       <UniqueIdentifier>{CF183FE6-D6DB-89CA-9DA9-FB2DD6E5DF89}</UniqueIdentifier>
     </Filter>
@@ -324,9 +321,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\MainComponent.cpp">
       <Filter>RISCV_Trace\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Resources\Files\main.c">
-      <Filter>RISCV_Trace\Resources\Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2ChainShape.cpp">
       <Filter>JUCE Modules\juce_box2d\box2d\Collision\Shapes</Filter>
@@ -3638,12 +3632,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Resources\Files\instructions_output.txt">
-      <Filter>RISCV_Trace\Resources\Files</Filter>
-    </None>
-    <None Include="..\..\Resources\Files\objdump.txt">
-      <Filter>RISCV_Trace\Resources\Files</Filter>
-    </None>
     <None Include="..\..\Resources\Icons\appIcon.png">
       <Filter>RISCV_Trace\Resources\Icons</Filter>
     </None>

@@ -84,7 +84,6 @@ OBJECTS_APP := \
   $(JUCE_OBJDIR)/CodeComponent_244200f1.o \
   $(JUCE_OBJDIR)/Main_90ebc5c2.o \
   $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o \
-  $(JUCE_OBJDIR)/main_6724d990.o \
   $(JUCE_OBJDIR)/BinaryData_ce4232d4.o \
   $(JUCE_OBJDIR)/include_juce_box2d_b0305d8b.o \
   $(JUCE_OBJDIR)/include_juce_core_f26d17db.o \
@@ -167,11 +166,6 @@ $(JUCE_OBJDIR)/MainComponent_a6ffb4a5.o: ../../Source/MainComponent.cpp
 	-$(V_AT)mkdir -p $(@D)
 	@echo "Compiling MainComponent.cpp"
 	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
-
-$(JUCE_OBJDIR)/main_6724d990.o: ../../Resources/Files/main.c
-	-$(V_AT)mkdir -p $(@D)
-	@echo "Compiling main.c"
-	$(V_AT)$(CC) $(JUCE_CFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/BinaryData_ce4232d4.o: ../../JuceLibraryCode/BinaryData.cpp
 	-$(V_AT)mkdir -p $(@D)

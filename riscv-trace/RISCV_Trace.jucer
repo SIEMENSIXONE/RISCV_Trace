@@ -48,12 +48,6 @@
             file="Source/MainComponent.cpp"/>
     </GROUP>
     <GROUP id="{847E9488-4485-BC98-7EDF-97F0ED54F3C7}" name="Resources">
-      <GROUP id="{4DAFB686-07DB-D80C-5C9A-29D41B517A99}" name="Files">
-        <FILE id="yIQ1Ka" name="instructions_output.txt" compile="0" resource="1"
-              file="Resources/Files/instructions_output.txt"/>
-        <FILE id="R8SrGr" name="main.c" compile="1" resource="0" file="Resources/Files/main.c"/>
-        <FILE id="ShcYeA" name="objdump.txt" compile="0" resource="1" file="Resources/Files/objdump.txt"/>
-      </GROUP>
       <GROUP id="{E2C7D250-DF90-405C-484B-8C36E7178237}" name="Icons">
         <FILE id="PXM3pj" name="appIcon.png" compile="0" resource="1" file="Resources/Icons/appIcon.png"/>
       </GROUP>

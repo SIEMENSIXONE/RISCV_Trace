@@ -153,7 +153,6 @@
     <ClCompile Include="..\..\Source\CodeComponent.cpp"/>
     <ClCompile Include="..\..\Source\Main.cpp"/>
     <ClCompile Include="..\..\Source\MainComponent.cpp"/>
-    <ClCompile Include="..\..\Resources\Files\main.c"/>
     <ClCompile Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\Collision\Shapes\b2ChainShape.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
@@ -2218,8 +2217,6 @@
     <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h"/>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Resources\Files\instructions_output.txt"/>
-    <None Include="..\..\Resources\Files\objdump.txt"/>
     <None Include="..\..\Resources\Icons\appIcon.png"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_box2d\box2d\README.txt"/>
     <None Include="..\..\..\..\..\..\..\JUCE\modules\juce_core\native\java\README.txt"/>
