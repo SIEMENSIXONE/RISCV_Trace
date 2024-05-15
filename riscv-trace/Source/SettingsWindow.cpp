@@ -16,6 +16,7 @@ SettingsPanel::SettingsPanel(juce::TextButton & _saveButton)
 {
     saveButton = &_saveButton;
     addAndMakeVisible(saveButton);
+    saveButton->setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(37, 11, 46));
     saveButton->setBounds(0, 0, 100, 100);
     //
     loadSettings();
@@ -40,14 +41,16 @@ SettingsPanel::~SettingsPanel()
 //
 void SettingsPanel::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll (juce::Colour(94, 60, 82));   // clear the background
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 }
 //
 void SettingsPanel::resized()
 {
-    juce::Rectangle<int> buttonArea = juce::Rectangle<int>(getWidth()/2 - (getWidth() / 4) / 2, getHeight() - 50, getWidth() / 4, 50);
+    int buttonOffset = 20;
+    int buttonHeight = 50;
+    juce::Rectangle<int> buttonArea = juce::Rectangle<int>(getWidth()/2 - (getWidth() / 4) / 2, getHeight() - buttonHeight - buttonOffset, getWidth() / 4, buttonHeight);
     juce::Rectangle<int> linesArea = juce::Rectangle<int>(getWidth() / 2 - (getWidth()) / 2, 0, getWidth(), getHeight() - 50);
     //
     juce::FlexBox fb;
@@ -80,6 +83,9 @@ SettingsPanel::SettingsPanelLine::SettingsPanelLine(const std::string& text, Set
     settings = &_settings;
     title = new LineTitle(text);
     textEditor = new juce::TextEditor("Setting Editor");
+    textEditor->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colours::white);
+    textEditor->setColour(juce::TextEditor::ColourIds::textColourId, juce::Colours::black);
+    //
     switch (settingIndex)
     {
     case 0:
@@ -172,16 +178,9 @@ SettingsPanel::SettingsPanelLine::LineTitle::~LineTitle()
 //
 void SettingsPanel::SettingsPanelLine::LineTitle::paint(juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
+    g.fillAll(juce::Colour(37, 11, 46));   // clear the background
 
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour(juce::Colours::grey);
+    g.setColour(juce::Colours::white);
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour(juce::Colours::white);

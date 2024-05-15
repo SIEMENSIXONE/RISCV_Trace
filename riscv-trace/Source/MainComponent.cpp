@@ -149,11 +149,8 @@ MainComponent::PerformanceAnalyzer::~PerformanceAnalyzer()
 //
 void MainComponent::PerformanceAnalyzer::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::white);
-
-    g.setColour(juce::Colours::white);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
+    g.fillAll(Colour(94, 60, 82));
+    //
     g.setColour(juce::Colours::white);
     g.setFont(14.0f);
     g.drawText("PerformanceAnalyzer", getLocalBounds(),
@@ -162,7 +159,9 @@ void MainComponent::PerformanceAnalyzer::paint(juce::Graphics& g)
 //
 void MainComponent::PerformanceAnalyzer::resized()
 {
-    table->setSize(getWidth(), getHeight());
+    int borderSize = 10;
+    table->setBounds(borderSize, borderSize, getWidth() - 2 * borderSize, getHeight() - 2 * borderSize);
+    //table->setSize(getWidth(), getHeight());
 }
 //
 void MainComponent::PerformanceAnalyzer::tableSetSelectedRow(const string& funcName) {
@@ -184,7 +183,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
     refreshRowsColoursMap();
     //
     box.setModel(this);
-    box.setColour(ListBox::backgroundColourId, Colour::greyLevel(0.2f));
+    box.setColour(ListBox::backgroundColourId, Colour(94, 60, 82));
     box.setRowHeight(30);
     //
     int width = getWidth();
@@ -201,6 +200,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
     //
     box.getVerticalScrollBar().setVisible(true);
     box.getVerticalScrollBar().setAutoHide(false);
+    box.getVerticalScrollBar().setColour(Slider::ColourIds::thumbColourId, Colour(187, 148, 174));
     //
     addAndMakeVisible(box);
     //
@@ -329,7 +329,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::resized() {
     //
     for (int i = 0; i < box.getHeader().getNumColumns(true); i++) {
         int columnId = box.getHeader().getColumnIdOfIndex(i, true);
-        if (columnId == 1) box.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth - scrollbarWidth);
+        if (columnId == 1) box.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth);
         else box.getHeader().setColumnWidth(columnId, singleColumnWidth);
     }
 }
@@ -377,7 +377,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::setFontSize(const int siz
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::MyLookAndFeel()
 {
-    setColour(juce::Slider::thumbColourId, juce::Colours::hotpink);
+    setColour(juce::Slider::thumbColourId, Colour(37, 11, 46));
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableHeaderColumn(Graphics& g, TableHeaderComponent& header,
@@ -385,7 +385,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
     int width, int height, bool isMouseOver, bool isMouseDown,
     int columnFlags)
 {
-    g.setColour(juce::Colours::darkgrey);
+    g.setColour(Colour(37, 11, 46));
     g.fillRect(0, 0, width, height);
     auto highlightColour = header.findColour(TableHeaderComponent::highlightColourId);
 
@@ -440,7 +440,7 @@ MainComponent::TitlePanel::~TitlePanel(){
 //
 void MainComponent::TitlePanel::paint (Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll (Colour(187, 148, 174));   // clear the background
     g.setColour (Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
     g.setColour (Colours::white);
@@ -458,7 +458,7 @@ MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TracePa
     TraceViewport->setViewedComponent(TraceWindow, false);
     TraceWindow->setTopLeftPosition(TraceViewport->getPosition());
     TraceViewport->setScrollBarsShown(true, false);
-    TraceViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colours::grey);
+    TraceViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(187, 148, 174));
     TraceViewport->setScrollBarThickness(10);
     addAndMakeVisible(TraceWindow);
     addAndMakeVisible(TraceViewport);
@@ -520,6 +520,9 @@ MainComponent::AsSubComponent::OccurancesPanel::OccurancesPanel(AsSubComponent &
     decrButton = new TextButton("<");
     incrButton = new TextButton(">");
     //
+    decrButton->setColour(TextButton::ColourIds::buttonColourId, Colour(37, 11, 46));
+    incrButton->setColour(TextButton::ColourIds::buttonColourId, Colour(37, 11, 46));
+    //
     decrButton->addListener(this);
     incrButton->addListener(this);
     //
@@ -545,7 +548,7 @@ MainComponent::AsSubComponent::OccurancesPanel::~OccurancesPanel(){
 //
 //
 void MainComponent::AsSubComponent::OccurancesPanel::paint (Graphics& g){
-    g.fillAll(Colours::grey);
+    g.fillAll(Colour(94, 60, 82));
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::resized(){
@@ -568,9 +571,9 @@ MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::~TitlePanel() {
 //
 void MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::paint(juce::Graphics& g)
 {
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll(Colour(94, 60, 82));   // clear the background
 
-    g.setColour(juce::Colours::grey);
+    g.setColour(Colour(94, 60, 82));
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour(juce::Colours::white);
@@ -654,6 +657,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
     functionsComboBox = new ComboBox("FunctionsComboBox");
     functionsComboBox->setText("Choose function...");
     functionsComboBox->setJustificationType (Justification::centred);
+    functionsComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
     functionsComboBox->setEditableText(false);
     //
     searchField = new TextEditor("searchField");
@@ -822,7 +826,7 @@ MainComponent::CodeSubComponent::~CodeSubComponent(){
 }
 //
 void MainComponent::CodeSubComponent::paint (Graphics& g){
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll (Colour(94, 60, 82));
 }
 void MainComponent::CodeSubComponent::resized(){
     //
@@ -854,7 +858,7 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
     : TabbedComponent(TabbedButtonBar::TabsAtTop)
 {
     //auto colour = findColour(ResizableWindow::backgroundColourId);
-    auto colour = juce::Colours::black;
+    auto colour = Colour(37, 11, 46);
     //
     for (vector<CodeComponent*>::iterator it = codeComponents.begin(); it != codeComponents.end(); it++) {
         addTab((*it)->getFilename(), colour, *it, true);
@@ -948,7 +952,7 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::paint (Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.fillAll (Colour(37, 11, 46));
 
 }
 //
@@ -1127,6 +1131,9 @@ StringArray MainComponent::getMenuBarNames(){
 //
 PopupMenu MainComponent::getMenuForIndex (int index, const String&){
     PopupMenu menu;
+    lf;
+    lf.setColour(PopupMenu::ColourIds::backgroundColourId, Colour(37, 11, 46));
+    menu.setLookAndFeel(&lf);
     if (isEnabled()) {
         //File
         if (index == 0) {

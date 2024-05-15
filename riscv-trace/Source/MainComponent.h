@@ -325,6 +325,8 @@ private:
     File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
     String defaultFilepath = parentDirecory.getFullPathName() + "/Projects/";
     //
+    LookAndFeel_V4 lf;
+    //
     int menuHeight = 20;
     bool projectOpened = false;
     //

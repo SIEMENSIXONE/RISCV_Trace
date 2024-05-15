@@ -18,10 +18,10 @@ CodeComponent::CodeComponent(std::string& _filename, std::string &code, map<stri
     //
     codeEditor = new juce::CodeEditorComponent(codeDocument, &cppTokeniser);
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::backgroundColourId, juce::Colours::whitesmoke);
-    codeEditor->setColour(juce::CodeEditorComponent::ColourIds::lineNumberBackgroundId, juce::Colours::grey);
+    codeEditor->setColour(juce::CodeEditorComponent::ColourIds::lineNumberBackgroundId, juce::Colour(94, 60, 82));
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::lineNumberTextId, juce::Colours::white);
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::highlightColourId, juce::Colours::hotpink);
-    codeEditor->getLookAndFeel().setColour(juce::ScrollBar::thumbColourId, juce::Colours::grey);
+    codeEditor->getLookAndFeel().setColour(juce::ScrollBar::thumbColourId, juce::Colour(187, 148, 174));
     codeEditor->setScrollbarThickness(10);
     codeEditor->loadContent(code);
     codeEditor->setReadOnly(true);

@@ -25,6 +25,10 @@ public:
     void resized() override;
 
 private:
+    juce::TextEditor* textField;
+    //
+    std::string text;
+    //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutPanel)
 };
 //

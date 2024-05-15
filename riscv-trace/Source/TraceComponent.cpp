@@ -88,13 +88,13 @@ TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, j
     func = new TraceFuncElement(lineInfo.func, *this, *traceComp);
     instr = new TraceLineElement(lineInfo.instr, *traceComp);
     //
-    time->backgroundColor = juce::Colours::grey;
-    time->borderColor = defaultBorderColour;
-    time->textColor = juce::Colours::whitesmoke;
+    time->backgroundColor = juce::Colour(125, 111, 111);
+    time->borderColor = juce::Colours::black;
+    time->textColor = juce::Colours::white;
     //
-    addr->backgroundColor = juce::Colours::darkgrey;
+    addr->backgroundColor = juce::Colour(125, 111, 111);
     addr->borderColor = defaultBorderColour;
-    addr->textColor = juce::Colours::whitesmoke;
+    addr->textColor = juce::Colours::white;
     //
     instr->textJustification = juce::Justification::left;
     instr->borderColor = defaultBorderColour;
