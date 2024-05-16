@@ -79,6 +79,24 @@ public:
 
         };
         //
+        class ProfileGraphPanel : public Component {
+        public:
+            ProfileGraphPanel(const string&);
+            ~ProfileGraphPanel() override;
+            void paint(juce::Graphics&) override;
+            void resized() override;
+        private:
+            string pictureFileath;
+            Image picture;
+        };
+        //
+        struct MyTabbedComponent final : public TabbedComponent
+        {
+            MyTabbedComponent(ProfileTable&, Viewport&);
+            //
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyTabbedComponent)
+        };
+        //
         MainComponent* mainComponent;
         //
         vector<TraceParser::TraceLineStruct>* lines = nullptr;
@@ -95,10 +113,14 @@ public:
         //
         map<string, juce::Colour>* funcColoursMap;
         //
-        ProfileTable* table;
+        MyTabbedComponent* tabs = nullptr;
+        ProfileTable* table = nullptr;
+        ProfileGraphPanel* graph = nullptr;
+        Viewport* graphViewport = nullptr;
         //
         File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
-        string graphFilepath = parentDirecory.getFullPathName().toStdString() + "/Resources/graph.txt";
+        string graphTXTFilepath = parentDirecory.getFullPathName().toStdString() + "/Resources/graph.txt";
+        string graphPNGFilepath = parentDirecory.getFullPathName().toStdString() + "/Resources/graph.png";
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PerformanceAnalyzer)
     };

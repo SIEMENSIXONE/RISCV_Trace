@@ -148,16 +148,44 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
         if (totalExecTime != 0) tableData->push_back(newRow);
     }
     //
-    table = new ProfileTable(*tableData, *funcColoursMap, *mainComponent);
-    addAndMakeVisible(table);
-    table->setBounds(0, 0, getWidth(), getHeight());
+    std::string command = "dot -Tpng -o " + graphPNGFilepath + " " + graphTXTFilepath;
+    const char* c = command.c_str();
+    std::system(c);
     //
-    getGraphCode();
+    table = new ProfileTable(*tableData, *funcColoursMap, *mainComponent);
+    table->setBounds(0, 0, getWidth(), getHeight());
+    graph = new ProfileGraphPanel(graphPNGFilepath);
+    //
+    graphViewport = new Viewport("graphViewport");
+    graphViewport->setViewedComponent(graph, false);
+    graphViewport->setScrollOnDragMode(Viewport::ScrollOnDragMode::all);
+    graphViewport->setScrollBarsShown(true, true);
+    graphViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(187, 148, 174));
+    graphViewport->getHorizontalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(187, 148, 174));
+    graphViewport->setScrollBarThickness(10);
+    graphViewport->setBounds(0, 0, getWidth(), getHeight());
+    //
+    tabs = new MyTabbedComponent(*table, *graphViewport);
+    addAndMakeVisible(tabs);
+    tabs->setBounds(0, 0, getWidth(), getHeight());
+    //
+    std::ofstream file;
+    file.open(graphTXTFilepath, std::ios::out);
+    //
+    if (file.is_open()) {
+        file << getGraphCode();
+    }
+    //
+    file.close();
+    //
 }
 //
 MainComponent::PerformanceAnalyzer::~PerformanceAnalyzer()
 {
     if (table != nullptr) delete(table);
+    if (graphViewport != nullptr) delete(graphViewport);
+    if (graph != nullptr) delete(graph);
+    if (tabs != nullptr) delete(tabs);
     delete(timesCalledMap);
     delete(execTimeMapTotalSelf);
 }
@@ -176,6 +204,8 @@ void MainComponent::PerformanceAnalyzer::resized()
 {
     int borderSize = 0;
     table->setBounds(borderSize, borderSize, getWidth() - 2 * borderSize, getHeight() - 2 * borderSize);
+    tabs->setBounds(borderSize, borderSize, getWidth() - 2 * borderSize, getHeight() - 2 * borderSize);
+    graph->setBounds(borderSize, borderSize, getWidth() - 2 * borderSize, getHeight() - 2 * borderSize);
 }
 //
 string MainComponent::PerformanceAnalyzer::getGraphCode() {
@@ -220,8 +250,8 @@ string MainComponent::PerformanceAnalyzer::getGraphCode() {
             string nodeNumber = to_string(nodeNumMap.at(func));
             //
             vector<string> calls = it->second;
-            for (vector<string> ::iterator it = calls.begin(); it != calls.end(); it++) {
-                string calledFunc = *it;
+            for (vector<string> ::iterator iter = calls.begin(); iter != calls.end(); iter++) {
+                string calledFunc = *iter;
                 string nodeNumberCalled = "";
                 if (nodeNumMap.find(calledFunc) != nodeNumMap.end()) {
                     nodeNumberCalled = to_string(nodeNumMap.at(calledFunc));
@@ -240,15 +270,6 @@ string MainComponent::PerformanceAnalyzer::getGraphCode() {
     //
     result = head + nodes + edges + tail;
     //
-    std::ofstream file;
-    file.open(graphFilepath, std::ios::out);
-    //
-    if (file.is_open()) {
-        file << result;
-    }
-    //
-    file.close();
-    //
     return result;
 }
 //
@@ -260,6 +281,35 @@ void MainComponent::PerformanceAnalyzer::setFontSize(const int size) {
     if (size < 0) return;
     //
     table->setFontSize(size);
+}
+//
+MainComponent::PerformanceAnalyzer::ProfileGraphPanel::ProfileGraphPanel(const string& _pictureFileath) {
+    pictureFileath = _pictureFileath;
+    File pictureFile(pictureFileath);
+    picture = ImageCache::getFromFile(pictureFile);
+    setSize(max(getParentWidth(),picture.getWidth()), max(getParentHeight(), picture.getHeight()));
+}
+//
+MainComponent::PerformanceAnalyzer::ProfileGraphPanel::~ProfileGraphPanel() {}
+//
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics& g) {
+    g.fillAll(Colours::white);
+    g.setOpacity(1.0f);
+    if (picture.isNull())  g.drawText("Error! Check if graphviz is installed!", getLocalBounds(), Justification::centred, true);
+    else g.drawImage(picture, 0, 0, picture.getWidth(), picture.getHeight(), 0, 0, picture.getWidth(), picture.getHeight());
+}
+//
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::resized() {
+    setSize(max(getParentWidth(), picture.getWidth()), max(getParentHeight(), picture.getHeight()));
+}
+//
+MainComponent::PerformanceAnalyzer::MyTabbedComponent::MyTabbedComponent(ProfileTable &table, Viewport &graphViewport)
+    : TabbedComponent(TabbedButtonBar::TabsAtTop)
+{
+    auto colour = Colour(37, 11, 46);
+    //
+    addTab("Table", colour, &table, true);
+    addTab("Graph", colour, &graphViewport, true);
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour> &_funcColoursMap, MainComponent & _mainComponent) {
@@ -413,7 +463,6 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::resized() {
     box.setBounds(getLocalBounds());
     int width = getWidth();
     int singleColumnWidth = width / 7;
-    int scrollbarWidth = box.getVerticalScrollBar().getWidth();
     //
     for (int i = 0; i < box.getHeader().getNumColumns(true); i++) {
         int columnId = box.getHeader().getColumnIdOfIndex(i, true);
@@ -999,8 +1048,8 @@ MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent(){}
 //
 void MainComponent::PlaceholderSubComponent::paint (Graphics& g){
     g.fillAll (juce::Colours::white);
-    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
-    String pictureFileath = parentDirecory.getFullPathName() + "/Resources/Icons/placeholder.png";
+    File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
     File pictureFile(pictureFileath);
     Image picture = ImageCache::getFromFile(pictureFile);
     g.setOpacity(1.0f);
