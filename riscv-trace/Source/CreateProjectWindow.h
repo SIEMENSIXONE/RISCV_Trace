@@ -37,6 +37,7 @@ public:
         std::unique_ptr<juce::FileChooser> chooser;
         TextButton* chooseFileButton = nullptr;
         TextButton* chooseFilesButton = nullptr;
+        TextEditor* textField = nullptr;
         vector<string> *vals;
         CreateProjectPanel* parent;
         //
@@ -101,7 +102,7 @@ public:
         setResizable(false, false);
         centreWithSize(getWidth(), getHeight());
 
-        setSize(500, 300);
+        setSize(600, 400);
         centreWithSize(getWidth(), getHeight());
         setVisible(true);
         //setFullScreen(true);

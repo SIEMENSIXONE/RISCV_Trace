@@ -153,7 +153,6 @@ void TraceComponent::TraceLine::resized(){
 //
 string TraceComponent::TraceLine::getFuncName() {
     return func->getText();
-
 }
 //
 void TraceComponent::TraceLine::setSelected(bool isSelected) {

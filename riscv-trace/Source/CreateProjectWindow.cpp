@@ -15,14 +15,26 @@ CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProje
 {
     parent = &_parent;
     vals = &_val;
+    //
+    textField = new TextEditor();
+    textField->setReadOnly(true);
+    textField->setMultiLine(true, false);
+    textField->setText("");
+    textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+    textField->setFont((float) 12);
+    //
+    addAndMakeVisible(textField);
+    //
     if (multipleFilesFlag) {
-        chooseFilesButton = new TextButton("Choose...");
+        chooseFilesButton = new TextButton("...");
         chooseFilesButton->addListener(this);
+        chooseFilesButton->setColour(TextButton::ColourIds::buttonColourId, Colour(187, 148, 174));
         addAndMakeVisible(chooseFilesButton);
     }
     else {
-        chooseFileButton = new TextButton("Choose...");
+        chooseFileButton = new TextButton("...");
         chooseFileButton->addListener(this);
+        chooseFileButton->setColour(TextButton::ColourIds::buttonColourId, Colour(187, 148, 174));
         addAndMakeVisible(chooseFileButton);
     }
 }
@@ -30,10 +42,15 @@ CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProje
 CreateProjectPanel::SetPathPanel::~SetPathPanel()
 {
     //
+    if (textField != nullptr) {
+        delete(textField);
+    }
+    //
     if (chooseFileButton != nullptr) {
         chooseFileButton->removeListener(this);
         delete(chooseFileButton);
     }
+    //
     if (chooseFilesButton != nullptr) {
         chooseFilesButton->removeListener(this);
         delete(chooseFilesButton);
@@ -42,37 +59,35 @@ CreateProjectPanel::SetPathPanel::~SetPathPanel()
 //
 void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::white);   // clear the background
-
-    g.setColour(juce::Colours::ghostwhite);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour(juce::Colours::black);
-    g.setFont(14.0f);
-    string text = "";
-    int pathsNum = (int) vals->size();
-    //
-    if (pathsNum == 0) text = "Choose...";
-    else {
-        for (int i = 0; i < pathsNum; i++) {
-            text += vals->at(i);
-            if (i < pathsNum - 1) text += ", ";
-        }
-    }
-    //
-    g.drawText(text, getLocalBounds(),
-        juce::Justification::left, true);   // draw some placeholder text
+    g.fillAll(juce::Colour(94, 60, 82));
 }
 //
 void CreateProjectPanel::SetPathPanel::resized()
 {
-    int val = 5;
-    if (chooseFileButton != nullptr) chooseFileButton->setBounds(getWidth() - getWidth()/val, 0, getWidth() / val, getHeight());
-    if (chooseFilesButton != nullptr) chooseFilesButton->setBounds(getWidth() - getWidth() / val, 0, getWidth() / val, getHeight());
+    int space = 7;
+    int buttonHeight = 13;
+    int buttonWidth = 30;
+    //
+    if (textField != nullptr) textField->setBounds(0, 0, getWidth() - buttonWidth - space, getHeight());
+    if (chooseFileButton != nullptr) chooseFileButton->setBounds(getWidth() - buttonWidth, 0, buttonWidth, buttonHeight);
+    if (chooseFilesButton != nullptr) chooseFilesButton->setBounds(getWidth() - buttonWidth, 0, buttonWidth, buttonHeight);
 }
 //
 void CreateProjectPanel::SetPathPanel::addPath(const string& filepath) {
     vals->push_back(filepath);
+    //
+    string text = "";
+    int pathsNum = (int)vals->size();
+    //
+    if (pathsNum == 0) text = "No files choosen";
+    else {
+        for (int i = 0; i < pathsNum; i++) {
+            text += vals->at(i);
+            if (i < pathsNum - 1) text += ",\n";
+        }
+    }
+    //
+    textField->setText(text);
     parent->refresh();
 }
 //
@@ -126,11 +141,7 @@ CreateProjectPanel::TitlePanel::~TitlePanel() {
 //
 void CreateProjectPanel::TitlePanel::paint(juce::Graphics& g)
 {
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour(juce::Colours::grey);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
+    g.fillAll(juce::Colour(94, 60, 82));   // clear the background
     g.setColour(juce::Colours::white);
     g.setFont(14.0f);
     g.drawText(text, getLocalBounds(),
@@ -168,10 +179,8 @@ CreateProjectPanel::CreateProjectPanel()
     saveProjectButton->setEnabled(false);
     addAndMakeVisible(saveProjectButton);
     saveProjectButton->addListener(this);
-    //ColourIds { buttonColourId = 0x1000100 , buttonOnColourId = 0x1000101 , textColourOffId = 0x1000102 , textColourOnId = 0x1000103 }
-    saveProjectButton->setColour(TextButton::ColourIds::buttonColourId, juce::Colours::lightgrey);
-    //saveProjectButton->setColour(TextButton::ColourIds::buttonOnColourId, juce::Colours::lightgrey);
-    //saveProjectButton->setColour(TextButton::ColourIds::textColourOffId, juce::Colours::lightgrey);
+    //
+    saveProjectButton->setColour(TextButton::ColourIds::buttonColourId, Colour(187, 148, 174));
     saveProjectButton->setColour(TextButton::ColourIds::textColourOnId, juce::Colours::white);
     //
     setSize(getParentWidth(), getParentHeight());
@@ -195,27 +204,23 @@ CreateProjectPanel::~CreateProjectPanel()
 //
 void CreateProjectPanel::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("CreateProjectWindow", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+    g.fillAll (juce::Colour(94, 60, 82));   // clear the background
 }
 //
 void CreateProjectPanel::resized()
 {
-    Rectangle<int> area = Rectangle<int>(0, 0, getWidth(), getHeight());
+    int border = 10;
+    int width = getWidth();
+    int height = getHeight();
+    //
+    Rectangle<int> area = Rectangle<int>(border, border, width - 2 * border, height - 2 * border);
     using Track = Grid::TrackInfo;
     using Fr = Grid::Fr;
     Grid grid;
-    grid.templateRows = { Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)) };
+    grid.templateRows = { Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(5)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)) };
     grid.templateColumns = { Track(Fr(1)) };
-    grid.items = { GridItem(titleTracePanel),GridItem(setTracePathPanel), GridItem(titleCodePanel) ,
-        GridItem(setCodePathPanel),GridItem(titleObjdumpPanel), GridItem(setObjdumpPathPanel), GridItem(spacerPanel), GridItem(saveProjectButton), GridItem(spacerPanel)};
+    grid.items = { GridItem(titleTracePanel),GridItem(setTracePathPanel),GridItem(titleObjdumpPanel), GridItem(setObjdumpPathPanel), GridItem(titleCodePanel) ,
+        GridItem(setCodePathPanel), GridItem(spacerPanel), GridItem(saveProjectButton).withWidth(width / 5).withJustifySelf(GridItem::JustifySelf::center), GridItem(spacerPanel)};
     grid.performLayout(area);
 }
 //

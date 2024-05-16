@@ -949,6 +949,7 @@ MainComponent::~MainComponent()
     if (asPanel != nullptr) delete(asPanel);
     if (codePanel != nullptr) delete(codePanel);
     if (analyzerPanel != nullptr) delete(analyzerPanel);
+    //
     if (createProjWindow != nullptr) delete(createProjWindow);
     if (settingsWindow != nullptr) delete(settingsWindow);
     if (aboutWindow != nullptr) delete(aboutWindow);
@@ -978,7 +979,12 @@ void MainComponent::resized()
     if (projectOpened){
         Grid grid;
         grid.templateRows = {Track (Fr (1)), Track (Fr (20)) };
-        grid.templateColumns = { Track (Fr (2)), Track (Fr (4)), Track(Fr(2))};
+        //
+        int traceProportion = 2;
+        int codeProportion = 4;
+        int analyzerProportion = 2;
+        //
+        grid.templateColumns = { Track(Fr(traceProportion)), Track(Fr(codeProportion)), Track(Fr(analyzerProportion)) };
         grid.items = {GridItem (asPanelTitle), GridItem (codePanelTitle), GridItem(analyzerPanelTitle), GridItem (asPanel), GridItem (codePanel), GridItem(analyzerPanel)};
         grid.performLayout (workspaceArea);
     }else{
