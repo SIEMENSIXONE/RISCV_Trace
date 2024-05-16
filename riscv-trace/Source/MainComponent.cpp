@@ -3,13 +3,14 @@
 //==============================================================================
 using namespace juce;
 //
-MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent)
+MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent)
 {
     mainComponent = &_mainComponent;
     lines = &_linesInfoVector;
     funcAddrMap = &_funcAddrMap;
     callingMap = &_callingMap;
     callersMap = &_callersMap;
+    addrCallingCalledMap = &_addrCallingCalledMap;
     //
     funcColoursMap = &_funcColoursMap;
     //
@@ -17,6 +18,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
     execTimeMapTotal = new map<string, int>();
     execTimeMapTotalSelf = new map<string, int>();
     execTimeMapOneInstance = new map<string, int>();
+    timesCalledByMap = new map< pair<string, string>, int>();
     //
     int totalTime = (int)lines->size();
     std::vector<string> funcNameVector;
@@ -52,6 +54,17 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
             //
             if (it->isLastLine) {
                 curFuncs.pop_back();
+            }
+        }
+        //
+        if (addrCallingCalledMap->find(it->addr) != addrCallingCalledMap->end()) {
+            pair<string, string> callerCalled = addrCallingCalledMap->at(it->addr);
+            if (timesCalledByMap->find(callerCalled) == timesCalledByMap->end()) {
+                timesCalledByMap->insert({ callerCalled, 1 });
+            }
+            else
+            {
+                (timesCalledByMap->at(callerCalled))++;
             }
         }
     }
@@ -132,12 +145,14 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
             newRow.at(5) = to_string((execTimeMapTotalSelf->at(funcName) * 100) / totalExecTime);
         }
         //
-        tableData->push_back(newRow);
+        if (totalExecTime != 0) tableData->push_back(newRow);
     }
     //
     table = new ProfileTable(*tableData, *funcColoursMap, *mainComponent);
     addAndMakeVisible(table);
     table->setBounds(0, 0, getWidth(), getHeight());
+    //
+    getGraphCode();
 }
 //
 MainComponent::PerformanceAnalyzer::~PerformanceAnalyzer()
@@ -154,14 +169,87 @@ void MainComponent::PerformanceAnalyzer::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white);
     g.setFont(14.0f);
     g.drawText("PerformanceAnalyzer", getLocalBounds(),
-        juce::Justification::centred, true);   // draw some placeholder text
+        juce::Justification::centred, true);
 }
 //
 void MainComponent::PerformanceAnalyzer::resized()
 {
     int borderSize = 0;
     table->setBounds(borderSize, borderSize, getWidth() - 2 * borderSize, getHeight() - 2 * borderSize);
-    //table->setSize(getWidth(), getHeight());
+}
+//
+string MainComponent::PerformanceAnalyzer::getGraphCode() {
+    string result = "";
+    //
+    string head = "digraph \"[calls]\" {\
+        fontname = \"Helvetica,Arial,sans-serif\"\
+            node[fontname = \"Helvetica,Arial,sans-serif\"]\
+            edge[fontname = \"Helvetica,Arial,sans-serif\"]\
+            node[style = filled fillcolor = \"#f8f8f8\"]\n";
+    //
+    string tail = "}";
+    //
+    string nodes = "";
+    //
+    string edges = "";
+    //
+    map<string, int> nodeNumMap;
+    //
+    int ctr = 1;
+    set<string> funcNameVector;
+    for (map< pair<string, string>, int>::iterator it = timesCalledByMap->begin(); it != timesCalledByMap->end(); it++) if (execTimeMapTotal->find(it->first.first) != execTimeMapTotal->end()) funcNameVector.insert(it->first.first);
+    for (map< pair<string, string>, int>::iterator it = timesCalledByMap->begin(); it != timesCalledByMap->end(); it++) if (execTimeMapTotal->find(it->first.second) != execTimeMapTotal->end()) funcNameVector.insert(it->first.second);
+    //
+    for (set<string> ::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) nodeNumMap.insert({*it, ctr++});
+    //
+    for (set<string> ::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
+        string func = *it;
+        string nodeNumber = to_string(nodeNumMap.at(func));
+        juce::Colour funcColour = juce::Colours::grey;
+        //
+        if (funcColoursMap->find(func) != funcColoursMap->end()) funcColour = funcColoursMap->at(func);
+        //
+        string funcColourString = (funcColour.toDisplayString(false)).toStdString();
+        string node = "N" + nodeNumber + "[label = \"" + func + "\" id = \"node" + nodeNumber + "\" fontsize = 18 shape = box tooltip = \"" + func + "\"  color = \"#ffffff\" fillcolor = \"#"+ funcColourString +"\"]";
+        nodes += node + "\n";
+    }
+    //
+    for (map<string, vector<string>> ::iterator it = callingMap->begin(); it != callingMap->end(); it++) {
+        string func = it->first;
+        if (nodeNumMap.find(func) != nodeNumMap.end()) {
+            string nodeNumber = to_string(nodeNumMap.at(func));
+            //
+            vector<string> calls = it->second;
+            for (vector<string> ::iterator it = calls.begin(); it != calls.end(); it++) {
+                string calledFunc = *it;
+                string nodeNumberCalled = "";
+                if (nodeNumMap.find(calledFunc) != nodeNumMap.end()) {
+                    nodeNumberCalled = to_string(nodeNumMap.at(calledFunc));
+                    pair<string, string> callerCalled = make_pair(func, calledFunc);
+                    int tmp = 0;
+                    if (timesCalledByMap->find(callerCalled) != timesCalledByMap->end()) tmp = timesCalledByMap->at(callerCalled);
+                    if (tmp > 0) {
+                        string timesCalled = to_string(tmp);
+                        string edge = "N" + nodeNumber + "->N" + nodeNumberCalled + "[label = \"" + timesCalled + "\" weight = 94 penwidth = 5 color = \"#5E3C52\" tooltip = \"" + func + " -> " + calledFunc + " (" + timesCalled + ")\" labeltooltip = \"" + func + " -> " + calledFunc + " (" + timesCalled + ")\"]";
+                        edges += edge + "\n";
+                    }
+                }
+            }
+        }
+    }
+    //
+    result = head + nodes + edges + tail;
+    //
+    std::ofstream file;
+    file.open(graphFilepath, std::ios::out);
+    //
+    if (file.is_open()) {
+        file << result;
+    }
+    //
+    file.close();
+    //
+    return result;
 }
 //
 void MainComponent::PerformanceAnalyzer::tableSetSelectedRow(const string& funcName) {
@@ -872,9 +960,9 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
     }
 }
 //
-MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& /*_addrCallingCalledMap*/, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent) {
+MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent) {
     mainComponent = &_mainComponent;
-    performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _funcColoursMap, *mainComponent);
+    performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _addrCallingCalledMap, _funcColoursMap, *mainComponent);
     addAndMakeVisible(performanceAnalyzer);
 }
 //
@@ -1105,6 +1193,9 @@ void MainComponent::closeProjectFile(){
     analyzerPanel = nullptr;
     //
     projectOpened = false;
+    //
+    resized();
+    repaint();
 }
 //
 void MainComponent::openSettingsWindow() {

@@ -26,10 +26,11 @@ public:
     {
     public:
         //
-        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, juce::Colour>&, MainComponent&);
+        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour>&, MainComponent&);
         ~PerformanceAnalyzer() override;
         void paint(juce::Graphics&) override;
         void resized() override;
+        string getGraphCode();
         void tableSetSelectedRow(const string&);
         //
         void setFontSize(const int);
@@ -84,8 +85,10 @@ public:
         map<string, vector<string>>* funcAddrMap = nullptr;
         map<string, vector<string>>* callingMap = nullptr;
         map<string, vector<string>>* callersMap = nullptr;
+        map<string, pair<string, string>>* addrCallingCalledMap = nullptr;
         //
         map<string, int>* timesCalledMap;
+        map< pair<string, string>, int>* timesCalledByMap; // caller - called - times
         map<string, int>* execTimeMapTotal;
         map<string, int>* execTimeMapTotalSelf;
         map<string, int>* execTimeMapOneInstance;
@@ -93,6 +96,9 @@ public:
         map<string, juce::Colour>* funcColoursMap;
         //
         ProfileTable* table;
+        //
+        File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+        string graphFilepath = parentDirecory.getFullPathName().toStdString() + "/Resources/graph.txt";
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PerformanceAnalyzer)
     };
