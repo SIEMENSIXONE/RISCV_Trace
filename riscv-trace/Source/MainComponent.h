@@ -75,7 +75,7 @@ public:
             map<int, juce::Colour> rowsColoursMap;
             int selectedRow = -1;
             //
-            int fontSize = 5;
+            int fontSize = 12;
 
         };
         //

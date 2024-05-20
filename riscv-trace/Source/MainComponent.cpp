@@ -328,12 +328,14 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
     if (width <= 0) width = 7;
     int singleColumnWidth = width / 7;
     //
+    box.setHeaderHeight(50);
+    //
     box.getHeader().addColumn("Name", 1, 2 * singleColumnWidth);
     box.getHeader().addColumn("Time", 2, singleColumnWidth);
-    box.getHeader().addColumn("Time (%)", 3, singleColumnWidth);
+    box.getHeader().addColumn("Time\n(%)", 3, singleColumnWidth);
     box.getHeader().addColumn("Called", 4, singleColumnWidth);
-    box.getHeader().addColumn("Children (%)", 5, singleColumnWidth);
-    box.getHeader().addColumn("Self (%)", 6, singleColumnWidth);
+    box.getHeader().addColumn("Children\n(%)", 5, singleColumnWidth);
+    box.getHeader().addColumn("Self\n(%)", 6, singleColumnWidth);
     box.getHeader().setLookAndFeel(&myLookAndFeel);
     //
     box.getVerticalScrollBar().setVisible(true);
@@ -351,7 +353,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
 void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int /*rowNumber*/, int width, int height, bool rowIsSelected)
 {
     g.setColour(juce::Colours::white);
-    if (rowIsSelected) g.setColour(juce::Colours::hotpink);
+    if (rowIsSelected) g.setColour(juce::Colours::lightpink);
     g.fillRect(0, 0, width, height);
     //!!!
     box.getHorizontalScrollBar().setVisible(false);
@@ -546,11 +548,11 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
     }
     //
     g.setColour(juce::Colours::white);
-    juce::String fontTypeface = "Courier New";
-    float headerFontSize = (float)(11);
-    juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::bold;
-    Font font(fontTypeface, headerFontSize, fontStyle);
-    g.setFont(font);
+ /*   juce::String fontTypeface = "Courier New";
+    float headerFontSize = (float)(15);
+    juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::plain;
+    Font font(fontTypeface, headerFontSize, fontStyle);*/
+    g.setFont(16.0f);
     //
     g.drawFittedText(columnName, area, Justification::centred, 1);
     g.setColour(juce::Colours::white);
@@ -581,7 +583,9 @@ void MainComponent::TitlePanel::paint (Graphics& g)
     g.setColour (Colour(37, 11, 46));
     g.drawRect (getLocalBounds(), 2);   // draw an outline around the component
     g.setColour (Colours::white);
-    g.setFont (14.0f);
+    juce::Font font("Candara", 25.0f, juce::Font::FontStyleFlags::plain);
+    g.setFont(font);
+    //g.setFont (14.0f);
     g.drawText (text, getLocalBounds(), Justification::centred, true);   // draw some placeholder text
 }
 //
@@ -689,7 +693,7 @@ void MainComponent::AsSubComponent::OccurancesPanel::paint (Graphics& g){
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::resized(){
-    Rectangle<int> area = Rectangle<int>(0, 0, getWidth()/2, getHeight());
+    Rectangle<int> area = Rectangle<int>(0, 0, getWidth(), getHeight());
     using Track = Grid::TrackInfo;
     using Fr = Grid::Fr;
     Grid grid;
@@ -735,7 +739,8 @@ void MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::paint
     g.setColour (juce::Colours::black);
     g.drawRect (getLocalBounds(), 1);
     g.setColour (juce::Colours::black);
-    g.setFont (12.0f);
+    juce::Font font("Courier New", 15.0f, juce::Font::FontStyleFlags::plain);
+    g.setFont (font);
     string text;
     if (currentOccurNum >= 0){
        text = to_string(currentOccurNum + 1);
@@ -799,6 +804,8 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
     //
     //
     searchField = new TextEditor("searchField");
+    juce::Font font("Courier New", 20.0f, juce::Font::FontStyleFlags::plain);
+    searchField->setFont(font);
     searchField->setMultiLine(false);
     searchField->addListener(this);
     //
@@ -865,7 +872,7 @@ void MainComponent::AsSubComponent::resized(){
     using Track = Grid::TrackInfo;
     using Fr = Grid::Fr;
     Grid grid;
-    grid.templateRows = {Track (Fr (1)),Track (Fr (1)),Track(Fr(1)), Track (Fr (40))};
+    grid.templateRows = {Track (Fr (3)),Track (Fr (3)),Track(Fr(3)), Track (Fr (80))};
     grid.templateColumns = { Track (Fr (1))};
     grid.items = {GridItem (functionsComboBox),GridItem(searchField), GridItem (occurancesPanel), GridItem (scrollableWindow)};
     grid.performLayout (getLocalBounds());
@@ -1122,11 +1129,11 @@ void MainComponent::resized()
     //
     if (projectOpened){
         Grid grid;
-        grid.templateRows = {Track (Fr (1)), Track (Fr (20)) };
+        grid.templateRows = {Track (Fr (3)), Track (Fr (40)) };
         //
-        int traceProportion = 2;
+        int traceProportion = 3;
         int codeProportion = 4;
-        int analyzerProportion = 2;
+        int analyzerProportion = 3;
         //
         grid.templateColumns = { Track(Fr(traceProportion)), Track(Fr(codeProportion)), Track(Fr(analyzerProportion)) };
         grid.items = {GridItem (asPanelTitle), GridItem (codePanelTitle), GridItem(analyzerPanelTitle), GridItem (asPanel), GridItem (codePanel), GridItem(analyzerPanel)};
