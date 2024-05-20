@@ -1047,13 +1047,20 @@ MainComponent::PlaceholderSubComponent::PlaceholderSubComponent(){}
 MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent(){}
 //
 void MainComponent::PlaceholderSubComponent::paint (Graphics& g){
-    g.fillAll (juce::Colours::white);
+    g.fillAll(juce::Colour(187, 148, 174));
     File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
     String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
     File pictureFile(pictureFileath);
     Image picture = ImageCache::getFromFile(pictureFile);
     g.setOpacity(1.0f);
-    g.drawImage(picture, 0, 0, getWidth(), getHeight(), 0, 0, picture.getWidth(), picture.getHeight());
+    Rectangle<float> pictureArea (0, getHeight() / 4, getWidth(), getHeight() / 2 - getHeight() / 4);
+    Rectangle<float> textArea (0, getHeight() / 2, getWidth(), getHeight() / 2);
+    g.drawImage(picture, pictureArea, RectanglePlacement::doNotResize, false);
+    //
+    g.setColour(Colour(94, 60, 82));
+    juce::Font font("Courier New", 55.0f, juce::Font::FontStyleFlags::bold);
+    g.setFont(font);
+    g.drawText("Create new project or open existing one!", textArea, juce::Justification::horizontallyCentred);
 }
 //
 void MainComponent::PlaceholderSubComponent::resized(){}
