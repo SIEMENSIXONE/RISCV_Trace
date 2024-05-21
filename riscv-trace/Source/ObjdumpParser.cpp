@@ -167,9 +167,9 @@ string TObjdumpParser::parseFuncName(const string &str){
     //
     if ((openingBracketPos < 0) || (closingBracketPos < 0) || ((closingBracketPos - openingBracketPos) <= 1)) {
         //TODO: Exception
-        cout<< "-----------------------------------" <<endl;
-        cout<<"Error! Not a func name."<<endl;
-        cout<< "-----------------------------------" <<endl;
+        //cout<< "-----------------------------------" <<endl;
+        //cout<<"Error! Not a func name."<<endl;
+        //cout<< "-----------------------------------" <<endl;
         return "";
     }
     //

@@ -22,9 +22,9 @@ class TSettingsParser {
     //
 public:
     struct Settings {
-        int traceFontSize;
-        int codeFontSize;
-        int analyzerFontSize;
+        int traceFontSize = 9;
+        int codeFontSize = 9;
+        int analyzerFontSize = 9;
         //
     };
     //

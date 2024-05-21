@@ -32,7 +32,7 @@ public:
         void chooseProjectFile();
         void chooseProjectFiles();
         void buttonClicked(Button* button) override;
-        File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+        File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
         String defaultFilepath = parentDirecory.getFullPathName() +"/Resources/Files/";
         std::unique_ptr<juce::FileChooser> chooser;
         TextButton* chooseFileButton = nullptr;
@@ -64,7 +64,7 @@ public:
     void refresh();
     void saveProject();
     //
-    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     String defaultSaveFilepath = parentDirecory.getFullPathName() + "/Projects/";
     String defaultFilepath = parentDirecory.getFullPathName();
     //

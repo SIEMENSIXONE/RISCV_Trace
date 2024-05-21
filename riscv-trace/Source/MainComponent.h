@@ -118,7 +118,7 @@ public:
         ProfileGraphPanel* graph = nullptr;
         Viewport* graphViewport = nullptr;
         //
-        File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+        File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
         string graphTXTFilepath = parentDirecory.getFullPathName().toStdString() + "/Resources/graph.txt";
         string graphPNGFilepath = parentDirecory.getFullPathName().toStdString() + "/Resources/graph.png";
         //
@@ -354,7 +354,7 @@ private:
     AboutWindow* aboutWindow = nullptr;
     //
     std::unique_ptr<juce::FileChooser> chooser;
-    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     String defaultFilepath = parentDirecory.getFullPathName() + "/Projects/";
     //
     LookAndFeel_V4 lf;

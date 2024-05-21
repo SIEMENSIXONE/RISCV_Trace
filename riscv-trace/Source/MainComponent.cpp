@@ -1055,7 +1055,7 @@ MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent(){}
 //
 void MainComponent::PlaceholderSubComponent::paint (Graphics& g){
     g.fillAll(juce::Colour(187, 148, 174));
-    File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
     File pictureFile(pictureFileath);
     Image picture = ImageCache::getFromFile(pictureFile);
@@ -1150,7 +1150,7 @@ void MainComponent::setSelectedFunc(const string& funcName, int callerID) {
 }
 //
 void MainComponent::loadSettings() {
-    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     currentSettings = TSettingsParser::getSettingsFromFile(workingDirectory.getFullPathName().toStdString() + "/config.JSON");
 }
 //

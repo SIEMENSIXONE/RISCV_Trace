@@ -67,12 +67,12 @@ void SettingsPanel::resized()
 }
 //
 void SettingsPanel::loadSettings() {
-    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     currentSettings = TSettingsParser::getSettingsFromFile(workingDirectory.getFullPathName().toStdString() + "/config.JSON");
 }
 //
 void SettingsPanel::saveSettings() {
-    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory();
+    juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     TSettingsParser::saveSettingsToFile(currentSettings, workingDirectory.getFullPathName().toStdString() + "/config.JSON");
 }
 //
