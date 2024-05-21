@@ -148,12 +148,22 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
         if (totalExecTime != 0) tableData->push_back(newRow);
     }
     //
+    table = new ProfileTable(*tableData, *funcColoursMap, *mainComponent);
+    table->setBounds(0, 0, getWidth(), getHeight());
+    //
+    std::ofstream file;
+    file.open(graphTXTFilepath, std::ios::out);
+    //
+    if (file.is_open()) {
+        file << getGraphCode();
+    }
+    //
+    file.close();
+    //
     std::string command = "dot -Tpng -o " + graphPNGFilepath + " " + graphTXTFilepath;
     const char* c = command.c_str();
     std::system(c);
     //
-    table = new ProfileTable(*tableData, *funcColoursMap, *mainComponent);
-    table->setBounds(0, 0, getWidth(), getHeight());
     graph = new ProfileGraphPanel(graphPNGFilepath);
     //
     graphViewport = new Viewport("graphViewport");
@@ -168,16 +178,6 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
     tabs = new MyTabbedComponent(*table, *graphViewport);
     addAndMakeVisible(tabs);
     tabs->setBounds(0, 0, getWidth(), getHeight());
-    //
-    std::ofstream file;
-    file.open(graphTXTFilepath, std::ios::out);
-    //
-    if (file.is_open()) {
-        file << getGraphCode();
-    }
-    //
-    file.close();
-    //
 }
 //
 MainComponent::PerformanceAnalyzer::~PerformanceAnalyzer()
