@@ -75,7 +75,7 @@ public:
         : DocumentWindow(name,
             juce::Desktop::getInstance().getDefaultLookAndFeel()
             .findColour(juce::ResizableWindow::backgroundColourId),
-            DocumentWindow::allButtons)
+            DocumentWindow::minimiseButton | closeButton)
     {
         setUsingNativeTitleBar(true);
         setContentOwned(new SettingsPanel(saveButton), true);
