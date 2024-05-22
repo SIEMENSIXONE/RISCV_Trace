@@ -22,8 +22,8 @@ class TProjectParser {
     //
 public:
     struct Project{
-        string trace;
-        string objdump;
+        string trace = "";
+        string objdump = "";
         vector<string> code;
     };
     //

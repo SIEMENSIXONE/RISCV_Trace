@@ -1161,60 +1161,65 @@ void MainComponent::createProjectFile() {
 //
 void MainComponent::openProjectFile(const string filepath) {
     TProjectParser::Project newProject = TProjectParser::getProjectFromFile(filepath);
-    project = newProject;
-    //
-    if (asPanelTitle != nullptr) delete(asPanelTitle);
-    if (codePanelTitle != nullptr) delete(codePanelTitle);
-    if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
-    if (asPanel != nullptr) delete(asPanel);
-    if (codePanel != nullptr) delete(codePanel);
-    if (analyzerPanel != nullptr) delete(analyzerPanel);
-    //
-    asPanelTitle = new TitlePanel("Assembly trace");
-    codePanelTitle = new TitlePanel("Code");
-    analyzerPanelTitle = new TitlePanel("Analyzer");
-    //
-    addAndMakeVisible(asPanelTitle);
-    addAndMakeVisible(codePanelTitle);
-    addAndMakeVisible(analyzerPanelTitle);
-    //
-    //Objdump parsing
-    TObjdumpParser *parser = new TObjdumpParser();
-    parser->parseFile(project.objdump);
-    map<string, string> firstFuncAddrMap = parser->getFirstFuncAddrMap();
-    map<string, string> addrFuncMap = parser->getAddrFuncMap();
-    map<string, vector<string>> funcAddrMap = parser->getFuncAddrMap();
-    //
-    map<string, string> lastFuncAddrMap;
-    for (map<string, vector<string>>::iterator it = funcAddrMap.begin(); it != funcAddrMap.end(); it++) {
-        lastFuncAddrMap.insert({ (it->second).at((it->second).size() - 1), it->first});
+    if ((newProject.trace != "") && (newProject.objdump != "") && (newProject.code.size() != 0)) {
+        project = newProject;
+        //
+        if (asPanelTitle != nullptr) delete(asPanelTitle);
+        if (codePanelTitle != nullptr) delete(codePanelTitle);
+        if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
+        if (asPanel != nullptr) delete(asPanel);
+        if (codePanel != nullptr) delete(codePanel);
+        if (analyzerPanel != nullptr) delete(analyzerPanel);
+        //
+        asPanelTitle = new TitlePanel("Assembly trace");
+        codePanelTitle = new TitlePanel("Code");
+        analyzerPanelTitle = new TitlePanel("Analyzer");
+        //
+        addAndMakeVisible(asPanelTitle);
+        addAndMakeVisible(codePanelTitle);
+        addAndMakeVisible(analyzerPanelTitle);
+        //
+        //Objdump parsing
+        TObjdumpParser* parser = new TObjdumpParser();
+        parser->parseFile(project.objdump);
+        map<string, string> firstFuncAddrMap = parser->getFirstFuncAddrMap();
+        map<string, string> addrFuncMap = parser->getAddrFuncMap();
+        map<string, vector<string>> funcAddrMap = parser->getFuncAddrMap();
+        //
+        map<string, string> lastFuncAddrMap;
+        for (map<string, vector<string>>::iterator it = funcAddrMap.begin(); it != funcAddrMap.end(); it++) {
+            lastFuncAddrMap.insert({ (it->second).at((it->second).size() - 1), it->first });
+        }
+        //
+        map<string, vector<string>> callingMap = parser->getCallingMap();
+        map<string, vector<string>> callersMap = parser->getCallersMap();
+        map<string, pair<string, string>> addrCallerCalled = parser->getAddrCallerCalled();
+        //
+        //Trace parsing
+        vector<TraceParser::TraceLineStruct>* vec = new vector<TraceParser::TraceLineStruct>();
+        TraceParser traceParser(*vec);
+        traceParser.parseTrace(project.trace);
+        traceParser.addFuncAddresses(addrFuncMap);
+        traceParser.markFirstLines(firstFuncAddrMap);
+        traceParser.markLastLines(lastFuncAddrMap);
+        //
+        //
+        asPanel = new AsSubComponent(*vec, *this);
+        map<string, juce::Colour> funcColoursMap = asPanel->getFuncColoursMap();
+        codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
+        analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, *this);
+        setFontSizes();
+        //
+        //
+        addAndMakeVisible(asPanel);
+        addAndMakeVisible(codePanel);
+        addAndMakeVisible(analyzerPanel);
+        projectOpened = true;
+        resized();
     }
-    //
-    map<string, vector<string>> callingMap = parser->getCallingMap();
-    map<string, vector<string>> callersMap = parser->getCallersMap();
-    map<string, pair<string, string>> addrCallerCalled = parser->getAddrCallerCalled();
-    //
-    //Trace parsing
-    vector<TraceParser::TraceLineStruct> *vec = new vector<TraceParser::TraceLineStruct>();
-    TraceParser traceParser(*vec);
-    traceParser.parseTrace(project.trace);
-    traceParser.addFuncAddresses(addrFuncMap);
-    traceParser.markFirstLines(firstFuncAddrMap);
-    traceParser.markLastLines(lastFuncAddrMap);
-    //
-    //
-    asPanel = new AsSubComponent(*vec, *this);
-    map<string, juce::Colour> funcColoursMap = asPanel->getFuncColoursMap();
-    codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
-    analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, *this);
-    setFontSizes();
-    //
-    //
-    addAndMakeVisible(asPanel);
-    addAndMakeVisible(codePanel);
-    addAndMakeVisible(analyzerPanel);
-    projectOpened = true;
-    resized();
+    else {
+        showAlertWindow();
+    }
 }
 //
 void MainComponent::chooseProjectFile(){
@@ -1337,6 +1342,15 @@ PopupMenu MainComponent::getMenuForIndex (int index, const String&){
 }
 //
 void MainComponent::menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/){}
+//
+void  MainComponent::showAlertWindow()
+{
+    MessageBoxIconType icon = MessageBoxIconType::WarningIcon;
+    auto options = MessageBoxOptions::makeOptionsOk(icon,
+        "Failed to open project file...",
+        "File is wrong format or empty.");
+    messageBox = AlertWindow::showScopedAsync(options, nullptr);
+}
 //
 void MainComponent::buttonClicked(Button* button) {
     if (button == saveSettingsButton) {

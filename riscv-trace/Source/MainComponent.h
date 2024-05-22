@@ -329,6 +329,7 @@ private:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
+    void showAlertWindow();
     //
     void buttonClicked(Button*) override;
     //
@@ -352,6 +353,8 @@ private:
     CreateProjectWindow* createProjWindow = nullptr;
     SettingsWindow* settingsWindow = nullptr;
     AboutWindow* aboutWindow = nullptr;
+    //
+    ScopedMessageBox messageBox;
     //
     std::unique_ptr<juce::FileChooser> chooser;
     File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
