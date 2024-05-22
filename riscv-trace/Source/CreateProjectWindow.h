@@ -63,6 +63,7 @@ public:
     void resized() override;
     void refresh();
     void saveProject();
+    void showCongratsWindow();
     //
     File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
     String defaultSaveFilepath = parentDirecory.getFullPathName() + "/Projects/";
@@ -86,6 +87,7 @@ private:
     TitlePanel* titleObjdumpPanel;
     SetPathPanel* setObjdumpPathPanel;
     //
+    ScopedMessageBox messageBox;
 };
 //
 class CreateProjectWindow  : public juce::DocumentWindow

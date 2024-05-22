@@ -246,6 +246,7 @@ void CreateProjectPanel::saveProject() {
                 project.trace = tracePath->at(0);
                 project.objdump = objdumpPath->at(0);
                 TProjectParser::saveProjectToFile(project, file.getFullPathName().toStdString());
+                showCongratsWindow();
                 getParentComponent()->setVisible(false);
             }
         });
@@ -255,4 +256,13 @@ void CreateProjectPanel::buttonClicked(Button* button) {
     if (button == saveProjectButton) {
         saveProject();
     }
+}
+//
+void CreateProjectPanel::showCongratsWindow()
+{
+    MessageBoxIconType icon = MessageBoxIconType::InfoIcon;
+    auto options = MessageBoxOptions::makeOptionsOk(icon,
+        "New project successfully created!",
+        "You can open it using File->Open.");
+    messageBox = AlertWindow::showScopedAsync(options, nullptr);
 }
