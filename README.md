@@ -47,7 +47,7 @@ $ make
 Set RISCV environment variable to the RISC-V tools install path.
 
 ```
-$ apt-get install device-tree-compiler libboost-regex-dev libasio-dev
+$ apt-get install device-tree-compiler libboost-regex-dev libasio-dev libboost-all-dev
 $ mkdir -p build
 $ cd build
 $ ../configure --prefix=$RISCV
