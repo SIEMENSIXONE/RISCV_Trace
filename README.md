@@ -34,7 +34,7 @@ In Projucer:
 - In order to build the project:
 
 ```
-$ cd RISCV_Trace/riscv-trace/Builds/LinuxMakefile
+$ cd riscv-trace/Builds/LinuxMakefile
 $ make
 ```
 
