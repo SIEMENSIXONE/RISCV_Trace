@@ -65,7 +65,7 @@ void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
     //
     bool funcNameVisibility = traceLine->getLineInfo().isFirstLine;
     g.setColour(borderColor);
-    if (funcNameVisibility) g.drawLine(0, 0, (float) getWidth(), 0);
+    if (funcNameVisibility) g.drawLine(0, 0, (float) getWidth(), 0, 3.0f);
     //
     g.setColour (textColor);
     juce::Font font(fontTypeface, (float) traceComp->fontSize, fontStyle);
@@ -167,9 +167,8 @@ TraceParser::TraceLineStruct TraceComponent::TraceLine::getLineInfo() {
     return lineInfo;
 }
 //
-TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::Viewport& traceViewport)
+TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec)
 {
-    viewport = &traceViewport;
     //
     funcColours = new map<string, juce::Colour>();
     funcLines = new map<string, vector<int>>();
@@ -180,8 +179,9 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::
     //
     FTraceLines = new std::vector<std::unique_ptr<TraceLine>>();
     //
-    juce::Colour curFuncColour = juce::Colours::black;
+    //juce::Colour curFuncColour = juce::Colours::black;
     for (int i = 0; i < (&vec)->size(); i++) {
+        juce::Colour curFuncColour = juce::Colours::black;
         string funcName = (&vec)->at(i).func;
         if (funcName != "") {
             curFuncColour = funcColours->at(funcName);
@@ -205,10 +205,13 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::
     }
     //
     for (int i = 0; i < FTraceLines->size(); i++){
-        addAndMakeVisible(*(FTraceLines->at(i)));
+        //addAndMakeVisible(*(FTraceLines->at(i)));
+        //addChildComponent(*(FTraceLines->at(i)));
     }
     //
-    setSize(getParentWidth()/2, (int) FTraceLines->size()*lineHeight);
+    /*setSize(getParentWidth(), (int) FTraceLines->size()*lineHeight);*/
+    setSize(getParentWidth(), getParentHeight());
+    setTopLine(0);
 }
 //
 TraceComponent::~TraceComponent()
@@ -218,26 +221,29 @@ TraceComponent::~TraceComponent()
 //
 void TraceComponent::paint (juce::Graphics& g)
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll(juce::Colour(94, 60, 82));
     //
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);
-    //
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("Trace", getLocalBounds(),
-                juce::Justification::centred, true);
 }
 //
 void TraceComponent::resized()
 {
+    int height = getHeight();
+    int maxLinesOnScreen = height / lineHeight;
+    //
     juce::FlexBox fb;
     fb.flexWrap = juce::FlexBox::Wrap::wrap;
     fb.justifyContent = juce::FlexBox::JustifyContent::flexStart;
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
-    for (int i = 0; i < FTraceLines->size(); i++){
-        fb.items.add(juce::FlexItem (*FTraceLines->at(i)).withMinWidth ((float) getWidth()).withMinHeight (lineHeight).withMaxHeight (lineHeight));
+    //for (int i = 0; i < FTraceLines->size(); i++){
+    //    fb.items.add(juce::FlexItem (*FTraceLines->at(i)).withMinWidth ((float) getWidth()).withMinHeight (lineHeight).withMaxHeight (lineHeight));
+    //}
+    //
+    //
+    for (int i = 0; i < getNumChildComponents(); i++) {
+        fb.items.add(juce::FlexItem(*getChildComponent(i)).withMinWidth((float)getWidth()).withMinHeight(lineHeight).withMaxHeight(lineHeight));
     }
     //
     fb.performLayout (getLocalBounds());
@@ -250,18 +256,26 @@ vector<int> TraceComponent::getFuncLines(const string &funcName){
 }
 //
 void TraceComponent::setTopLine(int val) {
-    int height = viewport->getHeight();
+    removeAllChildren();
+    //
+    int height = getHeight();
     int maxLinesOnScreen = height / lineHeight;
     int totalLines = (int) FTraceLines->size();
     //
     if (val < 0) topLine = 0;
-    else if (val > totalLines - maxLinesOnScreen)  topLine = totalLines - maxLinesOnScreen;
+    //else if (val > totalLines - maxLinesOnScreen)  topLine = totalLines - maxLinesOnScreen;
     else
     {
         topLine = val;
     }
     //
-    viewport->setViewPosition(0, lineHeight * (topLine));
+    //viewport->setViewPosition(0, lineHeight * (topLine));
+    for (int i = topLine; i < min((topLine + maxLinesOnScreen), (int) FTraceLines->size()); i++) {
+        addAndMakeVisible(*(FTraceLines->at(i)));
+        //addChildComponent(*(FTraceLines->at(i)));
+    }
+    //
+    resized();
 }
 //
 int TraceComponent::getTopLine() {
@@ -277,7 +291,7 @@ void TraceComponent::setSelectedLine(int lineNumber) {
         //
         FTraceLines->at(lineNumber)->setSelected(true);
         //
-        int height = viewport->getHeight();
+        int height = getHeight();
         int maxLinesOnScreen = height / lineHeight;
         setTopLine(lineNumber - maxLinesOnScreen / 4);
     }
@@ -285,16 +299,16 @@ void TraceComponent::setSelectedLine(int lineNumber) {
     resized();
 }
 //
-void TraceComponent::jumpToSelectedLine() {
-    int lineNumber = 0;
-    for (vector<std::unique_ptr<TraceLine>>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
-        if (it->get()->isSelected()) break;
-        lineNumber++;
-    }
-    int height = viewport->getHeight();
-    int maxLinesOnScreen = height / lineHeight;
-    setTopLine(lineNumber - maxLinesOnScreen / 4);
-}
+//void TraceComponent::jumpToSelectedLine() {
+//    int lineNumber = 0;
+//    for (vector<std::unique_ptr<TraceLine>>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
+//        if (it->get()->isSelected()) break;
+//        lineNumber++;
+//    }
+//    int height = viewport->getHeight();
+//    int maxLinesOnScreen = height / lineHeight;
+//    setTopLine(lineNumber - maxLinesOnScreen / 4);
+//}
 //
 void TraceComponent::clearSelections() {
     for (vector<std::unique_ptr<TraceLine>>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
@@ -302,10 +316,6 @@ void TraceComponent::clearSelections() {
     }
     repaint();
     resized();
-}
-//
-int TraceComponent::getViewPosition() {
-    return viewport->getViewPositionY();
 }
 //
 void TraceComponent::setFontSize(const int size) {

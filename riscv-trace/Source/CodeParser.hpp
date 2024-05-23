@@ -62,6 +62,8 @@ public:
     TCodeParser();
     ~TCodeParser();
     static CCode getCodeFromFile(const string & code, map<string, string>& funcAddrMap);
+private:
+    static string clearCommentsStringsSlashes(const string& code);
 };
 //
 #endif /* CodeParser_hpp */

@@ -18,11 +18,11 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string &code, map<string, 
     for (map<string, string>::iterator it = funcAddrMap.begin(); it != funcAddrMap.end(); it++) funcNameVector.push_back(it->second);
     //
     string buf;
-    std::stringstream fin(code);
+    std::stringstream fin(clearCommentsStringsSlashes(code));
     //
     int symbNum = 0;
     int lineNum = 0;
-    while (getline(fin, buf, ';')) { // читаем до ';'
+    while (getline(fin, buf, '}')) { // читаем до
         for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
             string funcName = *it;
             //
@@ -32,9 +32,28 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string &code, map<string, 
                     //нашли название функции в строке
                     int ctr = findResult + (int) funcName.length();
                     //
+                    bool ignoreNextSemiColon = false;
+                    int inBrackets = 0;
+                    //
                     while (ctr < buf.length()) {
-                        if (buf[ctr] == ';') break; // сюда вроде не попадаем в любом случае
-                        if (buf[ctr] == '{') {
+                        //
+                        if (buf[ctr] == '(') inBrackets++;
+                        if (buf[ctr] == ')') inBrackets--;
+                        //
+                        if ((buf[ctr] != ' ') && (buf[ctr] != '\n') && (buf[ctr] != ';') && (buf[ctr] != '\t') && (buf[ctr] != '(') && (buf[ctr] != ')') && (inBrackets == 0)) {
+                            ignoreNextSemiColon = true;
+                        }
+                        //
+                        if (buf[ctr] == ';') {
+                            if (!ignoreNextSemiColon) {
+                                break;
+                            }
+                            else {
+                                ignoreNextSemiColon = false;
+                            }
+                        }
+                        //
+                        if ((buf[ctr] == '{') && (inBrackets == 0)) {
                             //нашли! записываем
                             int lineNumInside = 0;
                             for (int i = 0; i < findResult; i++) {
@@ -56,5 +75,90 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string &code, map<string, 
         symbNum += (int) buf.length() + 1;
         lineNum += (int) count(buf.begin(), buf.end(), '\n');
     }
+    return result;
+}
+//
+string TCodeParser::clearCommentsStringsSlashes(const string& code) {
+    string result = code;
+    //
+    bool metSlash = false;
+    bool inComment = false;
+    bool inLongComment = false;
+    bool inString = false;
+    bool metStar = false;
+    bool metEscapeCharacter = false;
+    bool metApostrophe = false;
+    bool metDoubleApostrophe = false;
+    //
+    for (int i = 0; i < code.length(); i++) {
+        //
+        if (code[i] == '\\') { 
+            metEscapeCharacter = true; 
+            result[i] = ' ';
+            continue;
+        }
+        //
+        if (code[i] == '#') {
+            inComment = true;
+        }
+        //
+        if (code[i] == '*') {
+            if (metSlash) {
+                inLongComment = true;
+                result[i - 1] = ' ';
+            }
+            metStar = true;
+        }
+        //
+        if (code[i] == '/') {
+            if (metSlash) {
+                inComment = true;
+                result[i - 1] = ' ';
+            }
+            //
+            if (metStar) {
+                inLongComment = false;
+            }
+            //
+            metSlash = true;
+            result[i] = ' '; //!
+        }
+
+        if (code[i] != '/') metSlash = false;
+        if (code[i] != '*') metStar = false;
+        //
+        if (code[i] == '\n') {
+            inComment = false;
+            continue;
+        }
+        //
+        if ((inComment) || (inLongComment)) {
+            result[i] = ' ';
+        }
+        else {
+            if (code[i] == '"') {
+                if (!metEscapeCharacter) {
+                    if (inString) {
+                        inString = false;
+                    }
+                    else {
+                        inString = true;
+                    }
+                }
+            }
+            //
+            if (inString) {
+                result[i] = ' ';
+            }
+        }
+        metEscapeCharacter = false;
+    }
+    //
+    //std::ofstream file;
+    //file.open("test123.txt", std::ios::out);
+    //if (file.is_open()) {
+    //    file << result;
+    //}
+    //file.close();
     return result;
 }

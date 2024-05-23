@@ -202,7 +202,7 @@ public:
             void setFontSize(const int);
         private:
             TraceComponent* TraceWindow;
-            Viewport* TraceViewport;
+            //Viewport* TraceViewport;
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScrollableWindow)
         };

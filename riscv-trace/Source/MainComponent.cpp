@@ -22,17 +22,19 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
     //
     int totalTime = (int)lines->size();
     std::vector<string> funcNameVector;
-    for (map<string, vector<string>>::iterator it = _funcAddrMap.begin(); it != _funcAddrMap.end(); it++) funcNameVector.push_back(it->first);
-    //
+    for (map<string, vector<string>>::iterator it = funcAddrMap->begin(); it != funcAddrMap->end(); it++) funcNameVector.push_back(it->first);
+    
     vector<string> curFuncs;
+    string lastAddr = "";
+    string lastFunc = "";
     for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
         bool flag = false;
         if (it->func != "") {
             if (it->isFirstLine)
                 curFuncs.push_back(it->func);
             //
-            for (int i = 0; i < curFuncs.size(); i++) {
-                string funcTmp = curFuncs.at(i);
+            for (vector<string>::iterator it1 = curFuncs.begin(); it1 != curFuncs.end(); it1++) {
+                string funcTmp = *it1;
                 if (it->func == funcTmp) flag = true;
                 //
                 if (execTimeMapTotal->find(funcTmp) == execTimeMapTotal->end()) {
@@ -56,7 +58,9 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
                 curFuncs.pop_back();
             }
         }
-        //
+    }
+    //
+    for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
         if (addrCallingCalledMap->find(it->addr) != addrCallingCalledMap->end()) {
             pair<string, string> callerCalled = addrCallingCalledMap->at(it->addr);
             if (timesCalledByMap->find(callerCalled) == timesCalledByMap->end()) {
@@ -68,7 +72,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
             }
         }
     }
-    //
+    
     for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
         if (it->isFirstLine) {
             string funcName = it->func;
@@ -594,26 +598,17 @@ void MainComponent::TitlePanel::resized()
 }
 //
 MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec){
-    TraceViewport = new Viewport("traceViewport");
-    TraceWindow = new TraceComponent(vec, *TraceViewport);
-    TraceViewport->setViewedComponent(TraceWindow, false);
-    TraceWindow->setTopLeftPosition(TraceViewport->getPosition());
-    TraceViewport->setScrollBarsShown(true, false);
-    TraceViewport->getVerticalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(187, 148, 174));
-    TraceViewport->setScrollBarThickness(10);
+    TraceWindow = new TraceComponent(vec);
     addAndMakeVisible(TraceWindow);
-    addAndMakeVisible(TraceViewport);
-    TraceViewport->setBounds(0, 0, getWidth()/2, getHeight());
+    TraceWindow->setBounds(0, 0, getWidth(), getHeight());
 }
 //
 MainComponent::AsSubComponent::ScrollableWindow::~ScrollableWindow(){
     delete(TraceWindow);
-    delete(TraceViewport);
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::resized(){
-    TraceWindow->setSize(getWidth(), TraceWindow->getHeight());
-    TraceViewport->setSize(getWidth(), getHeight());
+    TraceWindow->setBounds(0, 0, getWidth(), getHeight());
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::paint (Graphics& g){
@@ -626,7 +621,7 @@ void MainComponent::AsSubComponent::ScrollableWindow::scrollToFunc(const string 
     if (linesVector.size()!=0){
         if (!(((occuranceNum) < 0) || ((occuranceNum) > linesVector.size()))) index = occuranceNum;
         int line = linesVector.at(index);
-        TraceWindow->setTopLine(line);
+        //TraceWindow->setTopLine(line);
         TraceWindow->setSelectedLine(line);
     }
 }
@@ -851,6 +846,11 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
         selectedFunction = functionsComboBox->getText().toStdString();
         mainComponent->setSelectedFunc(selectedFunction, 1);
         searchField->setText(defaultSearchfieldText);
+        //
+        selectedFuncOccurance = 0;
+        scrollableWindow->scrollToFunc(selectedFunction, selectedFuncOccurance);
+        searchField->setText(defaultSearchfieldText, false);
+        occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
     };
     //functionsComboBox->getItem
     //functionsComboBox->setSelectedId(1);

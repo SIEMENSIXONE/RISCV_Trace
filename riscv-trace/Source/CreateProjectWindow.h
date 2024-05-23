@@ -66,7 +66,7 @@ public:
     void showCongratsWindow();
     //
     File parentDirecory = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
-    String defaultSaveFilepath = parentDirecory.getFullPathName() + "/Projects/";
+    String defaultSaveFilepath = parentDirecory.getFullPathName() + "/Projects/project.JSON";
     String defaultFilepath = parentDirecory.getFullPathName();
     //
     vector<string>* tracePath;

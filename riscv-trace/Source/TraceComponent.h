@@ -92,7 +92,7 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLine)
     };
     //
-    TraceComponent(vector<TraceParser::TraceLineStruct> &, juce::Viewport&);
+    TraceComponent(vector<TraceParser::TraceLineStruct> &);
     ~TraceComponent() override;
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -100,9 +100,8 @@ public:
     void setTopLine(int);
     int getTopLine();
     void setSelectedLine(int);
-    void jumpToSelectedLine();
+    //void jumpToSelectedLine();
     void clearSelections();
-    int getViewPosition();
     void setFontSize(const int);
     map<string, juce::Colour> getFuncColoursMap();
     //
@@ -114,8 +113,6 @@ private:
     map<string, vector<int>> *funcLines;
     vector<TraceParser::TraceLineStruct> *TraceLinesVector;
     vector<std::unique_ptr<TraceLine>> *FTraceLines;
-    //
-    juce::Viewport* viewport;
     int scrollStep = 5;
     int topLine = 0;
     int selectedLine = -1;
