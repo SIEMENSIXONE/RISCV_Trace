@@ -55,7 +55,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
             }
             //
             if (it->isLastLine) {
-                curFuncs.pop_back();
+                if (curFuncs.size() > 0) curFuncs.pop_back();
             }
         }
     }
@@ -1201,7 +1201,7 @@ void MainComponent::openProjectFile(const string filepath) {
         traceParser.parseTrace(project.trace);
         traceParser.addFuncAddresses(addrFuncMap);
         traceParser.markFirstLines(firstFuncAddrMap);
-        traceParser.markLastLines(lastFuncAddrMap);
+        traceParser.markLastLines(lastFuncAddrMap, addrCallerCalled);
         //
         //
         asPanel = new AsSubComponent(*vec, *this);

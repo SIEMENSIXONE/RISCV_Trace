@@ -112,11 +112,16 @@ void TraceParser::markFirstLines(map<string, string>& firstLineAddrMap) {
     }
 }
 //
-void TraceParser::markLastLines(map<string, string>& lastLineAddrMap) {
+void TraceParser::markLastLines(map<string, string>& lastLineAddrMap, map<string, pair<string, string>> &addrCallerCalled) {
     for (vector<TraceLineStruct>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
-        string addr = it->addr;
-        if (lastLineAddrMap.find(addr) != lastLineAddrMap.end()) {
+        if (lastLineAddrMap.find(it->addr) != lastLineAddrMap.end()) {
             it->isLastLine = true;
+        }
+        
+        if (it + 1 != FTraceLines->end()) {
+            if (((it->func) != ((it + 1)->func)) && (addrCallerCalled.find(it->addr) == addrCallerCalled.end())) {
+                it->isLastLine = true;
+            }
         }
     }
 }

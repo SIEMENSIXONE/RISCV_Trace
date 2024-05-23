@@ -41,7 +41,7 @@ public:
     void parseTrace(const string& traceFilepath);
     void addFuncAddresses(map<string, string> &);
     void markFirstLines(map<string, string>&);
-    void markLastLines(map<string, string>&);
+    void markLastLines(map<string, string>&, map<string, pair<string, string>>&);
     friend ostream& operator<< (std::ostream& stream, const TraceParser& traceLine);
     //
 private:
