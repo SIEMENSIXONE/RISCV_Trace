@@ -34,12 +34,12 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
     string lastAddr = "";
     string lastFunc = "";
     for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
-        bool flag = false;
+        //
         if (it->func != "") {
             if (it->isFirstLine) (timeMultipliers.at(it->func))++;
             //
-            for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
-                execTimeMapTotal->at(*it) += timeMultipliers.at(*it);
+            for (vector<string>::iterator it1 = funcNameVector.begin(); it1 != funcNameVector.end(); it1++) {
+                execTimeMapTotal->at(*it1) += timeMultipliers.at(*it1);
             }
             //
             if (it->isLastLine) {
@@ -588,7 +588,7 @@ void MainComponent::TitlePanel::resized()
 //
 MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec){
     scrollBar = new juce::ScrollBar(true);
-    scrollBar->setRangeLimits(0, vec.size());
+    scrollBar->setRangeLimits((double) 0, (double) vec.size());
     scrollBar->setSingleStepSize(1);
     scrollBar->setCurrentRangeStart(0);
     scrollBar->addListener(this);
@@ -650,9 +650,8 @@ void MainComponent::AsSubComponent::ScrollableWindow::setFontSize(const int size
     TraceWindow->setFontSize(size);
 }
 //
-void MainComponent::AsSubComponent::ScrollableWindow::scrollBarMoved(juce::ScrollBar* scrollBarThatHasMoved, double newRangeStart) {
-    double tmp = newRangeStart;
-    TraceWindow->setSelectedLine(tmp);
+void MainComponent::AsSubComponent::ScrollableWindow::scrollBarMoved(juce::ScrollBar* /*scrollBarThatHasMoved*/, double newRangeStart) {
+    TraceWindow->setSelectedLine((int) newRangeStart);
 }
 //
 MainComponent::AsSubComponent::OccurancesPanel::OccurancesPanel(AsSubComponent &asComp){
@@ -1070,8 +1069,8 @@ void MainComponent::PlaceholderSubComponent::paint (Graphics& g){
     File pictureFile(pictureFileath);
     Image picture = ImageCache::getFromFile(pictureFile);
     g.setOpacity(1.0f);
-    Rectangle<float> pictureArea (0, getHeight() / 4, getWidth(), getHeight() / 2 - getHeight() / 4);
-    Rectangle<float> textArea (0, getHeight() / 2, getWidth(), getHeight() / 2);
+    Rectangle<float> pictureArea ((float) 0, (float) (getHeight() / 4), (float) getWidth(), (float) (getHeight() / 2 - getHeight() / 4));
+    Rectangle<float> textArea ((float) 0, (float) (getHeight() / 2), (float) getWidth(), (float) (getHeight() / 2));
     g.drawImage(picture, pictureArea, RectanglePlacement::doNotResize, false);
     //
     g.setColour(Colour(94, 60, 82));
