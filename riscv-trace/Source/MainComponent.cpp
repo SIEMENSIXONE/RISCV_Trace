@@ -3,7 +3,7 @@
 //==============================================================================
 using namespace juce;
 //
-MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent)
+MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent)
 {
     mainComponent = &_mainComponent;
     lines = &_linesInfoVector;
@@ -237,13 +237,13 @@ string MainComponent::PerformanceAnalyzer::getGraphCode() {
         nodes += node + "\n";
     }
     //
-    for (map<string, vector<string>> ::iterator it = callingMap->begin(); it != callingMap->end(); it++) {
+    for (map<string, set<string>> ::iterator it = callingMap->begin(); it != callingMap->end(); it++) {
         string func = it->first;
         if (nodeNumMap.find(func) != nodeNumMap.end()) {
             string nodeNumber = to_string(nodeNumMap.at(func));
             //
-            vector<string> calls = it->second;
-            for (vector<string> ::iterator iter = calls.begin(); iter != calls.end(); iter++) {
+            set<string> calls = it->second;
+            for (set<string> ::iterator iter = calls.begin(); iter != calls.end(); iter++) {
                 string calledFunc = *iter;
                 string nodeNumberCalled = "";
                 if (nodeNumMap.find(calledFunc) != nodeNumMap.end()) {
@@ -279,7 +279,7 @@ void MainComponent::PerformanceAnalyzer::setFontSize(const int size) {
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::ProfileGraphPanel(const string& _pictureFileath) {
     pictureFileath = _pictureFileath;
     File pictureFile(pictureFileath);
-    picture = ImageCache::getFromFile(pictureFile);
+    picture = ImageFileFormat::loadFrom(pictureFile);
     setSize(max(getParentWidth(),picture.getWidth()), max(getParentHeight(), picture.getHeight()));
 }
 //
@@ -1005,7 +1005,7 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
     }
 }
 //
-MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, vector<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent) {
+MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour> &_funcColoursMap, MainComponent& _mainComponent) {
     mainComponent = &_mainComponent;
     performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _addrCallingCalledMap, _funcColoursMap, *mainComponent);
     addAndMakeVisible(performanceAnalyzer);
@@ -1180,7 +1180,7 @@ void MainComponent::openProjectFile(const string filepath) {
             lastFuncAddrMap.insert({ (it->second).at((it->second).size() - 1), it->first });
         }
         //
-        map<string, vector<string>> callingMap = parser->getCallingMap();
+        map<string, set<string>> callingMap = parser->getCallingMap();
         map<string, vector<string>> callersMap = parser->getCallersMap();
         map<string, pair<string, string>> addrCallerCalled = parser->getAddrCallerCalled();
         //
@@ -1332,6 +1332,15 @@ PopupMenu MainComponent::getMenuForIndex (int index, const String&){
 }
 //
 void MainComponent::menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/){}
+//
+void  MainComponent::showWaitWindow()
+{
+    MessageBoxIconType icon = MessageBoxIconType::InfoIcon;
+    auto options = MessageBoxOptions::makeOptionsOk(icon,
+        "Opening project...",
+        "Please, wait for project to load.");
+    messageBox = AlertWindow::showScopedAsync(options, nullptr);
+}
 //
 void  MainComponent::showAlertWindow()
 {

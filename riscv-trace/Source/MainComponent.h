@@ -26,7 +26,7 @@ public:
     {
     public:
         //
-        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour>&, MainComponent&);
+        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, set<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour>&, MainComponent&);
         ~PerformanceAnalyzer() override;
         void paint(juce::Graphics&) override;
         void resized() override;
@@ -101,7 +101,7 @@ public:
         //
         vector<TraceParser::TraceLineStruct>* lines = nullptr;
         map<string, vector<string>>* funcAddrMap = nullptr;
-        map<string, vector<string>>* callingMap = nullptr;
+        map<string, set<string>>* callingMap = nullptr;
         map<string, vector<string>>* callersMap = nullptr;
         map<string, pair<string, string>>* addrCallingCalledMap = nullptr;
         //
@@ -169,7 +169,7 @@ public:
     {
     public:
         //
-        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour> &, MainComponent&);
+        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, set<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour> &, MainComponent&);
         ~AnalyzerSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
@@ -329,6 +329,7 @@ private:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
+    void showWaitWindow();
     void showAlertWindow();
     //
     void buttonClicked(Button*) override;

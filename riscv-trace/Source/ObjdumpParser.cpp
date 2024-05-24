@@ -12,7 +12,7 @@ TObjdumpParser::TObjdumpParser(){
     FAddrFuncMap = new map<string, string>();
     FFuncAddrMap = new map<string, vector<string>>();
     FCallersMap = new map<string, vector<string>>();
-    FCallingMap = new map<string, vector<string>>();
+    FCallingMap = new map<string, set<string>>();
     FAddrCallerCalled = new map<string, pair<string, string>>();
 }
 //
@@ -103,12 +103,12 @@ void TObjdumpParser::parseFile(const string &filename){
                         }
                         //
                         if (FCallingMap->find(curFuncName) == FCallingMap->end()) {
-                            vector<string> tmpVec;
-                            tmpVec.push_back(calledFunc);
+                            set<string> tmpVec;
+                            tmpVec.insert(calledFunc);
                             FCallingMap->insert({ curFuncName, tmpVec });
                         }
                         else {
-                            (FCallingMap->at(curFuncName)).push_back(calledFunc);
+                            (FCallingMap->at(curFuncName)).insert(calledFunc);
                         }
                         //
                         if (funcNames.find(calledFunc) != funcNames.end()) FAddrCallerCalled->insert({tmp, make_pair(curFuncName, calledFunc)});
@@ -161,7 +161,7 @@ map<string, std::vector<string>> TObjdumpParser::getFuncAddrMap() {
 map<string, std::vector<string>> TObjdumpParser::getCallersMap() {
     return *FCallersMap;
 }
-map<string, std::vector<string>> TObjdumpParser::getCallingMap() {
+map<string, std::set<string>> TObjdumpParser::getCallingMap() {
     return *FCallingMap;
 }
 //
