@@ -43,7 +43,7 @@ public:
     void addFuncAddresses(map<string, string> &);
     void markFirstLines(map<string, string>&);
     void markLastLines(map<string, pair<string, string>>&);
-    void TraceParser::markCallLines(map<string, string>& firstLineAddrMap, map<string, pair<string, string>>& addrCallerCalled);
+    void markCallLines(map<string, string>& firstLineAddrMap, map<string, pair<string, string>>& addrCallerCalled);
     friend ostream& operator<< (std::ostream& stream, const TraceParser& traceLine);
     //
 private:

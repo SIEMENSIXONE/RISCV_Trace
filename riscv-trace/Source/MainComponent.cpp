@@ -345,6 +345,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int /*rowNumber*/, int width, int height, bool rowIsSelected)
 {
+    //
     g.setColour(juce::Colours::white);
     if (rowIsSelected) g.setColour(juce::Colours::lightpink);
     g.fillRect(0, 0, width, height);
@@ -1165,6 +1166,8 @@ void MainComponent::loadSettings() {
 //
 void MainComponent::createProjectFile() {
     createProjWindow = new CreateProjectWindow("New project");
+    createProjWindow->setVisible(false);
+    createProjWindow->addComponentListener(this);
     createProjWindow->setVisible(true);
 }
 //
@@ -1377,7 +1380,6 @@ void MainComponent::buttonClicked(Button* button) {
         updateCurrentSettings();
     }
 }
-
 //
 void MainComponent::componentVisibilityChanged(Component& component) {
     if (component.isVisible()) {
