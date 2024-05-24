@@ -92,7 +92,7 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLine)
     };
     //
-    TraceComponent(vector<TraceParser::TraceLineStruct> &);
+    TraceComponent(vector<TraceParser::TraceLineStruct> &, juce::ScrollBar &);
     ~TraceComponent() override;
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -108,6 +108,7 @@ public:
     int fontSize = 5;
 private:
     void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+    //
     juce::Colour headerBackgroundColour = juce::Colours::grey;
     map<string, juce::Colour> *funcColours;
     map<string, vector<int>> *funcLines;
@@ -116,6 +117,8 @@ private:
     int scrollStep = 5;
     int topLine = 0;
     int selectedLine = -1;
+    //
+    juce::ScrollBar *scrollbar = nullptr;
     //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceComponent)
 };

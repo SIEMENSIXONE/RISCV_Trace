@@ -187,7 +187,7 @@ public:
     class AsSubComponent: public Component, public TextEditor::Listener
     {
     public:
-        class ScrollableWindow: public Component
+        class ScrollableWindow: public Component, public ScrollBar::Listener
         {
         public:
             ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec);
@@ -200,9 +200,13 @@ public:
             map<string, juce::Colour> getFuncColoursMap();
             //
             void setFontSize(const int);
+            //
+            int scrollBarWidth = 10;
         private:
+            void scrollBarMoved(juce::ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
+            //
             TraceComponent* TraceWindow;
-            //Viewport* TraceViewport;
+            ScrollBar* scrollBar = nullptr;
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScrollableWindow)
         };

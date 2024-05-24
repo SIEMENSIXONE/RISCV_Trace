@@ -587,26 +587,42 @@ void MainComponent::TitlePanel::resized()
 }
 //
 MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec){
-    TraceWindow = new TraceComponent(vec);
+    scrollBar = new juce::ScrollBar(true);
+    scrollBar->setRangeLimits(0, vec.size());
+    scrollBar->setSingleStepSize(1);
+    scrollBar->setCurrentRangeStart(0);
+    scrollBar->addListener(this);
+    addAndMakeVisible(scrollBar);
+    //
+    TraceWindow = new TraceComponent(vec, *scrollBar);
     addAndMakeVisible(TraceWindow);
-    TraceWindow->setBounds(0, 0, getWidth(), getHeight());
+    //
+    resized();
 }
 //
 MainComponent::AsSubComponent::ScrollableWindow::~ScrollableWindow(){
     delete(TraceWindow);
+    delete(scrollBar);
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::resized(){
-    TraceWindow->setBounds(0, 0, getWidth(), getHeight());
+    int width = getWidth();
+	int height = getHeight();
+	//
+	juce::Rectangle<int> mainArea(0, 0, width - scrollBarWidth, height);
+	juce::Rectangle<int> sliderArea(width - scrollBarWidth, 0, scrollBarWidth, height);
+	//
+	TraceWindow->setBounds(mainArea);
+	if (scrollBar != nullptr) scrollBar->setBounds(sliderArea);
 }
 //
-void MainComponent::AsSubComponent::ScrollableWindow::paint (Graphics& g){
-    g.fillAll(Colours::white);
+void MainComponent::AsSubComponent::ScrollableWindow::paint(Graphics& g) {
+	g.fillAll(Colour(94, 60, 82));
 }
 //
-void MainComponent::AsSubComponent::ScrollableWindow::scrollToFunc(const string &funcName, int occuranceNum){
-    vector<int> linesVector = TraceWindow->getFuncLines(funcName);
-    int index = 0;
+void MainComponent::AsSubComponent::ScrollableWindow::scrollToFunc(const string& funcName, int occuranceNum) {
+	vector<int> linesVector = TraceWindow->getFuncLines(funcName);
+	int index = 0;
     if (linesVector.size()!=0){
         if (!(((occuranceNum) < 0) || ((occuranceNum) > linesVector.size()))) index = occuranceNum;
         int line = linesVector.at(index);
@@ -632,6 +648,11 @@ void MainComponent::AsSubComponent::ScrollableWindow::setFontSize(const int size
     if (size < 0) return;
     //
     TraceWindow->setFontSize(size);
+}
+//
+void MainComponent::AsSubComponent::ScrollableWindow::scrollBarMoved(juce::ScrollBar* scrollBarThatHasMoved, double newRangeStart) {
+    double tmp = newRangeStart;
+    TraceWindow->setSelectedLine(tmp);
 }
 //
 MainComponent::AsSubComponent::OccurancesPanel::OccurancesPanel(AsSubComponent &asComp){

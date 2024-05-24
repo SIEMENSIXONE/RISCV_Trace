@@ -193,8 +193,9 @@ TraceParser::TraceLineStruct TraceComponent::TraceLine::getLineInfo() {
     return lineInfo;
 }
 //
-TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec)
+TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::ScrollBar& _scrollbar)
 {
+    scrollbar = &_scrollbar;
     //
     funcColours = new map<string, juce::Colour>();
     funcLines = new map<string, vector<int>>();
@@ -249,7 +250,9 @@ void TraceComponent::paint (juce::Graphics& g)
 //
 void TraceComponent::resized()
 {
+    int width = getWidth();
     int height = getHeight();
+    //
     int maxLinesOnScreen = height / lineHeight;
     //
     juce::FlexBox fb;
@@ -261,7 +264,7 @@ void TraceComponent::resized()
         fb.items.add(juce::FlexItem(*getChildComponent(i)).withMinWidth((float)getWidth()).withMinHeight(lineHeight).withMaxHeight(lineHeight));
     }
     //
-    fb.performLayout (getLocalBounds());
+    fb.performLayout(getLocalBounds());
 }
 //
 vector<int> TraceComponent::getFuncLines(const string &funcName){
@@ -287,6 +290,7 @@ void TraceComponent::setTopLine(int val) {
         addAndMakeVisible(*(FTraceLines->at(i)));
     }
     //
+    scrollbar->setCurrentRangeStart(val, juce::NotificationType::dontSendNotification);
     resized();
 }
 //
