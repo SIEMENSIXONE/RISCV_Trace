@@ -23,6 +23,12 @@ $ cd riscv-trace/Builds/LinuxMakefile
 $ make
 ```
 
+- Some functions of program require graphviz to be installed.
+
+```
+$ sudo apt install graphviz
+```
+
 ### riscv-isa-sim
 
 **Build**
