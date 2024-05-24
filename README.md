@@ -3,8 +3,7 @@ RISC-V Trace profiler
 
 ### riscv-trace
 
-- Install JUCE and the Projucer [JUCE](https://juce.com/download/) 
-- JUCE requires some dependencies. In order to install them, run the command:
+- JUCE library requires some dependencies. In order to install them, run the command:
 
 ```
 $ sudo apt update
@@ -17,25 +16,17 @@ $ sudo apt install libasound2-dev libjack-jackd2-dev \
      	libglu1-mesa-dev mesa-common-dev
 ```
 
-- Open the Projucer utility (located in JUCE folder)
-
-In Projucer:
-- Set up global paths to library:
-
-	- File -> Global Paths...
-	- Specify paths to JUCE and JUCE Modules (Where JUCE was installed by user)
-	- Click Re-scan JUCE Modules
-	- Close Global Paths window
-
-- Open JUCE project file (File -> Open -> RISCV_Trace/riscv-trace/RISCV_Trace.jucer)
-- Open Modules section and make sure that "Use global path" is ticked for each module. This is necessary for the Projucer to generate project files for Windows and macOS, as well as a Makefile for Linux.
-- Save changes (File -> Save)
-
 - In order to build the project:
 
 ```
 $ cd riscv-trace/Builds/LinuxMakefile
 $ make
+```
+
+- Some functions of program require graphviz to be installed.
+
+```
+$ sudo apt install graphviz
 ```
 
 ### riscv-isa-sim
