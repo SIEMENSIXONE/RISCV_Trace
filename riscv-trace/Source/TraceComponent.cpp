@@ -57,20 +57,46 @@ TraceComponent::TraceLine::TraceFuncElement::~TraceFuncElement()
     //removeMouseListener(this);
 }
 //
-void TraceComponent::TraceLine::TraceFuncElement::paint (juce::Graphics& g){
-    g.fillAll (backgroundColor);
+void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
+	g.fillAll(backgroundColor);
+	//
+	bool firstLine = traceLine->getLineInfo().isFirstLine;
+	bool lastLine = traceLine->getLineInfo().isLastLine;
+	bool callLine = traceLine->getLineInfo().isCallLine;
+	//
+	if (firstLine) {
+		g.setColour(backgroundColor);
+		g.drawLine(0, 0, getWidth(), 0, 1.5);
+	}
     //
-    //g.setColour (borderColor);
-    //g.drawRect (getLocalBounds(), 1);
+	if (lastLine) { 
+        g.setColour(juce::Colours::white); 
+        g.drawLine(0, getHeight(), getWidth(), getHeight(), 1.5);
+    }
     //
-    bool funcNameVisibility = traceLine->getLineInfo().isFirstLine;
-    g.setColour(borderColor);
-    if (funcNameVisibility) g.drawLine(0, 0, (float) getWidth(), 0, 3.0f);
+	if (callLine) {
+		g.setColour(juce::Colours::aqua);
+        g.drawLine(0, getHeight(), getWidth(), getHeight(), 1.5);
+	}
+	//
+	g.setColour(textColor);
+	juce::Font font(fontTypeface, (float)traceComp->fontSize, fontStyle);
+	g.setFont(font);
+	if (firstLine) g.drawText(text, getLocalBounds(), textJustification, true);
+	//
+	if (lastLine) {
+		g.setColour(juce::Colours::white);
+		juce::Font font(fontTypeface, (float)traceComp->fontSize / 1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold);
+		g.setFont(font);
+		g.drawText("--END--", getLocalBounds(), textJustification, true);
+	}
     //
-    g.setColour (textColor);
-    juce::Font font(fontTypeface, (float) traceComp->fontSize, fontStyle);
-    g.setFont(font);
-    if (funcNameVisibility) g.drawText (text, getLocalBounds(), textJustification, true);
+    if (callLine) {
+        g.setColour(juce::Colours::aqua);
+        juce::Font font(fontTypeface, (float)traceComp->fontSize / 1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold);
+        g.setFont(font);
+        g.drawText("CALL ->", getLocalBounds(), textJustification, true);
+    }
 }
 //
 TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, juce::Colour &curFuncColour, TraceComponent& _traceComp){
@@ -204,12 +230,6 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec)
         FTraceLines->emplace_back(newLine);
     }
     //
-    for (int i = 0; i < FTraceLines->size(); i++){
-        //addAndMakeVisible(*(FTraceLines->at(i)));
-        //addChildComponent(*(FTraceLines->at(i)));
-    }
-    //
-    /*setSize(getParentWidth(), (int) FTraceLines->size()*lineHeight);*/
     setSize(getParentWidth(), getParentHeight());
     setTopLine(0);
 }
@@ -237,11 +257,6 @@ void TraceComponent::resized()
     fb.justifyContent = juce::FlexBox::JustifyContent::flexStart;
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
-    //for (int i = 0; i < FTraceLines->size(); i++){
-    //    fb.items.add(juce::FlexItem (*FTraceLines->at(i)).withMinWidth ((float) getWidth()).withMinHeight (lineHeight).withMaxHeight (lineHeight));
-    //}
-    //
-    //
     for (int i = 0; i < getNumChildComponents(); i++) {
         fb.items.add(juce::FlexItem(*getChildComponent(i)).withMinWidth((float)getWidth()).withMinHeight(lineHeight).withMaxHeight(lineHeight));
     }
@@ -263,16 +278,13 @@ void TraceComponent::setTopLine(int val) {
     int totalLines = (int) FTraceLines->size();
     //
     if (val < 0) topLine = 0;
-    //else if (val > totalLines - maxLinesOnScreen)  topLine = totalLines - maxLinesOnScreen;
     else
     {
         topLine = val;
     }
     //
-    //viewport->setViewPosition(0, lineHeight * (topLine));
     for (int i = topLine; i < min((topLine + maxLinesOnScreen), (int) FTraceLines->size()); i++) {
         addAndMakeVisible(*(FTraceLines->at(i)));
-        //addChildComponent(*(FTraceLines->at(i)));
     }
     //
     resized();
@@ -298,17 +310,6 @@ void TraceComponent::setSelectedLine(int lineNumber) {
     repaint();
     resized();
 }
-//
-//void TraceComponent::jumpToSelectedLine() {
-//    int lineNumber = 0;
-//    for (vector<std::unique_ptr<TraceLine>>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
-//        if (it->get()->isSelected()) break;
-//        lineNumber++;
-//    }
-//    int height = viewport->getHeight();
-//    int maxLinesOnScreen = height / lineHeight;
-//    setTopLine(lineNumber - maxLinesOnScreen / 4);
-//}
 //
 void TraceComponent::clearSelections() {
     for (vector<std::unique_ptr<TraceLine>>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {

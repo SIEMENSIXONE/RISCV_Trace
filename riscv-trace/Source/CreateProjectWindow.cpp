@@ -64,9 +64,9 @@ void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
 //
 void CreateProjectPanel::SetPathPanel::resized()
 {
-    int space = 7;
+    int space = 15;
     int buttonHeight = 13;
-    int buttonWidth = 30;
+    int buttonWidth = 90;
     //
     if (textField != nullptr) textField->setBounds(0, 0, getWidth() - buttonWidth - space, getHeight());
     if (chooseFileButton != nullptr) chooseFileButton->setBounds(getWidth() - buttonWidth, 0, buttonWidth, buttonHeight);

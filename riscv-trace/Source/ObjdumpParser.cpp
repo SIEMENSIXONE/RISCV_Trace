@@ -28,18 +28,43 @@ TObjdumpParser::~TObjdumpParser(){
 void TObjdumpParser::parseFile(const string &filename){
     string result;
     string buf;
+    set<string> funcNames;
     ifstream fin(filename);
     //
     if(!fin.is_open())
     {
         //TODO: Exception
-        cout<< "-----------------------------------" <<endl;
-        cout<<"Error! Failed to open file."<<endl;
-        cout<< "-----------------------------------" <<endl;
+        //cout<< "-----------------------------------" <<endl;
+        //cout<<"Error! Failed to open file."<<endl;
+        //cout<< "-----------------------------------" <<endl;
         return;
     }
     //
     string curFuncName = "";
+    while (getline(fin, buf)) {
+        string addr;
+        bool flag = true;
+        //
+        for (int i = 0; i < 16; i++) {
+            char c = buf[i];
+            //
+            if (!(isADigitHex(c))) {
+                flag = false;
+                break;
+            }
+            addr += c;
+        }
+        //
+        if (flag) {
+            curFuncName = parseFuncName(buf);
+            FFirstAddrFuncMap->insert({ addr, curFuncName });
+            funcNames.insert(curFuncName);
+        }
+    }
+    //
+    fin.clear();
+    fin.seekg(0);
+    curFuncName = "";
     while (getline(fin, buf)){
         string addr;
         //
@@ -86,7 +111,7 @@ void TObjdumpParser::parseFile(const string &filename){
                             (FCallingMap->at(curFuncName)).push_back(calledFunc);
                         }
                         //
-                        FAddrCallerCalled->insert({tmp, make_pair(curFuncName, calledFunc)});
+                        if (funcNames.find(calledFunc) != funcNames.end()) FAddrCallerCalled->insert({tmp, make_pair(curFuncName, calledFunc)});
                     }
                 }
 
@@ -107,7 +132,6 @@ void TObjdumpParser::parseFile(const string &filename){
         //
         if (flag) { 
             curFuncName = parseFuncName(buf);
-            FFirstAddrFuncMap->insert({ addr, curFuncName }); 
         }
     }
     fin.close();

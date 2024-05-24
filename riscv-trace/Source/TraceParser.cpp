@@ -112,15 +112,25 @@ void TraceParser::markFirstLines(map<string, string>& firstLineAddrMap) {
     }
 }
 //
-void TraceParser::markLastLines(map<string, string>& lastLineAddrMap, map<string, pair<string, string>> &addrCallerCalled) {
+void TraceParser::markLastLines(map<string, pair<string, string>> &addrCallerCalled) {
     for (vector<TraceLineStruct>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
-        if (lastLineAddrMap.find(it->addr) != lastLineAddrMap.end()) {
-            it->isLastLine = true;
-        }
-        
         if (it + 1 != FTraceLines->end()) {
             if (((it->func) != ((it + 1)->func)) && (addrCallerCalled.find(it->addr) == addrCallerCalled.end())) {
                 it->isLastLine = true;
+            }
+        }
+    }
+}
+//
+void TraceParser::markCallLines(map<string, string>& firstLineAddrMap, map<string, pair<string, string>> &addrCallerCalled) {
+    for (vector<TraceLineStruct>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
+        string addr = it->addr;
+        if (addrCallerCalled.find(addr) != addrCallerCalled.end()) {
+            pair<string, string> pair = addrCallerCalled.at(addr);
+            if (it + 1 != FTraceLines->end()) {
+                if ((it + 1)->func == pair.second) {
+                    if ((firstLineAddrMap.find((it + 1)->addr) != firstLineAddrMap.end()) && (firstLineAddrMap.at((it + 1)->addr) == pair.second)) it->isCallLine = true;
+                }
             }
         }
     }

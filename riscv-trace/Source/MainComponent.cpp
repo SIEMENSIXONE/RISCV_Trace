@@ -25,36 +25,25 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
     for (map<string, vector<string>>::iterator it = funcAddrMap->begin(); it != funcAddrMap->end(); it++) funcNameVector.push_back(it->first);
     
     vector<string> curFuncs;
+    map<string, int> timeMultipliers;
+    for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
+        execTimeMapTotal->insert({ *it, 0 });
+        timeMultipliers.insert({ *it, 0 });
+    }
+    //
     string lastAddr = "";
     string lastFunc = "";
     for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
         bool flag = false;
         if (it->func != "") {
-            if (it->isFirstLine)
-                curFuncs.push_back(it->func);
+            if (it->isFirstLine) (timeMultipliers.at(it->func))++;
             //
-            for (vector<string>::iterator it1 = curFuncs.begin(); it1 != curFuncs.end(); it1++) {
-                string funcTmp = *it1;
-                if (it->func == funcTmp) flag = true;
-                //
-                if (execTimeMapTotal->find(funcTmp) == execTimeMapTotal->end()) {
-                    execTimeMapTotal->insert({ funcTmp, 1 });
-                }
-                else {
-                    execTimeMapTotal->at(funcTmp)++;
-                }
-            }
-            //
-            if (!flag) {
-                if (execTimeMapTotal->find(it->func) == execTimeMapTotal->end()) {
-                    execTimeMapTotal->insert({ it->func, 1 });
-                }
-                else {
-                    execTimeMapTotal->at(it->func)++;
-                }
+            for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
+                execTimeMapTotal->at(*it) += timeMultipliers.at(*it);
             }
             //
             if (it->isLastLine) {
+                if (timeMultipliers.at(it->func) > 0) (timeMultipliers.at(it->func))--;
                 if (curFuncs.size() > 0) curFuncs.pop_back();
             }
         }
@@ -72,7 +61,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
             }
         }
     }
-    
+    //
     for (vector<TraceParser::TraceLineStruct>::iterator it = lines->begin(); it != lines->end(); it++) {
         if (it->isFirstLine) {
             string funcName = it->func;
@@ -1201,7 +1190,8 @@ void MainComponent::openProjectFile(const string filepath) {
         traceParser.parseTrace(project.trace);
         traceParser.addFuncAddresses(addrFuncMap);
         traceParser.markFirstLines(firstFuncAddrMap);
-        traceParser.markLastLines(lastFuncAddrMap, addrCallerCalled);
+        traceParser.markCallLines(firstFuncAddrMap, addrCallerCalled);
+        traceParser.markLastLines(addrCallerCalled);
         //
         //
         asPanel = new AsSubComponent(*vec, *this);
