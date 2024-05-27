@@ -92,7 +92,7 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLine)
     };
     //
-    TraceComponent(vector<TraceParser::TraceLineStruct> &, juce::ScrollBar &);
+    TraceComponent(vector<TraceParser::TraceLineStruct> &, map<string, string>& , map<string, juce::Colour>& , juce::ScrollBar &);
     ~TraceComponent() override;
     void paint (juce::Graphics&) override;
     void resized() override;

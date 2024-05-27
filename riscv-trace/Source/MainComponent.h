@@ -30,7 +30,7 @@ public:
         ~PerformanceAnalyzer() override;
         void paint(juce::Graphics&) override;
         void resized() override;
-        string getGraphCode();
+        string getGraphCode(map<string, juce::Colour>& _funcColoursMap);
         void tableSetSelectedRow(const string&);
         //
         void setFontSize(const int);
@@ -79,15 +79,71 @@ public:
 
         };
         //
-        class ProfileGraphPanel : public Component {
+        class ProfileGraphPanel : public Component, public Button::Listener {
         public:
             ProfileGraphPanel(const string&);
             ~ProfileGraphPanel() override;
             void paint(juce::Graphics&) override;
             void resized() override;
+            void openSeparateGraphWindow();
         private:
+            void buttonClicked(Button* button) override;
+            void mouseDoubleClick(const MouseEvent& event) override;
+            //
+            class SeparateGraphPanel : public Component {
+            public:
+                SeparateGraphPanel(Image&);
+                ~SeparateGraphPanel() override;
+                void paint(juce::Graphics&) override;
+                void resized() override;
+            private:
+                class ImageComponent : public Component {
+                public:
+                    ImageComponent(Image&);
+                    ~ImageComponent() override;
+                    void paint(juce::Graphics&) override;
+                    void resized() override;
+                private:
+                    void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+                    //
+                    Image* picture;
+                };
+                ImageComponent *imageComponent;
+                Viewport *viewport;
+            };
+            //
+            class SeparateGraphPanelWindow : public juce::DocumentWindow
+            {
+            public:
+                SeparateGraphPanelWindow(juce::String name, Image& _image)
+                    : DocumentWindow(name,
+                        juce::Desktop::getInstance().getDefaultLookAndFeel()
+                        .findColour(juce::ResizableWindow::backgroundColourId),
+                        DocumentWindow::allButtons)
+                {
+                    setUsingNativeTitleBar(true);
+                    setContentOwned(new SeparateGraphPanel(_image), true);
+                    setResizable(true, true);
+                    setFullScreen(false);
+                    centreWithSize(getWidth() / 2, getHeight() / 2);
+                    setResizeLimits(1280, 720, 1920, 1080);
+                    setVisible(true);
+                }
+                //
+                void closeButtonPressed() override
+                {
+                    setVisible(false);
+                }
+                //
+            private:
+                JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SeparateGraphPanelWindow)
+            };
+            //
+            TextButton* openSeparateWindowButton = nullptr;
+            //
             string pictureFileath;
             Image picture;
+            SeparateGraphPanelWindow* separateWindow = nullptr;
         };
         //
         struct MyTabbedComponent final : public TabbedComponent
@@ -107,11 +163,11 @@ public:
         //
         map<string, int>* timesCalledMap;
         map< pair<string, string>, int>* timesCalledByMap; // caller - called - times
-        map<string, int>* execTimeMapTotal;
-        map<string, int>* execTimeMapTotalSelf;
-        map<string, int>* execTimeMapOneInstance;
+        map<string, long>* execTimeMapTotal;
+        map<string, long>* execTimeMapTotalSelf;
+        map<string, long>* execTimeMapOneInstance;
         //
-        map<string, juce::Colour>* funcColoursMap;
+        long totalTime = 0;
         //
         MyTabbedComponent* tabs = nullptr;
         ProfileTable* table = nullptr;
@@ -190,7 +246,7 @@ public:
         class ScrollableWindow: public Component, public ScrollBar::Listener
         {
         public:
-            ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec);
+            ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&);
             ~ScrollableWindow();
             void paint (Graphics&) override;
             void resized() override;
@@ -262,7 +318,7 @@ public:
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OccurancesPanel)
         };
-        AsSubComponent(vector<TraceParser::TraceLineStruct> &vec, MainComponent&);
+        AsSubComponent(vector<TraceParser::TraceLineStruct> &vec, map<string, string> & addrFuncMap, map<string, juce::Colour>&, MainComponent&);
         ~AsSubComponent() override;
         void paint (Graphics&) override;
         void resized() override;

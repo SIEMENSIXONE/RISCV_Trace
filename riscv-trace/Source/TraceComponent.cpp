@@ -193,16 +193,11 @@ TraceParser::TraceLineStruct TraceComponent::TraceLine::getLineInfo() {
     return lineInfo;
 }
 //
-TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::ScrollBar& _scrollbar)
+TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&  funcColours, juce::ScrollBar& _scrollbar)
 {
     scrollbar = &_scrollbar;
     //
-    funcColours = new map<string, juce::Colour>();
     funcLines = new map<string, vector<int>>();
-    //
-    for (int i = 0; i < (&vec)->size(); i++) {
-        if ((&vec)->at(i).func != "") funcColours->insert({(&vec)->at(i).func, juce::Colour((rand() % 180), (rand() % 180), (rand() % 180))});
-    }
     //
     FTraceLines = new std::vector<std::unique_ptr<TraceLine>>();
     //
@@ -211,7 +206,7 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, juce::
         juce::Colour curFuncColour = juce::Colours::black;
         string funcName = (&vec)->at(i).func;
         if (funcName != "") {
-            curFuncColour = funcColours->at(funcName);
+            curFuncColour = funcColours.at(funcName);
             //
             if ((&vec)->at(i).isFirstLine) {
                 if (funcLines->find(funcName) == funcLines->end()) {

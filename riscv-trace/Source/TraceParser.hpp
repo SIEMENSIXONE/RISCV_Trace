@@ -15,6 +15,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <set>
 #include <map>
 //
 using namespace std;
@@ -42,8 +43,8 @@ public:
     void parseTrace(const string& traceFilepath);
     void addFuncAddresses(map<string, string> &);
     void markFirstLines(map<string, string>&);
-    void markLastLines(map<string, pair<string, string>>&);
-    void markCallLines(map<string, string>& firstLineAddrMap, map<string, pair<string, string>>& addrCallerCalled);
+    void markLastLines(map<string, std::vector<string>>&);
+    void markCallLines(map<string, string>& firstLineAddrMap, map<string, pair<string, string>>& addrCallerCalled, map<string, std::set<string>>& callingMap);
     friend ostream& operator<< (std::ostream& stream, const TraceParser& traceLine);
     //
 private:

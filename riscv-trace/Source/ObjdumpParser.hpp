@@ -27,6 +27,7 @@ public:
     void parseFile(const string &);
     void print();
     map<string, string> getFirstFuncAddrMap();
+    map<string, std::vector<string>> getRetFuncAddrMap();
     map<string, string> getAddrFuncMap();
     map<string, std::vector<string>> getFuncAddrMap();
     map<string, std::vector<string>> getCallersMap();
@@ -38,6 +39,7 @@ protected:
     static string parseFuncName(const string &);
     //
     map<string, string> *FFirstAddrFuncMap;
+    map<string, std::vector<string>>* FRetFuncAddrMap;
     map<string, string> *FAddrFuncMap;
     map<string, std::vector<string>>* FFuncAddrMap;
     map<string, std::vector<string>>* FCallersMap; // called - [callers]
