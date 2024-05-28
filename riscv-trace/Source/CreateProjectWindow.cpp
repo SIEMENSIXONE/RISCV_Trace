@@ -220,7 +220,7 @@ void CreateProjectPanel::resized()
     grid.templateRows = { Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(5)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)) };
     grid.templateColumns = { Track(Fr(1)) };
     grid.items = { GridItem(titleTracePanel),GridItem(setTracePathPanel),GridItem(titleObjdumpPanel), GridItem(setObjdumpPathPanel), GridItem(titleCodePanel) ,
-        GridItem(setCodePathPanel), GridItem(spacerPanel), GridItem(saveProjectButton).withWidth(width / 5).withJustifySelf(GridItem::JustifySelf::center), GridItem(spacerPanel)};
+        GridItem(setCodePathPanel), GridItem(spacerPanel), GridItem(saveProjectButton).withWidth((float) width / 5).withJustifySelf(GridItem::JustifySelf::center), GridItem(spacerPanel)};
     grid.performLayout(area);
 }
 //

@@ -66,17 +66,17 @@ void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
 	//
 	if (firstLine) {
 		g.setColour(backgroundColor);
-		g.drawLine(0, 0, getWidth(), 0, 1.5);
+		g.drawLine(0, 0, (float) getWidth(), 0, 1.5);
 	}
     //
 	if (lastLine) { 
         g.setColour(juce::Colours::white); 
-        g.drawLine(0, getHeight(), getWidth(), getHeight(), 1.5);
+        g.drawLine(0, (float) getHeight(), (float) getWidth(), (float) getHeight(), 1.5);
     }
     //
 	if (callLine) {
 		g.setColour(juce::Colours::aqua);
-        g.drawLine(0, getHeight(), getWidth(), getHeight(), 1.5);
+        g.drawLine(0, (float) getHeight(), (float) getWidth(), (float) getHeight(), 1.5);
 	}
 	//
 	g.setColour(textColor);
@@ -86,15 +86,13 @@ void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
 	//
 	if (lastLine) {
 		g.setColour(juce::Colours::white);
-		juce::Font font(fontTypeface, (float)traceComp->fontSize / 1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold);
-		g.setFont(font);
+		g.setFont(juce::Font(fontTypeface, (float)traceComp->fontSize / (float)1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold));
 		g.drawText("--END--", getLocalBounds(), textJustification, true);
 	}
     //
     if (callLine) {
         g.setColour(juce::Colours::aqua);
-        juce::Font font(fontTypeface, (float)traceComp->fontSize / 1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold);
-        g.setFont(font);
+        g.setFont(juce::Font(fontTypeface, (float)traceComp->fontSize / (float) 1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold));
         g.drawText("CALL ->", getLocalBounds(), textJustification, true);
     }
 }
@@ -193,7 +191,7 @@ TraceParser::TraceLineStruct TraceComponent::TraceLine::getLineInfo() {
     return lineInfo;
 }
 //
-TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&  funcColours, juce::ScrollBar& _scrollbar)
+TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& /*addrFuncMap*/, map<string, juce::Colour>&  funcColours, juce::ScrollBar& _scrollbar)
 {
     scrollbar = &_scrollbar;
     //
@@ -245,10 +243,6 @@ void TraceComponent::paint (juce::Graphics& g)
 //
 void TraceComponent::resized()
 {
-    int width = getWidth();
-    int height = getHeight();
-    //
-    int maxLinesOnScreen = height / lineHeight;
     //
     juce::FlexBox fb;
     fb.flexWrap = juce::FlexBox::Wrap::wrap;
@@ -273,7 +267,6 @@ void TraceComponent::setTopLine(int val) {
     //
     int height = getHeight();
     int maxLinesOnScreen = height / lineHeight;
-    int totalLines = (int) FTraceLines->size();
     //
     if (val < 0) topLine = 0;
     else
