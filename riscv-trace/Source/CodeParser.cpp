@@ -87,8 +87,6 @@ string TCodeParser::clearCommentsStringsSlashes(const string& code) {
     bool inString = false;
     bool metStar = false;
     bool metEscapeCharacter = false;
-    bool metApostrophe = false;
-    bool metDoubleApostrophe = false;
     //
     for (int i = 0; i < code.length(); i++) {
         //

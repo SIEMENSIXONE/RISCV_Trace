@@ -129,7 +129,7 @@ void TraceParser::markLastLines(map<string, std::vector<string>> &retFuncAddrMap
     }
 }
 //
-void TraceParser::markCallLines(map<string, string>& firstLineAddrMap, map<string, pair<string, string>> &addrCallerCalled, map<string, set<string>>& callingMap) {
+void TraceParser::markCallLines(map<string, string>& /*firstLineAddrMap*/, map<string, pair<string, string>> &addrCallerCalled, map<string, set<string>>& callingMap) {
     for (vector<TraceLineStruct>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
         string addr = it->addr;
         string func = it->func;
