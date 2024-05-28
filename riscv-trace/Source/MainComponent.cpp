@@ -18,7 +18,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	execTimeMapOneInstance = new map<string, long>();
 	timesCalledByMap = new map< pair<string, string>, int>();
 	//
-	totalTime = lines->size();
+	totalTime = (long) lines->size();
 	std::vector<string> funcNameVector;
 	for (map<string, vector<string>>::iterator it = funcAddrMap->begin(); it != funcAddrMap->end(); it++) funcNameVector.push_back(it->first);
 
@@ -124,14 +124,14 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		//green = 0, 255, 0
 		long maxSelfTime = 0;
 		//
-		for (map<string, long>::iterator it = execTimeMapTotalSelf->begin(); it != execTimeMapTotalSelf->end(); it++) if (it->second > maxSelfTime) maxSelfTime = it->second;
+		for (map<string, long>::iterator it1 = execTimeMapTotalSelf->begin(); it1 != execTimeMapTotalSelf->end(); it1++) if (it1->second > maxSelfTime) maxSelfTime = it1->second;
 		//
 		double selfTime = 0;
 		if (execTimeMapTotalSelf->find(funcName) != execTimeMapTotalSelf->end()) selfTime = execTimeMapTotalSelf->at(funcName);
 		double precentage = selfTime / maxSelfTime;
 		//if ((int) precentage == 0) precentage = 1;
 		int maxColour = 200;
-		_funcColoursMap.insert({ funcName, Colour(maxColour * precentage, maxColour - (maxColour * precentage), 255 * precentage / 2) });
+		_funcColoursMap.insert({ funcName, Colour((juce::uint8) (maxColour * precentage), (juce::uint8) (maxColour - (maxColour * precentage)),(juce::uint8) (255 * precentage / 2)) });
 		//
 		//called
 		int timesCalled = 0;
@@ -143,7 +143,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		if (execTimeMapTotalSelf->find(funcName) != execTimeMapTotalSelf->end()) {
 
 			// от общего времени
-			newRow.at(4) = to_string(((totalExecTime - execTimeMapTotalSelf->at(funcName)) * 100 ) / totalTime);
+			newRow.at(4) = to_string(((totalExecTime - execTimeMapTotalSelf->at(funcName)) * 100) / totalTime);
 			newRow.at(5) = to_string((execTimeMapTotalSelf->at(funcName) * 100) / totalTime);
 
 
@@ -253,7 +253,7 @@ string MainComponent::PerformanceAnalyzer::getGraphCode(map<string, juce::Colour
 		streamTotal << std::fixed << std::setprecision(2) << totalPrecentage;
 		std::string totalPrecentageString = streamTotal.str();
 		//
-		double selfPrecentage = ((double) execTimeMapTotalSelf->at(func) * 100) / (double)totalTime;
+		double selfPrecentage = ((double)execTimeMapTotalSelf->at(func) * 100) / (double)totalTime;
 		std::stringstream streamSelf;
 		streamSelf << std::fixed << std::setprecision(2) << selfPrecentage;
 		std::string selfPrecentageString = streamSelf.str();
@@ -339,9 +339,6 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::resized() {
-	int offset = 20;
-	int buttonWidth = 80;
-	int buttonHeight = 50;
 	setSize(max(getParentWidth(), picture.getWidth()), max(getParentHeight(), picture.getHeight()));
 	//if (openSeparateWindowButton != nullptr) openSeparateWindowButton->setBounds(0, offset, buttonWidth, buttonHeight);
 }
@@ -351,7 +348,7 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::openSeparateGraphWin
 	separateWindow = new SeparateGraphPanelWindow("Graph window", picture);
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::buttonClicked(Button* button) {
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::buttonClicked(Button* /*button*/) {
 
 	//if (button == openSeparateWindowButton)
 	//{
@@ -359,7 +356,7 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::buttonClicked(Button
 	//}
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseDoubleClick(const MouseEvent& event) {
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseDoubleClick(const MouseEvent& /*event*/) {
 	openSeparateGraphWindow();
 }
 //
@@ -1295,68 +1292,82 @@ void MainComponent::createProjectFile() {
 }
 //
 void MainComponent::openProjectFile(const string filepath) {
-	TProjectParser::Project newProject = TProjectParser::getProjectFromFile(filepath);
-	if ((newProject.trace != "") && (newProject.objdump != "") && (newProject.code.size() != 0)) {
-		project = newProject;
-		//
-		if (asPanelTitle != nullptr) delete(asPanelTitle);
-		if (codePanelTitle != nullptr) delete(codePanelTitle);
-		if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
-		if (asPanel != nullptr) delete(asPanel);
-		if (codePanel != nullptr) delete(codePanel);
-		if (analyzerPanel != nullptr) delete(analyzerPanel);
-		//
-		asPanelTitle = new TitlePanel("Assembly trace");
-		codePanelTitle = new TitlePanel("Code");
-		analyzerPanelTitle = new TitlePanel("Analyzer");
-		//
-		addAndMakeVisible(asPanelTitle);
-		addAndMakeVisible(codePanelTitle);
-		addAndMakeVisible(analyzerPanelTitle);
-		//
-		//Objdump parsing
-		TObjdumpParser* parser = new TObjdumpParser();
-		parser->parseFile(project.objdump);
-		map<string, string> firstFuncAddrMap = parser->getFirstFuncAddrMap();
-		map<string, string> addrFuncMap = parser->getAddrFuncMap();
-		map<string, vector<string>> funcAddrMap = parser->getFuncAddrMap();
-		//
-		map<string, string> lastFuncAddrMap;
-		for (map<string, vector<string>>::iterator it = funcAddrMap.begin(); it != funcAddrMap.end(); it++) {
-			lastFuncAddrMap.insert({ (it->second).at((it->second).size() - 1), it->first });
-		}
-		//
-		map<string, set<string>> callingMap = parser->getCallingMap();
-		map<string, vector<string>> callersMap = parser->getCallersMap();
-		map<string, pair<string, string>> addrCallerCalled = parser->getAddrCallerCalled();
-		map<string, vector<string>> retFuncAddrs = parser->getRetFuncAddrMap();
-		//
-		//Trace parsing
-		vector<TraceParser::TraceLineStruct>* vec = new vector<TraceParser::TraceLineStruct>();
-		TraceParser traceParser(*vec);
-		traceParser.parseTrace(project.trace);
-		traceParser.addFuncAddresses(addrFuncMap);
-		traceParser.markFirstLines(firstFuncAddrMap);
-		traceParser.markCallLines(firstFuncAddrMap, addrCallerCalled, callingMap);
-		traceParser.markLastLines(retFuncAddrs);
-		//
-		//
-		map<string, juce::Colour> funcColoursMap;
-		codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
-		analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, *this);
-		asPanel = new AsSubComponent(*vec, addrFuncMap, funcColoursMap, *this);
-		setFontSizes();
-		//
-		//
-		addAndMakeVisible(asPanel);
-		addAndMakeVisible(codePanel);
-		addAndMakeVisible(analyzerPanel);
-		projectOpened = true;
-		resized();
-	}
-	else {
-		showAlertWindow();
-	}
+	//
+	AlertWindow* processWnd = new AlertWindow("Loading",
+		"Please, wait for project to load...",
+		MessageBoxIconType::NoIcon);
+	processWnd->enterModalState(true, nullptr, true);
+	//
+	/*Flag = */MessageManager::callAsync([this, processWnd, filepath]()
+		{
+			TProjectParser::Project newProject = TProjectParser::getProjectFromFile(filepath);
+			if ((newProject.trace != "") && (newProject.objdump != "") && (newProject.code.size() != 0)) {
+				project = newProject;
+				//
+				if (asPanelTitle != nullptr) delete(asPanelTitle);
+				if (codePanelTitle != nullptr) delete(codePanelTitle);
+				if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
+				if (asPanel != nullptr) delete(asPanel);
+				if (codePanel != nullptr) delete(codePanel);
+				if (analyzerPanel != nullptr) delete(analyzerPanel);
+				//
+				asPanelTitle = new TitlePanel("Assembly trace");
+				codePanelTitle = new TitlePanel("Code");
+				analyzerPanelTitle = new TitlePanel("Analyzer");
+				//
+				addAndMakeVisible(asPanelTitle);
+				addAndMakeVisible(codePanelTitle);
+				addAndMakeVisible(analyzerPanelTitle);
+				//
+				//Objdump parsing
+				TObjdumpParser* parser = new TObjdumpParser();
+				parser->parseFile(project.objdump);
+				map<string, string> firstFuncAddrMap = parser->getFirstFuncAddrMap();
+				map<string, string> addrFuncMap = parser->getAddrFuncMap();
+				map<string, vector<string>> funcAddrMap = parser->getFuncAddrMap();
+				//
+				map<string, string> lastFuncAddrMap;
+				for (map<string, vector<string>>::iterator it = funcAddrMap.begin(); it != funcAddrMap.end(); it++) {
+					lastFuncAddrMap.insert({ (it->second).at((it->second).size() - 1), it->first });
+				}
+				//
+				map<string, set<string>> callingMap = parser->getCallingMap();
+				map<string, vector<string>> callersMap = parser->getCallersMap();
+				map<string, pair<string, string>> addrCallerCalled = parser->getAddrCallerCalled();
+				map<string, vector<string>> retFuncAddrs = parser->getRetFuncAddrMap();
+				//
+				//Trace parsing
+				vector<TraceParser::TraceLineStruct>* vec = new vector<TraceParser::TraceLineStruct>();
+				TraceParser traceParser(*vec);
+				traceParser.parseTrace(project.trace);
+				traceParser.addFuncAddresses(addrFuncMap);
+				traceParser.markFirstLines(firstFuncAddrMap);
+				traceParser.markCallLines(firstFuncAddrMap, addrCallerCalled, callingMap);
+				traceParser.markLastLines(retFuncAddrs);
+				//
+				//
+				map<string, juce::Colour> funcColoursMap;
+				codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
+				analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, *this);
+				asPanel = new AsSubComponent(*vec, addrFuncMap, funcColoursMap, *this);
+				setFontSizes();
+				//
+				//
+				addAndMakeVisible(asPanel);
+				addAndMakeVisible(codePanel);
+				addAndMakeVisible(analyzerPanel);
+				projectOpened = true;
+				resized();
+			}
+			else {
+				showAlertWindow();
+			}
+			//
+			if (nullptr != processWnd)
+			{
+				processWnd->exitModalState();
+			}
+		});
 }
 //
 void MainComponent::chooseProjectFile() {
