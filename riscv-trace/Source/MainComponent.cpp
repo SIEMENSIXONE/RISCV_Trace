@@ -1293,8 +1293,8 @@ void MainComponent::createProjectFile() {
 //
 void MainComponent::openProjectFile(const string filepath) {
 	//
-	AlertWindow* processWnd = new AlertWindow("Loading",
-		"Please, wait for project to load...",
+	AlertWindow* processWnd = new AlertWindow("Loading...",
+		"Please, wait for project to load.",
 		MessageBoxIconType::NoIcon);
 	processWnd->enterModalState(true, nullptr, true);
 	//
