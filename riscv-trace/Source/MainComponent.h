@@ -26,7 +26,7 @@ public:
     {
     public:
         //
-        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, set<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour>&, MainComponent&);
+        PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, set<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour>&, map<string, juce::Colour>&, MainComponent&);
         ~PerformanceAnalyzer() override;
         void paint(juce::Graphics&) override;
         void resized() override;
@@ -39,7 +39,7 @@ public:
         class ProfileTable : public Component, public TableListBoxModel {
         public:
             //
-            ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>&, MainComponent &);
+            ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>&, map<string, juce::Colour>&, MainComponent &);
             ~ProfileTable() override;
             void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override;
             void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override;
@@ -72,7 +72,9 @@ public:
             vector<array<std::string, 6>> *data;
             string selectedFunc = "";
             map<string, juce::Colour> funcColoursMap;
+            map<string, juce::Colour> funcColoursTempMap;
             map<int, juce::Colour> rowsColoursMap;
+            map<int, juce::Colour> rowsColoursTempMap;
             int selectedRow = -1;
             //
             int fontSize = 12;
@@ -225,7 +227,7 @@ public:
     {
     public:
         //
-        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, set<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour> &, MainComponent&);
+        AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>&, map<string, vector<string>>&, map<string, set<string>>&, map<string, vector<string>>&, map<string, pair<string, string>>&, map<string, juce::Colour> &, map<string, juce::Colour>&, MainComponent&);
         ~AnalyzerSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
@@ -246,7 +248,7 @@ public:
         class ScrollableWindow: public Component, public ScrollBar::Listener
         {
         public:
-            ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&);
+            ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&, map<string, juce::Colour>&);
             ~ScrollableWindow();
             void paint (Graphics&) override;
             void resized() override;
@@ -318,7 +320,7 @@ public:
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OccurancesPanel)
         };
-        AsSubComponent(vector<TraceParser::TraceLineStruct> &vec, map<string, string> & addrFuncMap, map<string, juce::Colour>&, MainComponent&);
+        AsSubComponent(vector<TraceParser::TraceLineStruct> &vec, map<string, string> & addrFuncMap, map<string, juce::Colour>&, map<string, juce::Colour>&, MainComponent&);
         ~AsSubComponent() override;
         void paint (Graphics&) override;
         void resized() override;
@@ -334,12 +336,23 @@ public:
         //
         void setFontSize(const int);
     private:
+        class MyTextEditor : public TextEditor
+        {
+        public:
+            MyTextEditor(MainComponent &);
+            ~MyTextEditor() override;
+            //
+        private:
+            void returnPressed() override;
+            //
+            MainComponent* mainComponent;
+        };
+        //
         string defaultSearchfieldText = "Search...";
         //
-        void textEditorTextChanged(TextEditor&) override;
         MainComponent* mainComponent;
         OccurancesPanel* occurancesPanel;
-        TextEditor* searchField;
+        MyTextEditor* searchField;
         ComboBox* functionsComboBox;
         ScrollableWindow* scrollableWindow;
         string selectedFunction = "";

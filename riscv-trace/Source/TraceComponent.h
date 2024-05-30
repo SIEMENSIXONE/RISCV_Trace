@@ -64,7 +64,7 @@ public:
             TraceLine* traceLine;
         };
         //
-        TraceLine(TraceParser::TraceLineStruct &, juce::Colour &, TraceComponent &);
+        TraceLine(TraceParser::TraceLineStruct &, juce::Colour &, juce::Colour&, TraceComponent &);
         ~TraceLine() override;
         void paint (juce::Graphics&) override;
         void resized() override;
@@ -76,6 +76,7 @@ public:
     private:
         TraceParser::TraceLineStruct lineInfo;
         juce::Colour funcColour;
+        juce::Colour tempColour;
         juce::Colour defaultBorderColour;
         juce::Colour selectedFuncBackgroundColour;
         juce::Colour defaultFuncTextColour;
@@ -92,7 +93,7 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLine)
     };
     //
-    TraceComponent(vector<TraceParser::TraceLineStruct> &, map<string, string>& , map<string, juce::Colour>& , juce::ScrollBar &);
+    TraceComponent(vector<TraceParser::TraceLineStruct> &, map<string, string>& , map<string, juce::Colour>&, map<string, juce::Colour>&, juce::ScrollBar &);
     ~TraceComponent() override;
     void paint (juce::Graphics&) override;
     void resized() override;

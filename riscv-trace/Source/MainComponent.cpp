@@ -3,7 +3,7 @@
 //==============================================================================
 using namespace juce;
 //
-MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, MainComponent& _mainComponent)
+MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent)
 {
 	mainComponent = &_mainComponent;
 	lines = &_linesInfoVector;
@@ -131,7 +131,8 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		double precentage = selfTime / maxSelfTime;
 		//if ((int) precentage == 0) precentage = 1;
 		int maxColour = 200;
-		_funcColoursMap.insert({ funcName, Colour((juce::uint8) (maxColour * precentage), (juce::uint8) (maxColour - (maxColour * precentage)),(juce::uint8) (255 * precentage / 2)) });
+		_funcColoursMap.insert({ funcName, Colour((juce::uint8) (rand() % 200), (juce::uint8) (rand() % 100), (juce::uint8) (rand() % 200)) });
+		_funcColoursTempMap.insert({ funcName, Colour((juce::uint8) (maxColour * precentage), (juce::uint8) (maxColour - (maxColour * precentage)),/*(juce::uint8) (255 * precentage / 2)*/ 20) });
 		//
 		//called
 		int timesCalled = 0;
@@ -155,14 +156,14 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		if (totalExecTime != 0) tableData->push_back(newRow);
 	}
 	//
-	table = new ProfileTable(*tableData, _funcColoursMap, *mainComponent);
+	table = new ProfileTable(*tableData, _funcColoursMap, _funcColoursTempMap, *mainComponent);
 	table->setBounds(0, 0, getWidth(), getHeight());
 	//
 	std::ofstream file;
 	file.open(graphTXTFilepath, std::ios::out);
 	//
 	if (file.is_open()) {
-		file << getGraphCode(_funcColoursMap);
+		file << getGraphCode(_funcColoursTempMap);
 	}
 	//
 	file.close();
@@ -423,10 +424,11 @@ MainComponent::PerformanceAnalyzer::MyTabbedComponent::MyTabbedComponent(Profile
 	addTab("Graph", colour, &graphViewport, true);
 }
 //
-MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>& _funcColoursMap, MainComponent& _mainComponent) {
+MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
 	data = &_data;
 	mainComponent = &_mainComponent;
 	funcColoursMap = _funcColoursMap;
+	funcColoursTempMap = _funcColoursTempMap;
 	rowsColoursMap;
 	//
 	refreshRowsColoursMap();
@@ -461,10 +463,11 @@ MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
 	box.getHeader().setLookAndFeel(nullptr);
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int /*rowNumber*/, int width, int height, bool rowIsSelected)
+void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
 {
 	//
-	g.setColour(juce::Colours::white);
+	//g.setColour(juce::Colours::white);
+	if ((rowsColoursMap.size() != 0) && (rowsColoursMap.find(rowNumber) != rowsColoursMap.end())) g.setColour(rowsColoursMap.at(rowNumber));
 	if (rowIsSelected) g.setColour(juce::Colours::lightpink);
 	g.fillRect(0, 0, width, height);
 	//!!!
@@ -479,14 +482,14 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, in
 	juce::Font font(fontTypeface, (float)fontSize, fontStyle);
 	g.setFont(font);
 	g.setColour(juce::Colours::black);
-	std::string val = (data->at(rowNumber)).at(columnId - 1);
-	if ((rowsColoursMap.size() != 0) && (rowsColoursMap.find(rowNumber) != rowsColoursMap.end())) g.setColour(rowsColoursMap.at(rowNumber));
+	std::string val = (data->at(rowNumber)).at(columnId - 1); 
+	g.setColour(Colours::white);
 	g.drawText(val, 2, 0, width - 4, height, Justification::centred, true);
 	g.setColour(juce::Colours::white);
 	g.fillRect(width - 1, 0, 1, height);
-	g.setColour(juce::Colours::white);
-	if ((rowsColoursMap.size() != 0) && (rowsColoursMap.find(rowNumber) != rowsColoursMap.end())) g.setColour(rowsColoursMap.at(rowNumber));
-	g.drawRect(0, 0, width, height);
+	g.setColour(juce::Colours::whitesmoke);
+	if ((rowsColoursTempMap.size() != 0) && (rowsColoursTempMap.find(rowNumber) != rowsColoursTempMap.end())) g.setColour(rowsColoursTempMap.at(rowNumber));
+	g.drawRect(0, 0, width, height, 4);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::sortOrderChanged(int newSortColumnId, bool isForwards)
@@ -610,11 +613,17 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::clearSelection() {
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::refreshRowsColoursMap() {
 	rowsColoursMap = *(new map<int, juce::Colour>());
+	rowsColoursTempMap = *(new map<int, juce::Colour>());
+	//
 	int rowCtr = 0;
 	for (vector<array<std::string, 6>> ::iterator it = data->begin(); it != data->end(); it++) {
 		string funcName = it->at(0);
 		if ((funcColoursMap.size() != 0) && (funcColoursMap.find(funcName) != funcColoursMap.end())) {
 			rowsColoursMap.insert({ rowCtr, funcColoursMap.at(funcName) });
+		}
+		//
+		if ((funcColoursTempMap.size() != 0) && (funcColoursTempMap.find(funcName) != funcColoursTempMap.end())) {
+			rowsColoursTempMap.insert({ rowCtr, funcColoursTempMap.at(funcName) });
 		}
 		rowCtr++;
 	}
@@ -705,7 +714,7 @@ void MainComponent::TitlePanel::resized()
 {
 }
 //
-MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColours) {
+MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColours, map<string, juce::Colour>& funcColoursTemp) {
 	scrollBar = new juce::ScrollBar(true);
 	scrollBar->setRangeLimits((double)0, (double)vec.size());
 	scrollBar->setSingleStepSize(1);
@@ -713,7 +722,7 @@ MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TracePa
 	scrollBar->addListener(this);
 	addAndMakeVisible(scrollBar);
 	//
-	TraceWindow = new TraceComponent(vec, addrFuncMap, funcColours, *scrollBar);
+	TraceWindow = new TraceComponent(vec, addrFuncMap, funcColours, funcColoursTemp, *scrollBar);
 	addAndMakeVisible(TraceWindow);
 	//
 	resized();
@@ -911,8 +920,8 @@ void MainComponent::AsSubComponent::OccurancesPanel::buttonClicked(Button* butto
 	}
 }
 //
-MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColoursMap, MainComponent& _mainComponent) {
-	scrollableWindow = new ScrollableWindow(vec, addrFuncMap, funcColoursMap);
+MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColoursMap, map<string, juce::Colour> & funcColoursTempMap, MainComponent& _mainComponent) {
+	scrollableWindow = new ScrollableWindow(vec, addrFuncMap, funcColoursMap, funcColoursTempMap);
 	addAndMakeVisible(scrollableWindow);
 	//
 	mainComponent = &_mainComponent;
@@ -927,7 +936,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	functionsComboBox->setEditableText(false);
 	//
 	//
-	searchField = new TextEditor("searchField");
+	searchField = new MyTextEditor(*mainComponent);
 	juce::Font font("Courier New", 20.0f, juce::Font::FontStyleFlags::plain);
 	searchField->setFont(font);
 	searchField->setMultiLine(false);
@@ -1068,8 +1077,16 @@ void MainComponent::AsSubComponent::setFontSize(const int size) {
 	scrollableWindow->setFontSize(size);
 }
 //
-void MainComponent::AsSubComponent::textEditorTextChanged(TextEditor& editor) {
-	mainComponent->setSelectedFunc(editor.getText().toStdString(), 1);
+MainComponent::AsSubComponent::MyTextEditor::MyTextEditor(MainComponent& _mainComponent) 
+	: TextEditor() 
+{
+	mainComponent = &_mainComponent;
+}
+//
+MainComponent::AsSubComponent::MyTextEditor::~MyTextEditor() {}
+//
+void MainComponent::AsSubComponent::MyTextEditor::returnPressed() {
+	mainComponent->setSelectedFunc(this->getText().toStdString(), 1);
 }
 //
 MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>& filepaths, map<string, string> map, MainComponent& _mainComponent) {
@@ -1145,9 +1162,9 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
 	}
 }
 //
-MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, MainComponent& _mainComponent) {
+MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
 	mainComponent = &_mainComponent;
-	performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _addrCallingCalledMap, _funcColoursMap, *mainComponent);
+	performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _addrCallingCalledMap, _funcColoursMap, _funcColoursTempMap, *mainComponent);
 	addAndMakeVisible(performanceAnalyzer);
 }
 //
@@ -1345,11 +1362,12 @@ void MainComponent::openProjectFile(const string filepath) {
 				traceParser.markCallLines(firstFuncAddrMap, addrCallerCalled, callingMap);
 				traceParser.markLastLines(retFuncAddrs);
 				//
-				//
+				
 				map<string, juce::Colour> funcColoursMap;
+				map<string, juce::Colour> funcColoursTempMap;
 				codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
-				analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, *this);
-				asPanel = new AsSubComponent(*vec, addrFuncMap, funcColoursMap, *this);
+				analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, funcColoursTempMap, *this);
+				asPanel = new AsSubComponent(*vec, addrFuncMap, funcColoursMap, funcColoursTempMap, *this);
 				setFontSizes();
 				//
 				//

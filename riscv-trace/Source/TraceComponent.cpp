@@ -97,10 +97,11 @@ void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
     }
 }
 //
-TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, juce::Colour &curFuncColour, TraceComponent& _traceComp){
+TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, juce::Colour &curFuncColour, juce::Colour& curFuncTempColour, TraceComponent& _traceComp){
     traceComp = &_traceComp;
     lineInfo = lineInfoIn;
     funcColour = curFuncColour;
+    tempColour = curFuncTempColour;
     //
     defaultBorderColour = juce::Colours::black;
     selectedFuncBackgroundColour = juce::Colours::red;
@@ -112,7 +113,8 @@ TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, j
     func = new TraceFuncElement(lineInfo.func, *this, *traceComp);
     instr = new TraceLineElement(lineInfo.instr, *traceComp);
     //
-    time->backgroundColor = juce::Colour(125, 111, 111);
+    //time->backgroundColor = juce::Colour(125, 111, 111);
+    time->backgroundColor = tempColour;
     time->borderColor = juce::Colours::black;
     time->textColor = juce::Colours::white;
     //
@@ -191,7 +193,7 @@ TraceParser::TraceLineStruct TraceComponent::TraceLine::getLineInfo() {
     return lineInfo;
 }
 //
-TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& /*addrFuncMap*/, map<string, juce::Colour>&  funcColours, juce::ScrollBar& _scrollbar)
+TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& /*addrFuncMap*/, map<string, juce::Colour>&  funcColours, map<string, juce::Colour>& funcColoursTemp, juce::ScrollBar& _scrollbar)
 {
     scrollbar = &_scrollbar;
     //
@@ -202,9 +204,11 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<st
     //juce::Colour curFuncColour = juce::Colours::black;
     for (int i = 0; i < (&vec)->size(); i++) {
         juce::Colour curFuncColour = juce::Colours::black;
+        juce::Colour curFuncTempColour = juce::Colours::black;
         string funcName = (&vec)->at(i).func;
         if (funcName != "") {
             curFuncColour = funcColours.at(funcName);
+            curFuncTempColour = funcColoursTemp.at(funcName);
             //
             if ((&vec)->at(i).isFirstLine) {
                 if (funcLines->find(funcName) == funcLines->end()) {
@@ -220,7 +224,7 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<st
         }
         //
         TraceParser::TraceLineStruct newLineInfo = (&vec)->at(i);
-        TraceLine *newLine = new TraceLine(newLineInfo, curFuncColour, *this);
+        TraceLine *newLine = new TraceLine(newLineInfo, curFuncColour, curFuncTempColour, *this);
         FTraceLines->emplace_back(newLine);
     }
     //
