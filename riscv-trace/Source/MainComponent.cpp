@@ -1251,6 +1251,7 @@ MainComponent::~MainComponent()
 	if (createProjWindow != nullptr) delete(createProjWindow);
 	if (settingsWindow != nullptr) delete(settingsWindow);
 	if (aboutWindow != nullptr) delete(aboutWindow);
+	if (usageWindow != nullptr) delete(usageWindow);
 	//
 	if (saveSettingsButton != nullptr) delete(saveSettingsButton);
 }
@@ -1450,6 +1451,14 @@ void MainComponent::openAboutWindow() {
 	aboutWindow->setVisible(true);
 }
 //
+void MainComponent::openUsageWindow() {
+	if (usageWindow != nullptr) delete(usageWindow);
+	usageWindow = new UsageWindow("How to use");
+	usageWindow->setVisible(false);
+	usageWindow->addComponentListener(this);
+	usageWindow->setVisible(true);
+}
+//
 void MainComponent::updateCurrentSettings() {
 	if (projectOpened) {
 		setFontSizes();
@@ -1501,8 +1510,10 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 		//Help
 		else if (index == 2) {
 			std::function<void()> openAboutProgram = [this]() { openAboutWindow(); };
+			std::function<void()> openUsageGuide = [this]() { openUsageWindow(); };
 			//
 			menu.addItem(String("About"), openAboutProgram);
+			menu.addItem(String("Usage"), openUsageGuide);
 		}
 	}
 	return menu;

@@ -38,6 +38,7 @@
 		E2BC1E8E3837534C97EF6A84 /* Cocoa.framework */ = {isa = PBXBuildFile; fileRef = 52A788E608B65AE530CEFEA9; };
 		E8271BFF326286528FEF813F /* BinaryData.cpp */ = {isa = PBXBuildFile; fileRef = 7E99B4C7811FBAA0549904D3; };
 		F719FB78C21B5298C769B3E5 /* include_juce_gui_basics.mm */ = {isa = PBXBuildFile; fileRef = 9C3B756D46C16FA7DDACB24F; };
+		FA04CA71EEFEFAB3225FB779 /* UsageWindow.cpp */ = {isa = PBXBuildFile; fileRef = 6AE84506075618CDE643363B; };
 		FF09B37D19F7BCBAF1A74F06 /* Security.framework */ = {isa = PBXBuildFile; fileRef = 7E7E57E1196C85AAF8D4EB2E; };
 /* End PBXBuildFile section */
 
@@ -67,11 +68,13 @@
 		5BC7A45DBFC5B7CD09C284CC /* juce_events */ /* juce_events */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_events; path = ../../Juce/modules/juce_events; sourceTree = SOURCE_ROOT; };
 		61396D5B7DE623A9998FFEA9 /* include_juce_osc.cpp */ /* include_juce_osc.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = include_juce_osc.cpp; path = ../../JuceLibraryCode/include_juce_osc.cpp; sourceTree = SOURCE_ROOT; };
 		675A82FD94CAD36F3D74E19E /* TraceComponent.cpp */ /* TraceComponent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = TraceComponent.cpp; path = ../../Source/TraceComponent.cpp; sourceTree = SOURCE_ROOT; };
+		6AE84506075618CDE643363B /* UsageWindow.cpp */ /* UsageWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = UsageWindow.cpp; path = ../../Source/UsageWindow.cpp; sourceTree = SOURCE_ROOT; };
 		7538B583BD9446403CACCD24 /* Info-App.plist */ /* Info-App.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info-App.plist"; path = "Info-App.plist"; sourceTree = SOURCE_ROOT; };
 		79E9C551F08761D89615289A /* CodeParser.hpp */ /* CodeParser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CodeParser.hpp; path = ../../Source/CodeParser.hpp; sourceTree = SOURCE_ROOT; };
 		7E7E57E1196C85AAF8D4EB2E /* Security.framework */ /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		7E99B4C7811FBAA0549904D3 /* BinaryData.cpp */ /* BinaryData.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = BinaryData.cpp; path = ../../JuceLibraryCode/BinaryData.cpp; sourceTree = SOURCE_ROOT; };
 		8671901C4CD222CA194F4F2D /* CodeComponent.h */ /* CodeComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CodeComponent.h; path = ../../Source/CodeComponent.h; sourceTree = SOURCE_ROOT; };
+		86EA6DD680DB35AE20192B1A /* UsageWindow.h */ /* UsageWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UsageWindow.h; path = ../../Source/UsageWindow.h; sourceTree = SOURCE_ROOT; };
 		8D7DF7A7489F642FBDEB1CA2 /* ProjectParser.hpp */ /* ProjectParser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ProjectParser.hpp; path = ../../Source/ProjectParser.hpp; sourceTree = SOURCE_ROOT; };
 		917819D6F0ABD9A5D1142184 /* App */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RISCV_Trace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		948BD50675D1EF09940DF888 /* MainComponent.cpp */ /* MainComponent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MainComponent.cpp; path = ../../Source/MainComponent.cpp; sourceTree = SOURCE_ROOT; };
@@ -140,6 +143,7 @@
 		403BD05D252180EA02DAA2D2 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6AE84506075618CDE643363B,
 				CFDBBE93F6F65DC56EBB0B33,
 				EBC681E45E238281C0B6CA24,
 				AE8329E8246645E2B526DCCA,
@@ -190,6 +194,7 @@
 		AB5CDE72CB712B991DDB1DF4 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				86EA6DD680DB35AE20192B1A,
 				BE10A6697B584A946FAB2357,
 				D91EFE30B60AAF8A246FE3B1,
 				3BC89C9887B7275ECB7C8518,
@@ -357,6 +362,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA04CA71EEFEFAB3225FB779,
 				92A4F77CBE4771C3D8546E0E,
 				4308273D219860506EC18F0A,
 				9F8A6EE256CD8E7B5632CB34,

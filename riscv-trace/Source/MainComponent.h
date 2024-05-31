@@ -8,6 +8,7 @@
 #include "CreateProjectWindow.h"
 #include "SettingsWindow.h"
 #include "AboutWindow.h"
+#include "UsageWindow.h"
 #include <array>
 
 //==============================================================================
@@ -397,6 +398,7 @@ private:
     void closeProjectFile();
     void openSettingsWindow();
     void openAboutWindow();
+    void openUsageWindow();
     void updateCurrentSettings();
     void setFontSizes();
     StringArray getMenuBarNames() override;
@@ -427,6 +429,7 @@ private:
     CreateProjectWindow* createProjWindow = nullptr;
     SettingsWindow* settingsWindow = nullptr;
     AboutWindow* aboutWindow = nullptr;
+    UsageWindow* usageWindow = nullptr;
     //
     ScopedMessageBox messageBox;
     //

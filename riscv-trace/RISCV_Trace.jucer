@@ -7,6 +7,7 @@
       <FILE id="Hjhkg4" name="json.hpp" compile="0" resource="0" file="Source/JSON/json.hpp"/>
     </GROUP>
     <GROUP id="{9CD26884-6009-02E8-F552-8750B62BD65C}" name="Include">
+      <FILE id="HUktV2" name="UsageWindow.h" compile="0" resource="0" file="Source/UsageWindow.h"/>
       <FILE id="TKs9CJ" name="SettingsParser.hpp" compile="0" resource="0"
             file="Source/SettingsParser.hpp"/>
       <FILE id="k4yYS4" name="SettingsWindow.h" compile="0" resource="0"
@@ -26,6 +27,7 @@
       <FILE id="EcktmO" name="AboutWindow.h" compile="0" resource="0" file="Source/AboutWindow.h"/>
     </GROUP>
     <GROUP id="{EDAA3E03-AFD0-589E-C685-DC96070FECA2}" name="Source">
+      <FILE id="JDs6VC" name="UsageWindow.cpp" compile="1" resource="0" file="Source/UsageWindow.cpp"/>
       <FILE id="mC6fIu" name="AboutWindow.cpp" compile="1" resource="0" file="Source/AboutWindow.cpp"/>
       <FILE id="hOma5N" name="SettingsParser.cpp" compile="1" resource="0"
             file="Source/SettingsParser.cpp"/>
