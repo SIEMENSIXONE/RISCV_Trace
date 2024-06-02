@@ -3,4 +3,22 @@
    uuid = "F2074E9C-0F3B-4734-AFC2-417C8E7DFFC0"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "520C651D-876C-43AD-B15E-08B1E6A4F480"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../Source/MainComponent.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
+            landmarkName = "MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _addrCallingCalledMap, _funcColoursMap, _funcColoursTempMap, _mainComponent)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

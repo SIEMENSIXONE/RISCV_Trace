@@ -170,6 +170,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	//
 	std::string command = "dot -Tpng -o " + graphPNGFilepath + " " + graphTXTFilepath;
 	const char* c = command.c_str();
+//    std::cout << c << std::endl;
 	std::system(c);
 	//
 	graph = new ProfileGraphPanel(graphPNGFilepath);

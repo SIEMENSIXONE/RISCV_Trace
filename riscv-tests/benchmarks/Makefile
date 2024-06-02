@@ -19,6 +19,8 @@ instbasedir = $(UCB_VLSI_HOME)/install
 
 bmarks = \
 	program \
+	func_name_test \
+	profiling_test \
 
 
 #--------------------------------------------------------------------
