@@ -3,4 +3,6 @@
 
 int myFunc(int val);
 
+int myFunc1(int val);
+
 #endif /* header_h */
