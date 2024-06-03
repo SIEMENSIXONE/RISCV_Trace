@@ -670,10 +670,6 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
 	}
 	//
 	g.setColour(juce::Colours::white);
-	/*   juce::String fontTypeface = "Courier New";
-	   float headerFontSize = (float)(15);
-	   juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::plain;
-	   Font font(fontTypeface, headerFontSize, fontStyle);*/
 	g.setFont(16.0f);
 	//
 	g.drawFittedText(columnName, area, Justification::centred, 1);
@@ -922,6 +918,10 @@ void MainComponent::AsSubComponent::OccurancesPanel::buttonClicked(Button* butto
 }
 //
 MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColoursMap, map<string, juce::Colour> & funcColoursTempMap, MainComponent& _mainComponent) {
+	//
+	titlePanel = new TitlePanel("Assembly Trace");
+	addAndMakeVisible(titlePanel);
+	//
 	scrollableWindow = new ScrollableWindow(vec, addrFuncMap, funcColoursMap, funcColoursTempMap);
 	addAndMakeVisible(scrollableWindow);
 	//
@@ -951,7 +951,6 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	searchField->setColour(TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::hotpink);
 	searchField->setColour(TextEditor::ColourIds::shadowColourId, juce::Colours::grey);
 	//
-	//searchField->setText(defaultSearchfieldText);
 	searchField->setTextToShowWhenEmpty(defaultSearchfieldText, Colours::black);
 
 	addAndMakeVisible(searchField);
@@ -998,6 +997,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 }
 //
 MainComponent::AsSubComponent::~AsSubComponent() {
+	delete(titlePanel);
 	delete(scrollableWindow);
 	delete(functionsComboBox);
 	delete(occurancesPanel);
@@ -1009,13 +1009,20 @@ void MainComponent::AsSubComponent::paint(Graphics& g) {
 }
 //
 void MainComponent::AsSubComponent::resized() {
+	int titleHeight = 50;
+	//
+	Rectangle<int> titleArea(0, 0, getWidth(), titleHeight);
+	Rectangle<int> mainArea(0, titleHeight, getWidth(), getHeight() - titleHeight);
+	//
+	titlePanel->setBounds(titleArea);
+	//
 	using Track = Grid::TrackInfo;
 	using Fr = Grid::Fr;
 	Grid grid;
 	grid.templateRows = { Track(Fr(3)),Track(Fr(3)),Track(Fr(3)), Track(Fr(80)) };
 	grid.templateColumns = { Track(Fr(1)) };
 	grid.items = { GridItem(functionsComboBox),GridItem(searchField), GridItem(occurancesPanel), GridItem(scrollableWindow) };
-	grid.performLayout(getLocalBounds());
+	grid.performLayout(mainArea);
 }
 //
 void MainComponent::AsSubComponent::selectFuncInCombobox(const string& funcName) {
@@ -1092,6 +1099,10 @@ void MainComponent::AsSubComponent::MyTextEditor::returnPressed() {
 }
 //
 MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>& filepaths, map<string, string> map, MainComponent& _mainComponent) {
+	//
+	titlePanel = new TitlePanel("Code");
+	addAndMakeVisible(titlePanel);
+	//
 	mainComponent = &_mainComponent;
 	//
 	std::vector<std::string> filesContentVector;
@@ -1112,12 +1123,11 @@ MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>
 	}
 	//
 	tabs = new MyTabbedComponent(*codeWindows);
-	tabs->setBounds(0, 0, getWidth(), getHeight());
 	addAndMakeVisible(tabs);
 }
 //
 MainComponent::CodeSubComponent::~CodeSubComponent() {
-	//delete(CodeWindow);
+	delete(titlePanel);
 	delete(codeWindows);
 	delete(tabs);
 }
@@ -1129,11 +1139,14 @@ void MainComponent::CodeSubComponent::paint(Graphics& g) {
 }
 void MainComponent::CodeSubComponent::resized() {
 	//
+	int titleHeight = 50;
+	//
 	for (vector<CodeComponent*>::iterator it = codeWindows->begin(); it != codeWindows->end(); it++) {
 		(*it)->setSize(getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness);
 	}
 	//
-	tabs->setBounds(borderThickness, borderThickness, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness);
+	titlePanel->setBounds(0, 0, getWidth(), titleHeight);
+	tabs->setBounds(borderThickness, borderThickness + titleHeight, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness - titleHeight);
 }
 //
 void MainComponent::CodeSubComponent::selectFunc(const string& funcName) {
@@ -1165,12 +1178,16 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
 }
 //
 MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
+	titlePanel = new TitlePanel("Analyzer");
+	addAndMakeVisible(titlePanel);
+	//
 	mainComponent = &_mainComponent;
 	performanceAnalyzer = new PerformanceAnalyzer(_linesInfoVector, _funcAddrMap, _callingMap, _callersMap, _addrCallingCalledMap, _funcColoursMap, _funcColoursTempMap, *mainComponent);
 	addAndMakeVisible(performanceAnalyzer);
 }
 //
 MainComponent::AnalyzerSubComponent::~AnalyzerSubComponent() {
+	delete(titlePanel);
 	delete(performanceAnalyzer);
 }
 //
@@ -1184,7 +1201,10 @@ void MainComponent::AnalyzerSubComponent::paint(Graphics& g) {
 }
 //
 void MainComponent::AnalyzerSubComponent::resized() {
-	performanceAnalyzer->setBounds(borderThickness, borderThickness, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness);
+	int titleHeight = 50;
+	//
+	titlePanel->setBounds(0, 0, getWidth(), titleHeight);
+	performanceAnalyzer->setBounds(borderThickness, borderThickness + titleHeight, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness - titleHeight);
 }
 //
 void MainComponent::AnalyzerSubComponent::setSelectedFunc(const string& funcName) {
@@ -1235,16 +1255,25 @@ MainComponent::MainComponent()
 	placeholderPanel = new PlaceholderSubComponent();
 	addAndMakeVisible(placeholderPanel);
 	//
+	double thickness = 4;
+	verticalLayout.setItemLayout(0, -0.1, -1.0, -0.65);
+	verticalLayout.setItemLayout(1, thickness, thickness, thickness);
+	verticalLayout.setItemLayout(2, -0.1, -1.0, -0.65);
+	verticalLayout.setItemLayout(3, thickness, thickness, thickness);
+	verticalLayout.setItemLayout(4, -0.1, -1.0, -0.65);
+	//
+	verticalDividerBarLeft.reset(new StretchableLayoutResizerBar(&verticalLayout, 1, true));
+	addAndMakeVisible(verticalDividerBarLeft.get());
+	verticalDividerBarRight.reset(new StretchableLayoutResizerBar(&verticalLayout, 2, true));
+	addAndMakeVisible(verticalDividerBarRight.get());
+	//
 	setSize(1440, 800);
 }
-
+//
 MainComponent::~MainComponent()
 {
 	if (menuBar != nullptr) delete(menuBar);
 	if (placeholderPanel != nullptr) delete(placeholderPanel);
-	if (asPanelTitle != nullptr) delete(asPanelTitle);
-	if (codePanelTitle != nullptr) delete(codePanelTitle);
-	if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
 	if (asPanel != nullptr) delete(asPanel);
 	if (codePanel != nullptr) delete(codePanel);
 	if (analyzerPanel != nullptr) delete(analyzerPanel);
@@ -1256,7 +1285,6 @@ MainComponent::~MainComponent()
 	//
 	if (saveSettingsButton != nullptr) delete(saveSettingsButton);
 }
-
 //==============================================================================
 void MainComponent::paint(Graphics& g)
 {
@@ -1277,19 +1305,20 @@ void MainComponent::resized()
 	using Fr = Grid::Fr;
 	//
 	if (projectOpened) {
-		Grid grid;
-		grid.templateRows = { Track(Fr(3)), Track(Fr(40)) };
 		//
-		int traceProportion = 3;
-		int codeProportion = 4;
-		int analyzerProportion = 3;
+		placeholderPanel->setVisible(false);
+		auto r = getLocalBounds();
+		Component* vcomps[] = { asPanel, verticalDividerBarLeft.get(), codePanel, verticalDividerBarRight.get(), analyzerPanel };
+		verticalLayout.layOutComponents(vcomps, 5, r.getX(), r.getY() + menuBar->getHeight(), r.getWidth(), r.getHeight() - menuBar->getHeight(), false, true);
 		//
-		grid.templateColumns = { Track(Fr(traceProportion)), Track(Fr(codeProportion)), Track(Fr(analyzerProportion)) };
-		grid.items = { GridItem(asPanelTitle), GridItem(codePanelTitle), GridItem(analyzerPanelTitle), GridItem(asPanel), GridItem(codePanel), GridItem(analyzerPanel) };
-		grid.performLayout(workspaceArea);
+		r.removeFromLeft(verticalDividerBarLeft->getRight());
+		r.removeFromRight(verticalDividerBarLeft->getRight());
+		r.removeFromLeft(verticalDividerBarRight->getRight());
+		r.removeFromRight(verticalDividerBarRight->getRight());
 	}
 	else {
 		placeholderPanel->setBounds(workspaceArea);
+		placeholderPanel->setVisible(true);
 	}
 }
 //
@@ -1324,20 +1353,9 @@ void MainComponent::openProjectFile(const string filepath) {
 			if ((newProject.trace != "") && (newProject.objdump != "") && (newProject.code.size() != 0)) {
 				project = newProject;
 				//
-				if (asPanelTitle != nullptr) delete(asPanelTitle);
-				if (codePanelTitle != nullptr) delete(codePanelTitle);
-				if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
 				if (asPanel != nullptr) delete(asPanel);
 				if (codePanel != nullptr) delete(codePanel);
 				if (analyzerPanel != nullptr) delete(analyzerPanel);
-				//
-				asPanelTitle = new TitlePanel("Assembly trace");
-				codePanelTitle = new TitlePanel("Code");
-				analyzerPanelTitle = new TitlePanel("Analyzer");
-				//
-				addAndMakeVisible(asPanelTitle);
-				addAndMakeVisible(codePanelTitle);
-				addAndMakeVisible(analyzerPanelTitle);
 				//
 				//Objdump parsing
 				TObjdumpParser* parser = new TObjdumpParser();
@@ -1415,16 +1433,10 @@ void MainComponent::saveProject() {
 }
 //
 void MainComponent::closeProjectFile() {
-	if (asPanelTitle != nullptr) delete(asPanelTitle);
-	if (codePanelTitle != nullptr) delete(codePanelTitle);
-	if (analyzerPanelTitle != nullptr) delete(analyzerPanelTitle);
 	if (asPanel != nullptr) delete(asPanel);
 	if (codePanel != nullptr) delete(codePanel);
 	if (analyzerPanel != nullptr) delete(analyzerPanel);
 	//
-	asPanelTitle = nullptr;
-	codePanelTitle = nullptr;
-	analyzerPanelTitle = nullptr;
 	asPanel = nullptr;
 	codePanel = nullptr;
 	analyzerPanel = nullptr;

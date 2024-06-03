@@ -221,6 +221,8 @@ public:
         //
         int borderThickness = 2;
         //
+        TitlePanel *titlePanel;
+        //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CodeSubComponent)
     };
     //
@@ -239,6 +241,8 @@ public:
         MainComponent* mainComponent;
         PerformanceAnalyzer* performanceAnalyzer;
         int borderThickness = 2;
+        //
+        TitlePanel* titlePanel;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnalyzerSubComponent)
     };
@@ -363,6 +367,8 @@ public:
         //
         LookAndFeel_V4 lf;
         //
+        TitlePanel *titlePanel;
+        //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AsSubComponent)
     };
     //
@@ -417,9 +423,6 @@ private:
     TextButton *saveSettingsButton = nullptr;
     //
     MenuBarComponent *menuBar = nullptr;
-    TitlePanel *asPanelTitle = nullptr;
-    TitlePanel *codePanelTitle = nullptr;
-    TitlePanel *analyzerPanelTitle = nullptr;
     //
     AsSubComponent *asPanel = nullptr;
     CodeSubComponent *codePanel = nullptr;
@@ -430,6 +433,10 @@ private:
     SettingsWindow* settingsWindow = nullptr;
     AboutWindow* aboutWindow = nullptr;
     UsageWindow* usageWindow = nullptr;
+    //
+    StretchableLayoutManager verticalLayout;
+    std::unique_ptr<StretchableLayoutResizerBar> verticalDividerBarLeft;
+    std::unique_ptr<StretchableLayoutResizerBar> verticalDividerBarRight;
     //
     ScopedMessageBox messageBox;
     //

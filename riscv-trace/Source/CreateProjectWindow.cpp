@@ -29,12 +29,14 @@ CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProje
         chooseFilesButton = new TextButton("...");
         chooseFilesButton->addListener(this);
         chooseFilesButton->setColour(TextButton::ColourIds::buttonColourId, Colour(187, 148, 174));
+        chooseFilesButton->setColour(TextButton::ColourIds::textColourOffId, juce::Colour(37, 11, 46));
         addAndMakeVisible(chooseFilesButton);
     }
     else {
         chooseFileButton = new TextButton("...");
         chooseFileButton->addListener(this);
         chooseFileButton->setColour(TextButton::ColourIds::buttonColourId, Colour(187, 148, 174));
+        chooseFileButton->setColour(TextButton::ColourIds::textColourOffId, juce::Colour(37, 11, 46));
         addAndMakeVisible(chooseFileButton);
     }
 }
@@ -65,7 +67,7 @@ void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
 void CreateProjectPanel::SetPathPanel::resized()
 {
     int space = 15;
-    int buttonHeight = 13;
+    int buttonHeight = 17;
     int buttonWidth = 90;
     //
     if (textField != nullptr) textField->setBounds(0, 0, getWidth() - buttonWidth - space, getHeight());
