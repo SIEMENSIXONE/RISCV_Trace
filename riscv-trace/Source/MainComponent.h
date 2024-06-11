@@ -384,7 +384,15 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaceholderSubComponent)
     };
     //
-
+    class MyAlertWindow : public AlertWindow
+    {
+    public:
+        MyAlertWindow(const String& title,
+            const String& message,
+            MessageBoxIconType iconType,
+            Component* comp);
+        ~MyAlertWindow() override;
+    };
     //
     MainComponent();
     ~MainComponent() override;
@@ -410,7 +418,6 @@ private:
     StringArray getMenuBarNames() override;
     PopupMenu getMenuForIndex (int menuIndex, const String& /*menuName*/) override;
     void menuItemSelected (int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
-    void showWaitWindow();
     void showAlertWindow();
     //
     void buttonClicked(Button*) override;

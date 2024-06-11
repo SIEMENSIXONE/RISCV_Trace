@@ -11,6 +11,18 @@
 #include <JuceHeader.h>
 #include "CreateProjectWindow.h"
 //==============================================================================
+CreateProjectPanel::MyAlertWindow::MyAlertWindow(const String& title,
+    const String& message,
+    MessageBoxIconType iconType,
+    Component* comp)
+    :AlertWindow(title, message, iconType, comp)
+{
+    setColour(AlertWindow::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+    setColour(AlertWindow::ColourIds::outlineColourId, juce::Colours::white);
+}
+//
+CreateProjectPanel::MyAlertWindow::~MyAlertWindow() {}
+//
 CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProjectPanel& _parent, bool multipleFilesFlag)
 {
     parent = &_parent;
@@ -21,6 +33,7 @@ CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProje
     textField->setMultiLine(true, false);
     textField->setText("");
     textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+    textField->getLookAndFeel().setColour(ScrollBar::thumbColourId, Colour(187, 148, 174));
     textField->setFont((float) 12);
     //
     addAndMakeVisible(textField);
@@ -262,9 +275,10 @@ void CreateProjectPanel::buttonClicked(Button* button) {
 //
 void CreateProjectPanel::showCongratsWindow()
 {
-    MessageBoxIconType icon = MessageBoxIconType::InfoIcon;
-    auto options = MessageBoxOptions::makeOptionsOk(icon,
-        "New project successfully created!",
-        "You can open it using File->Open.");
-    messageBox = AlertWindow::showScopedAsync(options, nullptr);
+    MyAlertWindow* processWnd = new MyAlertWindow("New project successfully created!",
+        "You can open it using File->Open.",
+        MessageBoxIconType::InfoIcon, this);
+    processWnd->addButton("Ok", 0);
+    processWnd->enterModalState(true, nullptr, true);
+    MessageManager::callAsync([this, processWnd]() {});
 }

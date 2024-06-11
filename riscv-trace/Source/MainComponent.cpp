@@ -18,7 +18,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	execTimeMapOneInstance = new map<string, long>();
 	timesCalledByMap = new map< pair<string, string>, int>();
 	//
-	totalTime = (long) lines->size();
+	totalTime = (long)lines->size();
 	std::vector<string> funcNameVector;
 	for (map<string, vector<string>>::iterator it = funcAddrMap->begin(); it != funcAddrMap->end(); it++) funcNameVector.push_back(it->first);
 
@@ -131,8 +131,8 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		double precentage = selfTime / maxSelfTime;
 		//if ((int) precentage == 0) precentage = 1;
 		int maxColour = 200;
-		_funcColoursMap.insert({ funcName, Colour((juce::uint8) (rand() % 200), (juce::uint8) (rand() % 100), (juce::uint8) (rand() % 200)) });
-		_funcColoursTempMap.insert({ funcName, Colour((juce::uint8) (maxColour * precentage), (juce::uint8) (maxColour - (maxColour * precentage)),/*(juce::uint8) (255 * precentage / 2)*/ 20) });
+		_funcColoursMap.insert({ funcName, Colour((juce::uint8)(rand() % 200), (juce::uint8)(rand() % 100), (juce::uint8)(rand() % 200)) });
+		_funcColoursTempMap.insert({ funcName, Colour((juce::uint8)(maxColour * precentage), (juce::uint8)(maxColour - (maxColour * precentage)),/*(juce::uint8) (255 * precentage / 2)*/ 20) });
 		//
 		//called
 		int timesCalled = 0;
@@ -170,7 +170,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	//
 	std::string command = "dot -Tpng -o " + graphPNGFilepath + " " + graphTXTFilepath;
 	const char* c = command.c_str();
-//    std::cout << c << std::endl;
+	//    std::cout << c << std::endl;
 	std::system(c);
 	//
 	graph = new ProfileGraphPanel(graphPNGFilepath);
@@ -483,7 +483,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, in
 	juce::Font font(fontTypeface, (float)fontSize, fontStyle);
 	g.setFont(font);
 	g.setColour(juce::Colours::black);
-	std::string val = (data->at(rowNumber)).at(columnId - 1); 
+	std::string val = (data->at(rowNumber)).at(columnId - 1);
 	g.setColour(Colours::white);
 	g.drawText(val, 2, 0, width - 4, height, Justification::centred, true);
 	g.setColour(juce::Colours::white);
@@ -917,7 +917,7 @@ void MainComponent::AsSubComponent::OccurancesPanel::buttonClicked(Button* butto
 	}
 }
 //
-MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColoursMap, map<string, juce::Colour> & funcColoursTempMap, MainComponent& _mainComponent) {
+MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColoursMap, map<string, juce::Colour>& funcColoursTempMap, MainComponent& _mainComponent) {
 	//
 	titlePanel = new TitlePanel("Assembly Trace");
 	addAndMakeVisible(titlePanel);
@@ -1086,8 +1086,8 @@ void MainComponent::AsSubComponent::setFontSize(const int size) {
 	scrollableWindow->setFontSize(size);
 }
 //
-MainComponent::AsSubComponent::MyTextEditor::MyTextEditor(MainComponent& _mainComponent) 
-	: TextEditor() 
+MainComponent::AsSubComponent::MyTextEditor::MyTextEditor(MainComponent& _mainComponent)
+	: TextEditor()
 {
 	mainComponent = &_mainComponent;
 }
@@ -1240,6 +1240,18 @@ void MainComponent::PlaceholderSubComponent::paint(Graphics& g) {
 //
 void MainComponent::PlaceholderSubComponent::resized() {}
 //
+MainComponent::MyAlertWindow::MyAlertWindow(const String& title,
+	const String& message,
+	MessageBoxIconType iconType,
+	Component* comp)
+	:AlertWindow(title, message, iconType, comp)
+{
+	setColour(AlertWindow::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+	setColour(AlertWindow::ColourIds::outlineColourId, juce::Colours::white);
+}
+//
+MainComponent::MyAlertWindow::~MyAlertWindow() {}
+//
 MainComponent::MainComponent()
 {
 	currentSettings;
@@ -1342,9 +1354,9 @@ void MainComponent::createProjectFile() {
 //
 void MainComponent::openProjectFile(const string filepath) {
 	//
-	AlertWindow* processWnd = new AlertWindow("Loading...",
+	MyAlertWindow* processWnd = new MyAlertWindow("Loading...",
 		"Please, wait for project to load.",
-		MessageBoxIconType::NoIcon);
+		MessageBoxIconType::NoIcon, this);
 	processWnd->enterModalState(true, nullptr, true);
 	//
 	/*Flag = */MessageManager::callAsync([this, processWnd, filepath]()
@@ -1383,7 +1395,7 @@ void MainComponent::openProjectFile(const string filepath) {
 				traceParser.markCallLines(firstFuncAddrMap, addrCallerCalled, callingMap);
 				traceParser.markLastLines(retFuncAddrs);
 				//
-				
+
 				map<string, juce::Colour> funcColoursMap;
 				map<string, juce::Colour> funcColoursTempMap;
 				codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
@@ -1534,22 +1546,14 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 //
 void MainComponent::menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex*/) {}
 //
-void  MainComponent::showWaitWindow()
-{
-	MessageBoxIconType icon = MessageBoxIconType::InfoIcon;
-	auto options = MessageBoxOptions::makeOptionsOk(icon,
-		"Opening project...",
-		"Please, wait for project to load.");
-	messageBox = AlertWindow::showScopedAsync(options, nullptr);
-}
-//
 void  MainComponent::showAlertWindow()
 {
-	MessageBoxIconType icon = MessageBoxIconType::WarningIcon;
-	auto options = MessageBoxOptions::makeOptionsOk(icon,
-		"Failed to open project file...",
-		"File is wrong format or empty.");
-	messageBox = AlertWindow::showScopedAsync(options, nullptr);
+	MyAlertWindow* processWnd = new MyAlertWindow("Failed to open project file...",
+		"File is wrong format or empty.",
+		MessageBoxIconType::WarningIcon, this);
+	processWnd->addButton("Ok", 0);
+	processWnd->enterModalState(true, nullptr, true);
+	MessageManager::callAsync([this, processWnd](){});
 }
 //
 void MainComponent::buttonClicked(Button* button) {

@@ -20,6 +20,16 @@ using namespace juce;
 class CreateProjectPanel : public Component, Button::Listener
 {
 public:
+    class MyAlertWindow : public AlertWindow
+    {
+    public:
+        MyAlertWindow(const String& title,
+            const String& message,
+            MessageBoxIconType iconType,
+            Component* comp);
+        ~MyAlertWindow() override;
+    };
+    //
     class SetPathPanel : public Component, Button::Listener
     {
     public:
