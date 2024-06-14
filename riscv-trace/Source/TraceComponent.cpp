@@ -253,6 +253,8 @@ void TraceComponent::resized()
     fb.justifyContent = juce::FlexBox::JustifyContent::flexStart;
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
+    updateLines();
+    //
     for (int i = 0; i < getNumChildComponents(); i++) {
         fb.items.add(juce::FlexItem(*getChildComponent(i)).withMinWidth((float)getWidth()).withMinHeight(lineHeight).withMaxHeight(lineHeight));
     }
@@ -270,7 +272,7 @@ void TraceComponent::setTopLine(int val) {
     removeAllChildren();
     //
     int height = getHeight();
-    int maxLinesOnScreen = height / lineHeight;
+    maxLinesOnScreen = height / lineHeight;
     //
     if (val < 0) topLine = 0;
     else
@@ -278,12 +280,20 @@ void TraceComponent::setTopLine(int val) {
         topLine = val;
     }
     //
-    for (int i = topLine; i < min((topLine + maxLinesOnScreen), (int) FTraceLines->size()); i++) {
+    for (int i = topLine; i < min((topLine + maxLinesOnScreen) + 1, (int) FTraceLines->size()); i++) {
         addAndMakeVisible(*(FTraceLines->at(i)));
     }
     //
     scrollbar->setCurrentRangeStart(val, juce::NotificationType::dontSendNotification);
     resized();
+}
+//
+void TraceComponent::updateLines() {
+    int height = getHeight();
+    int newMaxLines = height / lineHeight;
+    if (newMaxLines != maxLinesOnScreen) {
+        setTopLine(topLine);
+    }
 }
 //
 int TraceComponent::getTopLine() {
@@ -300,7 +310,7 @@ void TraceComponent::setSelectedLine(int lineNumber) {
         FTraceLines->at(lineNumber)->setSelected(true);
         //
         int height = getHeight();
-        int maxLinesOnScreen = height / lineHeight;
+        maxLinesOnScreen = height / lineHeight;
         setTopLine(lineNumber - maxLinesOnScreen / 4);
     }
     repaint();

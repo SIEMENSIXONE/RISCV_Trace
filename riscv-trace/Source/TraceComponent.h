@@ -99,6 +99,7 @@ public:
     void resized() override;
     vector<int> getFuncLines(const string&);
     void setTopLine(int);
+    void updateLines();
     int getTopLine();
     void setSelectedLine(int);
     //void jumpToSelectedLine();
@@ -117,6 +118,7 @@ private:
     vector<std::unique_ptr<TraceLine>> *FTraceLines;
     int scrollStep = 5;
     int topLine = 0;
+    int maxLinesOnScreen = 0;
     int selectedLine = -1;
     //
     juce::ScrollBar *scrollbar = nullptr;

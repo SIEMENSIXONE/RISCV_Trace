@@ -362,6 +362,7 @@ public:
         ScrollableWindow* scrollableWindow;
         string selectedFunction = "";
         int selectedFuncOccurance = -1;
+        int totalOccurances = -1;
         map<string, int> *funcOccurances;
         map<string, int> *comboBoxItemID;
         //

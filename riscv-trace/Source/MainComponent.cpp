@@ -103,6 +103,8 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	const int columnsNum = 6;
 	vector<array<std::string, columnsNum>>* tableData = new vector<array<std::string, columnsNum>>();
 	//
+	srand(9); // constant colours fix
+	//
 	for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
 		string funcName = *it;
 		array<std::string, columnsNum> newRow;
@@ -336,7 +338,7 @@ MainComponent::PerformanceAnalyzer::ProfileGraphPanel::~ProfileGraphPanel() {
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics& g) {
 	g.fillAll(Colours::white);
 	g.setOpacity(1.0f);
-	if (picture.isNull())  g.drawText("Error! Check if graphviz is installed!", getLocalBounds(), Justification::centred, true);
+	if (picture.isNull())  g.drawText("The graph display function is only available when graphviz is installed.", getLocalBounds(), Justification::centred, true);
 	else g.drawImage(picture, 0, 0, picture.getWidth(), picture.getHeight(), 0, 0, picture.getWidth(), picture.getHeight());
 }
 //
@@ -453,7 +455,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
 	box.getHeader().setLookAndFeel(&myLookAndFeel);
 	//
 	box.getVerticalScrollBar().setVisible(true);
-	box.getVerticalScrollBar().setAutoHide(false);
+	box.getVerticalScrollBar().setAutoHide(true);
 	box.getVerticalScrollBar().setColour(Slider::ColourIds::thumbColourId, Colour(187, 148, 174));
 	//
 	addAndMakeVisible(box);
@@ -894,6 +896,16 @@ void MainComponent::AsSubComponent::OccurancesPanel::setPanelNumbers(int num, in
 	numPanel->setNumber(num);
 	if (max <= 0) numPanel->setNumber(-1);
 	totalPanel->setNumber(max - 1);
+	//
+	if (max > 1) {
+		incrButton->setEnabled(true);
+		decrButton->setEnabled(true);
+	}
+	else {
+		incrButton->setEnabled(false);
+		decrButton->setEnabled(false);
+	}
+	//
 	repaint();
 	resized();
 }
@@ -1065,7 +1077,8 @@ int MainComponent::AsSubComponent::getCurrentSelectedOccurance() {
 }
 //
 void MainComponent::AsSubComponent::incrCurrentSelectedOccurance() {
-	selectedFuncOccurance = (selectedFuncOccurance + 1) % getFuncOccuranceNumber(getCurrentSelectedFunction());
+	totalOccurances = getFuncOccuranceNumber(getCurrentSelectedFunction());
+	selectedFuncOccurance = (selectedFuncOccurance + 1) % totalOccurances;
 	scrollableWindow->scrollToFunc(selectedFunction, selectedFuncOccurance);
 	occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
 }
@@ -1204,7 +1217,7 @@ void MainComponent::AnalyzerSubComponent::resized() {
 	int titleHeight = 50;
 	//
 	titlePanel->setBounds(0, 0, getWidth(), titleHeight);
-	performanceAnalyzer->setBounds(borderThickness, borderThickness + titleHeight, getWidth() - 2 * borderThickness, getHeight() - 2 * borderThickness - titleHeight);
+	performanceAnalyzer->setBounds(borderThickness, titlePanel->getBottom(), getWidth() - 2 * borderThickness, getHeight() - borderThickness - titleHeight);
 }
 //
 void MainComponent::AnalyzerSubComponent::setSelectedFunc(const string& funcName) {
