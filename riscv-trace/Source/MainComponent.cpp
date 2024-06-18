@@ -1521,6 +1521,12 @@ void MainComponent::updateCurrentSettings() {
 	menuBar = new MenuBarComponent(this);
 	addAndMakeVisible(menuBar);
 	//
+	if (settingsWindow != nullptr) { 
+		settingsWindow->repaint(); 
+		settingsWindow->resized();
+	}
+	saveSettingsButton->setButtonText(SaveSettingsButtonText);
+	//
 	if (projectOpened) {
 		setFontSizes();
 	}

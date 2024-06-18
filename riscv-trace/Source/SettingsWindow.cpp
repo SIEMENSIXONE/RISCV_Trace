@@ -25,10 +25,10 @@ SettingsPanel::SettingsPanel(juce::TextButton & _saveButton, juce::String lang)
     //
     setLang(currentSettings.lang);
     //
-    settingsLines->emplace_back(new SettingsPanelLine(SettingsTraceFontSizeText.toStdString(), *this, currentSettings, 0));
-    settingsLines->emplace_back(new SettingsPanelLine(SettingsCodeFontSizeText.toStdString(), *this, currentSettings, 1));
-    settingsLines->emplace_back(new SettingsPanelLine(SettingsTableFontSizeText.toStdString(), *this, currentSettings, 2));
-    settingsLines->emplace_back(new SettingsPanelLine(SettingsInterfaceFontSizeText.toStdString(), *this, currentSettings, 3));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsTraceFontSizeText, *this, currentSettings, 0));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsCodeFontSizeText, *this, currentSettings, 1));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsTableFontSizeText, *this, currentSettings, 2));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsInterfaceFontSizeText, *this, currentSettings, 3));
     //
     langComboBox = new ComboBox("LanguageComboBox");
     langComboBox->setText(ChooseLangText);
@@ -70,6 +70,12 @@ void SettingsPanel::paint (juce::Graphics& g)
     g.fillAll (juce::Colour(94, 60, 82));   // clear the background
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    //
+    setLang(currentSettings.lang);
+    for (int i = 0; i < settingsLines->size(); i++) {
+        settingsLines->at(i)->resized();
+        settingsLines->at(i)->repaint();
+    }
 }
 //
 void SettingsPanel::resized()
@@ -106,7 +112,7 @@ void SettingsPanel::saveSettings() {
     TSettingsParser::saveSettingsToFile(currentSettings, workingDirectory.getFullPathName().toStdString() + "/config.JSON");
 }
 //
-SettingsPanel::SettingsPanelLine::SettingsPanelLine(const std::string& text, SettingsPanel & _settingsPanel, TSettingsParser::Settings& _settings, int index)
+SettingsPanel::SettingsPanelLine::SettingsPanelLine(juce::String& text, SettingsPanel & _settingsPanel, TSettingsParser::Settings& _settings, int index)
 {
     settingsPanel = &_settingsPanel;
     settingIndex = index;
@@ -158,6 +164,9 @@ void SettingsPanel::SettingsPanelLine::paint(juce::Graphics& g)
     g.setFont(15.0f);
     g.drawText("Line", getLocalBounds(),
         juce::Justification::centred, true);   // draw some placeholder text
+    //
+    title->resized();
+    textEditor->resized();
 }
 //
 void SettingsPanel::SettingsPanelLine::resized()
@@ -204,9 +213,9 @@ void SettingsPanel::SettingsPanelLine::textEditorTextChanged(juce::TextEditor& e
     //
 }
 //
-SettingsPanel::SettingsPanelLine::LineTitle::LineTitle(const std::string& _text, TSettingsParser::Settings& _settings)
+SettingsPanel::SettingsPanelLine::LineTitle::LineTitle(juce::String& _text, TSettingsParser::Settings& _settings)
 {
-    text = _text;
+    text = &_text;
     settings = &_settings;
 }
 //
@@ -217,19 +226,16 @@ SettingsPanel::SettingsPanelLine::LineTitle::~LineTitle()
 void SettingsPanel::SettingsPanelLine::LineTitle::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(37, 11, 46));   // clear the background
-
     g.setColour(juce::Colours::white);
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
     g.setColour(juce::Colours::white);
     g.setFont((float) settings->interfaceFontSize);
-    g.drawText(text, getLocalBounds(),
+    g.drawText(*text, getLocalBounds(),
         juce::Justification::centred, true);   // draw some placeholder text
 }
 //
 void SettingsPanel::SettingsPanelLine::LineTitle::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
+    repaint();
 
 }

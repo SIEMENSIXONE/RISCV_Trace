@@ -32,7 +32,7 @@ private:
     class SettingsPanelLine : public juce::Component, public juce::TextEditor::Listener
     {
     public:
-        SettingsPanelLine(const std::string &, SettingsPanel&, TSettingsParser::Settings &, int);
+        SettingsPanelLine(juce::String &, SettingsPanel&, TSettingsParser::Settings &, int);
         ~SettingsPanelLine() override;
         //
         void paint(juce::Graphics&) override;
@@ -43,13 +43,13 @@ private:
         class LineTitle : public juce::Component
         {
         public:
-            LineTitle(const std::string&, TSettingsParser::Settings&);
+            LineTitle(juce::String&, TSettingsParser::Settings&);
             ~LineTitle() override;
             //
             void paint(juce::Graphics&) override;
             void resized() override;
         private:
-            std::string text;
+            juce::String *text;
             TSettingsParser::Settings* settings = nullptr;
         };
         //
