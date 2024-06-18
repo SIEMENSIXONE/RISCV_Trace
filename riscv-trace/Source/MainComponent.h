@@ -152,6 +152,7 @@ public:
         struct MyTabbedComponent final : public TabbedComponent
         {
             MyTabbedComponent(ProfileTable&, Viewport&);
+            void updateTabNames();
             //
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyTabbedComponent)
         };
@@ -187,12 +188,12 @@ public:
     class TitlePanel: public Component
     {
     public:
-        TitlePanel(const std::string &);
+        TitlePanel(juce::String&);
         ~TitlePanel() override;
         void paint (Graphics&) override;
         void resized() override;
     private:
-        std::string text;
+        juce::String *text;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TitlePanel)
     };
@@ -286,14 +287,14 @@ public:
             class TitlePanel :public Component
             {
             public:
-                TitlePanel(const string&);
+                TitlePanel(String&);
                 ~TitlePanel() override;
                 void paint(Graphics&) override;
                 void resized() override;
                 void setText(const string&);
                 string getText();
             private:
-                string text;
+                String *text;
                 //
                 JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TitlePanel)
             };
@@ -352,8 +353,6 @@ public:
             //
             MainComponent* mainComponent;
         };
-        //
-        string defaultSearchfieldText = "Search...";
         //
         MainComponent* mainComponent;
         OccurancesPanel* occurancesPanel;

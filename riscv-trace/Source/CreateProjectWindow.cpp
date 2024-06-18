@@ -23,10 +23,11 @@ CreateProjectPanel::MyAlertWindow::MyAlertWindow(const String& title,
 //
 CreateProjectPanel::MyAlertWindow::~MyAlertWindow() {}
 //
-CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProjectPanel& _parent, bool multipleFilesFlag)
+CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProjectPanel& _parent, TSettingsParser::Settings& _settings, bool multipleFilesFlag)
 {
     parent = &_parent;
     vals = &_val;
+    settings = &_settings;
     //
     textField = new TextEditor();
     textField->setReadOnly(true);
@@ -34,7 +35,7 @@ CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProje
     textField->setText("");
     textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
     textField->getLookAndFeel().setColour(ScrollBar::thumbColourId, Colour(187, 148, 174));
-    textField->setFont((float) 12);
+    textField->setFont((float) settings->interfaceFontSize);
     //
     addAndMakeVisible(textField);
     //
@@ -107,7 +108,7 @@ void CreateProjectPanel::SetPathPanel::addPath(const string& filepath) {
 }
 //
 void CreateProjectPanel::SetPathPanel::chooseProjectFile() {
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.c;*.h;*.txt");
+    chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.c;*.h;*.txt");
     auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
         {
@@ -120,7 +121,7 @@ void CreateProjectPanel::SetPathPanel::chooseProjectFile() {
 }
 //
 void CreateProjectPanel::SetPathPanel::chooseProjectFiles() {
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.c;*.h;*.txt");
+    chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.c;*.h;*.txt");
     auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectMultipleItems;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
         {
@@ -147,8 +148,9 @@ void CreateProjectPanel::SetPathPanel::buttonClicked(Button * button)
     }
 }
 //
-CreateProjectPanel::TitlePanel::TitlePanel(const string& _text) {
+CreateProjectPanel::TitlePanel::TitlePanel(const string& _text, TSettingsParser::Settings& _settings) {
     text = _text;
+    settings = &_settings;
 }
 //
 CreateProjectPanel::TitlePanel::~TitlePanel() {
@@ -158,7 +160,7 @@ void CreateProjectPanel::TitlePanel::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(94, 60, 82));   // clear the background
     g.setColour(juce::Colours::white);
-    g.setFont(14.0f);
+    g.setFont((float) settings->interfaceFontSize);
     g.drawText(text, getLocalBounds(),
         juce::Justification::left, true);   // draw some placeholder text
 }
@@ -166,31 +168,34 @@ void CreateProjectPanel::TitlePanel::paint(juce::Graphics& g)
 void CreateProjectPanel::TitlePanel::resized()
 {}
 //
-CreateProjectPanel::CreateProjectPanel()
+CreateProjectPanel::CreateProjectPanel(TSettingsParser::Settings& _settings)
 {
+    settings = &_settings;
+    setLang(settings->lang);
+    //
     codePaths = new vector<string>();
     tracePath = new vector<string>();
     objdumpPath = new vector<string>();
     //
-    spacerPanel = new TitlePanel("");
-    titleTracePanel = new TitlePanel("Choose trace file:");
-    titleCodePanel = new TitlePanel("Choose code files:");
-    titleObjdumpPanel = new TitlePanel("Choose objdump file:");
+    spacerPanel = new TitlePanel("", *settings);
+    titleTracePanel = new TitlePanel(chooseTraceFileText.toStdString(), *settings);
+    titleCodePanel = new TitlePanel(chooseCodeFilesText.toStdString(), *settings);
+    titleObjdumpPanel = new TitlePanel(chooseObjdumpFileText.toStdString(), *settings);
     //
     addAndMakeVisible(spacerPanel);
     addAndMakeVisible(titleTracePanel);
     addAndMakeVisible(titleCodePanel);
     addAndMakeVisible(titleObjdumpPanel);
     //
-    setTracePathPanel = new SetPathPanel(*tracePath, *this);
-    setCodePathPanel = new SetPathPanel(*codePaths, *this, true);
-    setObjdumpPathPanel = new SetPathPanel(*objdumpPath, *this);
+    setTracePathPanel = new SetPathPanel(*tracePath, *this, *settings);
+    setCodePathPanel = new SetPathPanel(*codePaths, *this, *settings, true);
+    setObjdumpPathPanel = new SetPathPanel(*objdumpPath, *this, *settings);
     //
     addAndMakeVisible(setTracePathPanel);
     addAndMakeVisible(setCodePathPanel);
     addAndMakeVisible(setObjdumpPathPanel);
     //
-    saveProjectButton = new TextButton("Save...");
+    saveProjectButton = new TextButton(saveButtonText);
     saveProjectButton->setEnabled(false);
     addAndMakeVisible(saveProjectButton);
     saveProjectButton->addListener(this);
@@ -249,7 +254,7 @@ void CreateProjectPanel::refresh() {
 }
 //
 void CreateProjectPanel::saveProject() {
-    chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultSaveFilepath), "*.JSON");
+    chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultSaveFilepath), "*.JSON");
     auto chooserFlags = FileBrowserComponent::saveMode;
     chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
         {
@@ -275,8 +280,8 @@ void CreateProjectPanel::buttonClicked(Button* button) {
 //
 void CreateProjectPanel::showCongratsWindow()
 {
-    MyAlertWindow* processWnd = new MyAlertWindow("New project successfully created!",
-        "You can open it using File->Open.",
+    MyAlertWindow* processWnd = new MyAlertWindow(SuccessText,
+        SuccessSubText,
         MessageBoxIconType::InfoIcon, this);
     processWnd->addButton("Ok", 0);
     processWnd->enterModalState(true, nullptr, true);

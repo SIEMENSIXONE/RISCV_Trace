@@ -1,5 +1,7 @@
 {
-    "Analyzer": 13,
-    "Code": 13,
+    "Analyzer": 15,
+    "Code": 15,
+    "Interface": 12,
+    "Lang": "RUS",
     "Trace": 15
 }

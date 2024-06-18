@@ -12,18 +12,16 @@
 #include "AboutWindow.h"
 
 //==============================================================================
-AboutPanel::AboutPanel()
+AboutPanel::AboutPanel(TSettingsParser::Settings& _settings)
 {
-    text = "RISC-V Trace Viewer\
-        \n--------------------------------------------------------------------------\
-    \nRISC-V Trace Viewer is a program for profiling software written for the RISC-V architecture.\
-    The main objective of the program is a convenient and informative presentation\
-    of the information necessary for performance analysis. It is an open source and free software. Any modifications and any models of use are allowed.";
+    settings = &_settings;
     //
     textField = new juce::TextEditor();
+    textField->setFont((float) settings->interfaceFontSize);
     textField->setReadOnly(true);
     textField->setMultiLine(true);
-    textField->setText(text);
+    setLang(settings->lang);
+    textField->setText(HelpAboutText);
     textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
     //
     addAndMakeVisible(textField);
@@ -43,7 +41,7 @@ void AboutPanel::paint (juce::Graphics& g)
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
+    g.setFont ((float) settings->interfaceFontSize);
     g.drawText("text", getLocalBounds(),
                 juce::Justification::centred, true);   // draw some placeholder text
 }

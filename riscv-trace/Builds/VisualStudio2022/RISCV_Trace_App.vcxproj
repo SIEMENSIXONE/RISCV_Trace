@@ -1655,6 +1655,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\JSON\json.hpp"/>
+    <ClInclude Include="..\..\Source\TextResources.h"/>
     <ClInclude Include="..\..\Source\UsageWindow.h"/>
     <ClInclude Include="..\..\Source\SettingsParser.hpp"/>
     <ClInclude Include="..\..\Source\SettingsWindow.h"/>

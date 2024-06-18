@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "SettingsParser.hpp"
+#include "TextResources.h"
 
 //==============================================================================
 /*
@@ -19,7 +20,7 @@
 class SettingsPanel  : public juce::Component
 {
 public:
-    SettingsPanel(juce::TextButton &);
+    SettingsPanel(juce::TextButton &, juce::String);
     ~SettingsPanel() override;
     //
     void paint (juce::Graphics&) override;
@@ -42,13 +43,14 @@ private:
         class LineTitle : public juce::Component
         {
         public:
-            LineTitle(const std::string&);
+            LineTitle(const std::string&, TSettingsParser::Settings&);
             ~LineTitle() override;
             //
             void paint(juce::Graphics&) override;
             void resized() override;
         private:
             std::string text;
+            TSettingsParser::Settings* settings = nullptr;
         };
         //
         LineTitle *title = nullptr;
@@ -60,6 +62,7 @@ private:
     };
     //
     vector<std::unique_ptr<SettingsPanelLine>> *settingsLines;
+    ComboBox* langComboBox;
     juce::TextButton* saveButton = nullptr;
     TSettingsParser::Settings currentSettings;
     //
@@ -71,14 +74,14 @@ private:
 class SettingsWindow : public juce::DocumentWindow
 {
 public:
-    SettingsWindow(juce::String name, juce::TextButton &saveButton)
+    SettingsWindow(juce::String name, juce::TextButton &saveButton, juce::String lang)
         : DocumentWindow(name,
             juce::Desktop::getInstance().getDefaultLookAndFeel()
             .findColour(juce::ResizableWindow::backgroundColourId),
             DocumentWindow::minimiseButton | closeButton)
     {
         setUsingNativeTitleBar(true);
-        setContentOwned(new SettingsPanel(saveButton), true);
+        setContentOwned(new SettingsPanel(saveButton, lang), true);
         setResizable(false, false);
         centreWithSize(getWidth(), getHeight());
         //

@@ -21,7 +21,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	totalTime = (long)lines->size();
 	std::vector<string> funcNameVector;
 	for (map<string, vector<string>>::iterator it = funcAddrMap->begin(); it != funcAddrMap->end(); it++) funcNameVector.push_back(it->first);
-
+	//
 	vector<string> curFuncs;
 	map<string, int> timeMultipliers;
 	for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
@@ -313,6 +313,8 @@ void MainComponent::PerformanceAnalyzer::setFontSize(const int size) {
 	if (size < 0) return;
 	//
 	table->setFontSize(size);
+	//
+	tabs->updateTabNames();
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::ProfileGraphPanel(const string& _pictureFileath) {
@@ -423,8 +425,13 @@ MainComponent::PerformanceAnalyzer::MyTabbedComponent::MyTabbedComponent(Profile
 {
 	auto colour = Colour(37, 11, 46);
 	//
-	addTab("Table", colour, &table, true);
-	addTab("Graph", colour, &graphViewport, true);
+	addTab(tableTabText, colour, &table, true);
+	addTab(graphTabText, colour, &graphViewport, true);
+}
+//
+void MainComponent::PerformanceAnalyzer::MyTabbedComponent::updateTabNames() {
+	setTabName(0, tableTabText);
+	setTabName(1, graphTabText);
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
@@ -446,12 +453,12 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
 	//
 	box.setHeaderHeight(50);
 	//
-	box.getHeader().addColumn("Name", 1, 2 * singleColumnWidth);
-	box.getHeader().addColumn("Time", 2, singleColumnWidth);
-	box.getHeader().addColumn("Time\n(%)", 3, singleColumnWidth);
-	box.getHeader().addColumn("Called", 4, singleColumnWidth);
-	box.getHeader().addColumn("Children\n(%)", 5, singleColumnWidth);
-	box.getHeader().addColumn("Self\n(%)", 6, singleColumnWidth);
+	box.getHeader().addColumn(TableNameColomnTitleText, 1, 2 * singleColumnWidth);
+	box.getHeader().addColumn(TableTimeColomnTitleText, 2, singleColumnWidth);
+	box.getHeader().addColumn(TableTimePrecentColomnTitleText, 3, singleColumnWidth);
+	box.getHeader().addColumn(TableCalledColomnTitleText, 4, singleColumnWidth);
+	box.getHeader().addColumn(TableChildrenColomnTitleText, 5, singleColumnWidth);
+	box.getHeader().addColumn(TableSelfColomnTitleText, 6, singleColumnWidth);
 	box.getHeader().setLookAndFeel(&myLookAndFeel);
 	//
 	box.getVerticalScrollBar().setVisible(true);
@@ -636,6 +643,13 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::setFontSize(const int siz
 	if (size < 0) return;
 	//
 	fontSize = size;
+	//
+	box.getHeader().setColumnName(1, TableNameColomnTitleText);
+	box.getHeader().setColumnName(2, TableTimeColomnTitleText);
+	box.getHeader().setColumnName(3, TableTimePrecentColomnTitleText);
+	box.getHeader().setColumnName(4, TableCalledColomnTitleText);
+	box.getHeader().setColumnName(5, TableChildrenColomnTitleText);
+	box.getHeader().setColumnName(6, TableSelfColomnTitleText);
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::MyLookAndFeel()
@@ -689,8 +703,8 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::selectedRowsChanged(int l
 	mainComponent->setSelectedFunc(data->at(lastRowSelected).at(0), 3);
 }
 //
-MainComponent::TitlePanel::TitlePanel(const std::string& str) {
-	text = str;
+MainComponent::TitlePanel::TitlePanel(juce::String& str) {
+	text = &str;
 }
 //
 MainComponent::TitlePanel::~TitlePanel() {
@@ -706,7 +720,7 @@ void MainComponent::TitlePanel::paint(Graphics& g)
 	juce::Font font("Candara", 25.0f, juce::Font::FontStyleFlags::plain);
 	g.setFont(font);
 	//g.setFont (14.0f);
-	g.drawText(text, getLocalBounds(), Justification::centred, true);   // draw some placeholder text
+	g.drawText(*text, getLocalBounds(), Justification::centred, true);   // draw some placeholder text
 }
 //
 void MainComponent::TitlePanel::resized()
@@ -786,8 +800,8 @@ MainComponent::AsSubComponent::OccurancesPanel::OccurancesPanel(AsSubComponent& 
 	numPanel = new OccuranceNumberPanel(parent->getCurrentSelectedOccurance());
 	totalPanel = new OccuranceNumberPanel(-1);
 	//
-	outOfPanel = new TitlePanel("out of");
-	occuranceTitlePanel = new TitlePanel("Occurance");
+	outOfPanel = new TitlePanel(OutOfText);
+	occuranceTitlePanel = new TitlePanel(OccuranceText);
 	//
 	decrButton = new TextButton("<");
 	incrButton = new TextButton(">");
@@ -834,8 +848,8 @@ void MainComponent::AsSubComponent::OccurancesPanel::resized() {
 	grid.performLayout(area);
 }
 //
-MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::TitlePanel(const string& _text) {
-	text = _text;
+MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::TitlePanel(String& _text) {
+	text = &_text;
 }
 //
 MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::~TitlePanel() {
@@ -850,7 +864,7 @@ void MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::paint(juce::Gra
 
 	g.setColour(juce::Colours::white);
 	g.setFont(14.0f);
-	g.drawText(text, getLocalBounds(),
+	g.drawText(*text, getLocalBounds(),
 		juce::Justification::centred, true);   // draw some placeholder text
 }
 //
@@ -931,7 +945,7 @@ void MainComponent::AsSubComponent::OccurancesPanel::buttonClicked(Button* butto
 //
 MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColoursMap, map<string, juce::Colour>& funcColoursTempMap, MainComponent& _mainComponent) {
 	//
-	titlePanel = new TitlePanel("Assembly Trace");
+	titlePanel = new TitlePanel(TraceSectionTitle);
 	addAndMakeVisible(titlePanel);
 	//
 	scrollableWindow = new ScrollableWindow(vec, addrFuncMap, funcColoursMap, funcColoursTempMap);
@@ -943,7 +957,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	addAndMakeVisible(occurancesPanel);
 	//
 	functionsComboBox = new ComboBox("FunctionsComboBox");
-	functionsComboBox->setText("Choose function...");
+	functionsComboBox->setText(FunctionsDropdownText);
 	functionsComboBox->setJustificationType(Justification::centred);
 	functionsComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
 	functionsComboBox->setEditableText(false);
@@ -963,8 +977,8 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	searchField->setColour(TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::hotpink);
 	searchField->setColour(TextEditor::ColourIds::shadowColourId, juce::Colours::grey);
 	//
-	searchField->setTextToShowWhenEmpty(defaultSearchfieldText, Colours::black);
-
+	searchField->setTextToShowWhenEmpty(SearchFieldText, Colours::black);
+	//
 	addAndMakeVisible(searchField);
 	//
 	funcOccurances = new map<string, int>();
@@ -1003,8 +1017,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 		searchField->clear();
 		occurancesPanel->setPanelNumbers(selectedFuncOccurance, scrollableWindow->getNumberOfOccurances(selectedFunction));
 		};
-	//functionsComboBox->getItem
-	//functionsComboBox->setSelectedId(1);
+	//
 	addAndMakeVisible(functionsComboBox);
 }
 //
@@ -1097,6 +1110,8 @@ void MainComponent::AsSubComponent::setFontSize(const int size) {
 	if (size < 0) return;
 	//
 	scrollableWindow->setFontSize(size);
+	searchField->setTextToShowWhenEmpty(SearchFieldText, Colours::black);
+	functionsComboBox->setText(FunctionsDropdownText);
 }
 //
 MainComponent::AsSubComponent::MyTextEditor::MyTextEditor(MainComponent& _mainComponent)
@@ -1113,7 +1128,7 @@ void MainComponent::AsSubComponent::MyTextEditor::returnPressed() {
 //
 MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>& filepaths, map<string, string> map, MainComponent& _mainComponent) {
 	//
-	titlePanel = new TitlePanel("Code");
+	titlePanel = new TitlePanel(CodeSectionTitle);
 	addAndMakeVisible(titlePanel);
 	//
 	mainComponent = &_mainComponent;
@@ -1191,7 +1206,7 @@ MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<Cod
 }
 //
 MainComponent::AnalyzerSubComponent::AnalyzerSubComponent(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
-	titlePanel = new TitlePanel("Analyzer");
+	titlePanel = new TitlePanel(AnalyzerSectionTitle);
 	addAndMakeVisible(titlePanel);
 	//
 	mainComponent = &_mainComponent;
@@ -1248,7 +1263,7 @@ void MainComponent::PlaceholderSubComponent::paint(Graphics& g) {
 	g.setColour(Colour(94, 60, 82));
 	juce::Font font("Courier New", 55.0f, juce::Font::FontStyleFlags::bold);
 	g.setFont(font);
-	g.drawText("Create new project or open existing one!", textArea, juce::Justification::horizontallyCentred);
+	g.drawText(WelcomeText, textArea, juce::Justification::horizontallyCentred);
 }
 //
 void MainComponent::PlaceholderSubComponent::resized() {}
@@ -1269,8 +1284,9 @@ MainComponent::MainComponent()
 {
 	currentSettings;
 	loadSettings();
+	setLang(currentSettings.lang);//!!
 	//
-	saveSettingsButton = new TextButton("Save");
+	saveSettingsButton = new TextButton(SaveSettingsButtonText);
 	saveSettingsButton->addListener(this);
 	//
 	menuBar = new MenuBarComponent(this);
@@ -1291,6 +1307,7 @@ MainComponent::MainComponent()
 	addAndMakeVisible(verticalDividerBarLeft.get());
 	verticalDividerBarRight.reset(new StretchableLayoutResizerBar(&verticalLayout, 2, true));
 	addAndMakeVisible(verticalDividerBarRight.get());
+	//
 	//
 	setSize(1440, 800);
 }
@@ -1359,7 +1376,7 @@ void MainComponent::loadSettings() {
 }
 //
 void MainComponent::createProjectFile() {
-	createProjWindow = new CreateProjectWindow("New project");
+	createProjWindow = new CreateProjectWindow(NewProjectWindowTitle, currentSettings);
 	createProjWindow->setVisible(false);
 	createProjWindow->addComponentListener(this);
 	createProjWindow->setVisible(true);
@@ -1367,8 +1384,8 @@ void MainComponent::createProjectFile() {
 //
 void MainComponent::openProjectFile(const string filepath) {
 	//
-	MyAlertWindow* processWnd = new MyAlertWindow("Loading...",
-		"Please, wait for project to load.",
+	MyAlertWindow* processWnd = new MyAlertWindow(LoadingText,
+		LoadingSubText,
 		MessageBoxIconType::NoIcon, this);
 	processWnd->enterModalState(true, nullptr, true);
 	//
@@ -1435,7 +1452,7 @@ void MainComponent::openProjectFile(const string filepath) {
 }
 //
 void MainComponent::chooseProjectFile() {
-	chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.JSON");
+	chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.JSON");
 	auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
 	chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
 		{
@@ -1445,7 +1462,7 @@ void MainComponent::chooseProjectFile() {
 }
 //
 void MainComponent::saveProject() {
-	chooser = std::make_unique<FileChooser>(String("Chooser"), File(defaultFilepath), "*.JSON");
+	chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.JSON");
 	auto chooserFlags = FileBrowserComponent::saveMode;
 	chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
 		{
@@ -1474,7 +1491,7 @@ void MainComponent::closeProjectFile() {
 //
 void MainComponent::openSettingsWindow() {
 	if (settingsWindow != nullptr) delete(settingsWindow);
-	settingsWindow = new SettingsWindow("Settings", *saveSettingsButton);
+	settingsWindow = new SettingsWindow(SettingsWindowTitle, *saveSettingsButton, currentSettings.lang);
 	settingsWindow->setVisible(false);
 	settingsWindow->addComponentListener(this);
 	settingsWindow->setVisible(true);
@@ -1483,7 +1500,7 @@ void MainComponent::openSettingsWindow() {
 //
 void MainComponent::openAboutWindow() {
 	if (aboutWindow != nullptr) delete(aboutWindow);
-	aboutWindow = new AboutWindow("About");
+	aboutWindow = new AboutWindow(AboutWindowTitle, currentSettings);
 	aboutWindow->setVisible(false);
 	aboutWindow->addComponentListener(this);
 	aboutWindow->setVisible(true);
@@ -1491,15 +1508,28 @@ void MainComponent::openAboutWindow() {
 //
 void MainComponent::openUsageWindow() {
 	if (usageWindow != nullptr) delete(usageWindow);
-	usageWindow = new UsageWindow("How to use");
+	usageWindow = new UsageWindow(UsageWindowTitle, currentSettings);
 	usageWindow->setVisible(false);
 	usageWindow->addComponentListener(this);
 	usageWindow->setVisible(true);
 }
 //
 void MainComponent::updateCurrentSettings() {
+	setLang(currentSettings.lang);
+	//
+	if (menuBar != nullptr) delete(menuBar);
+	menuBar = new MenuBarComponent(this);
+	addAndMakeVisible(menuBar);
+	//
 	if (projectOpened) {
 		setFontSizes();
+	}
+	else {
+		//
+		if (placeholderPanel != nullptr) placeholderPanel->resized();
+		//
+		repaint();
+		resized();
 	}
 }
 //
@@ -1507,12 +1537,13 @@ void MainComponent::setFontSizes() {
 	analyzerPanel->setFontSize(currentSettings.analyzerFontSize);
 	codePanel->setFontSize(currentSettings.codeFontSize);
 	asPanel->setFontSize(currentSettings.traceFontSize);
+	//
 	repaint();
 	resized();
 }
 //
 StringArray MainComponent::getMenuBarNames() {
-	return { "File", "Settings", "Help" };
+	return { FileButtonText, SettingsButtonText, HelpButtonText };
 }
 //
 PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
@@ -1529,12 +1560,12 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 			std::function<void()> saveProjFunc = [this]() { saveProject(); };
 			std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
 			//
-			menu.addItem(String("New"), createProjFunc);
-			menu.addItem(String("Open..."), chooseProjFunc);
+			menu.addItem(FileNewButtonText, createProjFunc);
+			menu.addItem(FileOpenButtonText, chooseProjFunc);
 			//
 			if (projectOpened) {
-				menu.addItem(String("Save..."), saveProjFunc);
-				menu.addItem(String("Close"), closeProjFunc);
+				menu.addItem(FileSaveButtonText, saveProjFunc);
+				menu.addItem(FileCloseButtonText, closeProjFunc);
 			}
 		}
 		//
@@ -1542,7 +1573,7 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 		else if (index == 1) {
 			std::function<void()> openGeneralSettings = [this]() { openSettingsWindow(); };
 			//
-			menu.addItem(String("General"), openGeneralSettings);
+			menu.addItem(SettingsGeneralButtonText, openGeneralSettings);
 		}
 		//
 		//Help
@@ -1550,8 +1581,8 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 			std::function<void()> openAboutProgram = [this]() { openAboutWindow(); };
 			std::function<void()> openUsageGuide = [this]() { openUsageWindow(); };
 			//
-			menu.addItem(String("About"), openAboutProgram);
-			menu.addItem(String("Usage"), openUsageGuide);
+			menu.addItem(HelpAboutButtonText, openAboutProgram);
+			menu.addItem(HelpUsageButtonText, openUsageGuide);
 		}
 	}
 	return menu;
@@ -1561,8 +1592,8 @@ void MainComponent::menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex
 //
 void  MainComponent::showAlertWindow()
 {
-	MyAlertWindow* processWnd = new MyAlertWindow("Failed to open project file...",
-		"File is wrong format or empty.",
+	MyAlertWindow* processWnd = new MyAlertWindow(FailText,
+		FailSubText,
 		MessageBoxIconType::WarningIcon, this);
 	processWnd->addButton("Ok", 0);
 	processWnd->enterModalState(true, nullptr, true);

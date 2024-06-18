@@ -12,7 +12,7 @@
 #include "SettingsWindow.h"
 
 //==============================================================================
-SettingsPanel::SettingsPanel(juce::TextButton & _saveButton)
+SettingsPanel::SettingsPanel(juce::TextButton & _saveButton, juce::String lang)
 {
     saveButton = &_saveButton;
     addAndMakeVisible(saveButton);
@@ -23,9 +23,34 @@ SettingsPanel::SettingsPanel(juce::TextButton & _saveButton)
     //
     settingsLines = new std::vector<std::unique_ptr<SettingsPanelLine>>();
     //
-    settingsLines->emplace_back(new SettingsPanelLine("Trace Font Size", *this, currentSettings, 0));
-    settingsLines->emplace_back(new SettingsPanelLine("Code Font Size", *this, currentSettings, 1));
-    settingsLines->emplace_back(new SettingsPanelLine("Analyzer Table Font Size", *this, currentSettings, 2));
+    setLang(currentSettings.lang);
+    //
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsTraceFontSizeText.toStdString(), *this, currentSettings, 0));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsCodeFontSizeText.toStdString(), *this, currentSettings, 1));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsTableFontSizeText.toStdString(), *this, currentSettings, 2));
+    settingsLines->emplace_back(new SettingsPanelLine(SettingsInterfaceFontSizeText.toStdString(), *this, currentSettings, 3));
+    //
+    langComboBox = new ComboBox("LanguageComboBox");
+    langComboBox->setText(ChooseLangText);
+    langComboBox->setJustificationType(Justification::centred);
+    langComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
+    langComboBox->setEditableText(false);
+    //
+    langComboBox->addItem(String((std::wstring(L"English")).c_str()), 1);
+    langComboBox->addItem(String((std::wstring(L"Русский")).c_str()), 2);
+    //
+    langComboBox->onChange = [this] {
+        if (langComboBox->getSelectedId() == 1) { 
+            currentSettings.lang = "ENG"; 
+            saveSettings();
+        }
+        if (langComboBox->getSelectedId() == 2) { 
+            currentSettings.lang = "RUS"; 
+            saveSettings();
+        }
+        };
+    //
+    addAndMakeVisible(langComboBox);
     //
     for (int i = 0; i < settingsLines->size(); i++) {
         addAndMakeVisible(*(settingsLines->at(i)));
@@ -37,6 +62,7 @@ SettingsPanel::SettingsPanel(juce::TextButton & _saveButton)
 SettingsPanel::~SettingsPanel()
 {
     delete(settingsLines);
+    delete(langComboBox);
 }
 //
 void SettingsPanel::paint (juce::Graphics& g)
@@ -48,10 +74,13 @@ void SettingsPanel::paint (juce::Graphics& g)
 //
 void SettingsPanel::resized()
 {
+    int offset = 20;
     int buttonOffset = 20;
     int buttonHeight = 50;
+    int comboBoxHeight = lineHeight;
     juce::Rectangle<int> buttonArea = juce::Rectangle<int>(getWidth()/2 - (getWidth() / 4) / 2, getHeight() - buttonHeight - buttonOffset, getWidth() / 4, buttonHeight);
-    juce::Rectangle<int> linesArea = juce::Rectangle<int>(getWidth() / 2 - (getWidth()) / 2, 0, getWidth(), getHeight() - 50);
+    juce::Rectangle<int> comboBoxArea = juce::Rectangle<int>(offset, offset, getWidth() - 2 * offset, comboBoxHeight);
+    juce::Rectangle<int> linesArea = juce::Rectangle<int>(offset, comboBoxHeight + offset + offset, getWidth() - 2 * offset, getHeight() - buttonHeight - comboBoxHeight);
     //
     juce::FlexBox fb;
     fb.flexWrap = juce::FlexBox::Wrap::wrap;
@@ -59,9 +88,10 @@ void SettingsPanel::resized()
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
     for (int i = 0; i < settingsLines->size(); i++) {
-        fb.items.add(juce::FlexItem(*settingsLines->at(i)).withMinWidth((float)getWidth()).withMinHeight((float) lineHeight).withMaxHeight((float) lineHeight));
+        fb.items.add(juce::FlexItem(*settingsLines->at(i)).withMinWidth((float)getWidth() - 2 * offset).withMinHeight((float) lineHeight).withMaxHeight((float) lineHeight));
     }
     //
+    langComboBox->setBounds(comboBoxArea);
     fb.performLayout(linesArea);
     saveButton->setBounds(buttonArea);
 }
@@ -81,10 +111,11 @@ SettingsPanel::SettingsPanelLine::SettingsPanelLine(const std::string& text, Set
     settingsPanel = &_settingsPanel;
     settingIndex = index;
     settings = &_settings;
-    title = new LineTitle(text);
+    title = new LineTitle(text, *settings);
     textEditor = new juce::TextEditor("Setting Editor");
     textEditor->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colours::white);
     textEditor->setColour(juce::TextEditor::ColourIds::textColourId, juce::Colours::black);
+    textEditor->setFont((float) settings->interfaceFontSize);
     //
     switch (settingIndex)
     {
@@ -96,6 +127,9 @@ SettingsPanel::SettingsPanelLine::SettingsPanelLine(const std::string& text, Set
         break;
     case 2:
         textEditor->setText(std::to_string(settings->analyzerFontSize));
+        break;
+    case 3:      
+        textEditor->setText(std::to_string(settings->interfaceFontSize));
         break;
     default:
         break;
@@ -116,10 +150,10 @@ SettingsPanel::SettingsPanelLine::~SettingsPanelLine()
 void SettingsPanel::SettingsPanelLine::paint(juce::Graphics& g)
 {
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
-
+    //
     g.setColour(juce::Colours::grey);
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
+    //
     g.setColour(juce::Colours::white);
     g.setFont(15.0f);
     g.drawText("Line", getLocalBounds(),
@@ -159,6 +193,9 @@ void SettingsPanel::SettingsPanelLine::textEditorTextChanged(juce::TextEditor& e
         case 2:
             settings->analyzerFontSize = val;
             break;
+        case 3:
+            settings->interfaceFontSize = val;
+            break;
         default:
             break;
         }
@@ -167,9 +204,10 @@ void SettingsPanel::SettingsPanelLine::textEditorTextChanged(juce::TextEditor& e
     //
 }
 //
-SettingsPanel::SettingsPanelLine::LineTitle::LineTitle(const std::string& _text)
+SettingsPanel::SettingsPanelLine::LineTitle::LineTitle(const std::string& _text, TSettingsParser::Settings& _settings)
 {
     text = _text;
+    settings = &_settings;
 }
 //
 SettingsPanel::SettingsPanelLine::LineTitle::~LineTitle()
@@ -184,7 +222,7 @@ void SettingsPanel::SettingsPanelLine::LineTitle::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour(juce::Colours::white);
-    g.setFont(12.0f);
+    g.setFont((float) settings->interfaceFontSize);
     g.drawText(text, getLocalBounds(),
         juce::Justification::centred, true);   // draw some placeholder text
 }

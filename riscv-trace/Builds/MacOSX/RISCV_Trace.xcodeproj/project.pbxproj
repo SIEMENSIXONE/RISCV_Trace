@@ -79,6 +79,7 @@
 		917819D6F0ABD9A5D1142184 /* App */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RISCV_Trace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		948BD50675D1EF09940DF888 /* MainComponent.cpp */ /* MainComponent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MainComponent.cpp; path = ../../Source/MainComponent.cpp; sourceTree = SOURCE_ROOT; };
 		9C3B756D46C16FA7DDACB24F /* include_juce_gui_basics.mm */ /* include_juce_gui_basics.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = include_juce_gui_basics.mm; path = ../../JuceLibraryCode/include_juce_gui_basics.mm; sourceTree = SOURCE_ROOT; };
+		A704EA07B1A28B83148581E2 /* TextResources.h */ /* TextResources.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TextResources.h; path = ../../Source/TextResources.h; sourceTree = SOURCE_ROOT; };
 		A97EBD02F5B4AEE211A537B0 /* BinaryData.h */ /* BinaryData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BinaryData.h; path = ../../JuceLibraryCode/BinaryData.h; sourceTree = SOURCE_ROOT; };
 		AE8329E8246645E2B526DCCA /* SettingsWindow.cpp */ /* SettingsWindow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = SettingsWindow.cpp; path = ../../Source/SettingsWindow.cpp; sourceTree = SOURCE_ROOT; };
 		B0760BC706FBC3DD7E2C2E42 /* juce_core */ /* juce_core */ = {isa = PBXFileReference; lastKnownFileType = folder; name = juce_core; path = ../../Juce/modules/juce_core; sourceTree = SOURCE_ROOT; };
@@ -194,6 +195,7 @@
 		AB5CDE72CB712B991DDB1DF4 /* Include */ = {
 			isa = PBXGroup;
 			children = (
+				A704EA07B1A28B83148581E2,
 				86EA6DD680DB35AE20192B1A,
 				BE10A6697B584A946FAB2357,
 				D91EFE30B60AAF8A246FE3B1,

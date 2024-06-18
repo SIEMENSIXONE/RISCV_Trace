@@ -12,18 +12,16 @@
 #include "UsageWindow.h"
 
 //==============================================================================
-UsagePanel::UsagePanel()
+UsagePanel::UsagePanel(TSettingsParser::Settings& _settings)
 {
-    text = "RISCV Trace profiler usage pipeline:\
-        \n--------------------------------------------------------------------------\
-        \n* File->New\
-        \n* In opened menu set paths to trace info file, objdump file and code file. Choose where to save project file.\
-        \n* Open created project file";
+    settings = &_settings;
     //
     textField = new juce::TextEditor();
+    textField->setFont((float) settings->interfaceFontSize);
     textField->setReadOnly(true);
     textField->setMultiLine(true);
-    textField->setText(text);
+    setLang(settings->lang);
+    textField->setText(HelpUsageText);
     textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
     //
     addAndMakeVisible(textField);
@@ -43,7 +41,7 @@ void UsagePanel::paint (juce::Graphics& g)
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
+    g.setFont((float) settings->interfaceFontSize);
     g.drawText("text", getLocalBounds(),
                 juce::Justification::centred, true);   // draw some placeholder text
 }

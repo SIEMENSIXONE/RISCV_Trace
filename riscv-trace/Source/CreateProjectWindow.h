@@ -12,6 +12,8 @@
 
 #include <JuceHeader.h>
 #include "ProjectParser.hpp"
+#include "TextResources.h"
+#include "SettingsParser.hpp"
 
 using namespace juce;
 //==============================================================================
@@ -33,7 +35,7 @@ public:
     class SetPathPanel : public Component, Button::Listener
     {
     public:
-        SetPathPanel(vector<string>&, CreateProjectPanel &, bool multipleFilesFlag = false);
+        SetPathPanel(vector<string>&, CreateProjectPanel &, TSettingsParser::Settings&, bool multipleFilesFlag = false);
         ~SetPathPanel() override;
         void paint(Graphics&) override;
         void resized() override;
@@ -51,13 +53,13 @@ public:
         vector<string> *vals;
         CreateProjectPanel* parent;
         //
-
+        TSettingsParser::Settings* settings;
     };
     //
     class TitlePanel :public Component
     {
     public:
-        TitlePanel(const string&);
+        TitlePanel(const string&, TSettingsParser::Settings&);
         ~TitlePanel() override;
         void paint(Graphics&) override;
         void resized() override;
@@ -65,9 +67,10 @@ public:
         string getText();
     private:
         string text;
+        TSettingsParser::Settings* settings;
     };
     //
-    CreateProjectPanel();
+    CreateProjectPanel(TSettingsParser::Settings&);
     ~CreateProjectPanel() override;
     void paint(Graphics&) override;
     void resized() override;
@@ -82,6 +85,8 @@ public:
     vector<string>* tracePath;
     vector<string> *codePaths;
     vector<string>* objdumpPath;
+    //
+    TSettingsParser::Settings* settings = nullptr;
     //
 private:
     void buttonClicked(Button* button) override;
@@ -103,14 +108,14 @@ private:
 class CreateProjectWindow  : public juce::DocumentWindow
 {
 public:
-    CreateProjectWindow(juce::String name)
+    CreateProjectWindow(juce::String name, TSettingsParser::Settings& settings)
         : DocumentWindow(name,
             juce::Desktop::getInstance().getDefaultLookAndFeel()
             .findColour(juce::ResizableWindow::backgroundColourId),
             DocumentWindow::minimiseButton | closeButton)
     {
         setUsingNativeTitleBar(true);
-        setContentOwned(new CreateProjectPanel(), true);
+        setContentOwned(new CreateProjectPanel(settings), true);
         setResizable(false, false);
         centreWithSize(getWidth(), getHeight());
 

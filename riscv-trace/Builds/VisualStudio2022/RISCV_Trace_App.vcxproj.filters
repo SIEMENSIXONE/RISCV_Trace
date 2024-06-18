@@ -1950,6 +1950,9 @@
     <ClInclude Include="..\..\Source\JSON\json.hpp">
       <Filter>RISCV_Trace\JSON</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\TextResources.h">
+      <Filter>RISCV_Trace\Include</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\Source\UsageWindow.h">
       <Filter>RISCV_Trace\Include</Filter>
     </ClInclude>

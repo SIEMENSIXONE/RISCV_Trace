@@ -22,10 +22,12 @@ class TSettingsParser {
     //
 public:
     struct Settings {
+        int interfaceFontSize = 9;
         int traceFontSize = 9;
         int codeFontSize = 9;
         int analyzerFontSize = 9;
         //
+        string lang = "ENG";
     };
     //
     TSettingsParser();
