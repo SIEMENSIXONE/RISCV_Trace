@@ -204,6 +204,8 @@ MainComponent::PerformanceAnalyzer::~PerformanceAnalyzer()
 void MainComponent::PerformanceAnalyzer::paint(juce::Graphics& g)
 {
 	g.fillAll(Colour(94, 60, 82));
+	g.setColour(juce::Colours::white);
+	g.fillRect(graphViewport->getBounds());
 	//
 	g.setColour(juce::Colours::white);
 	g.setFont(14.0f);
@@ -340,12 +342,13 @@ MainComponent::PerformanceAnalyzer::ProfileGraphPanel::~ProfileGraphPanel() {
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics& g) {
 	g.fillAll(Colours::white);
 	g.setOpacity(1.0f);
+	
 	if (picture.isNull())  g.drawText("The graph display function is only available when graphviz is installed.", getLocalBounds(), Justification::centred, true);
-	else g.drawImage(picture, 0, 0, picture.getWidth(), picture.getHeight(), 0, 0, picture.getWidth(), picture.getHeight());
+	else g.drawImage(picture, 0, 0, min(getWidth(), picture.getWidth()), min(getHeight(), picture.getHeight()), 0, 0, picture.getWidth(), picture.getHeight());
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::resized() {
-	setSize(max(getParentWidth(), picture.getWidth()), max(getParentHeight(), picture.getHeight()));
+	//setSize(max(getParentWidth(), picture.getWidth()), max(getParentHeight(), picture.getHeight()));
 	//if (openSeparateWindowButton != nullptr) openSeparateWindowButton->setBounds(0, offset, buttonWidth, buttonHeight);
 }
 //
@@ -366,9 +369,19 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseDoubleClick(con
 	openSeparateGraphWindow();
 }
 //
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
+	//
+	if (wheel.deltaY < 0) {
+		if ((getWidth() - zoomStep > getParentWidth()) && (getHeight() - zoomStep > getParentHeight())) setSize(getWidth() - zoomStep, getHeight() - zoomStep);
+	}
+	if (wheel.deltaY > 0) {
+		if ((getWidth() + zoomStep < maxZoom) && (getHeight() + zoomStep < maxZoom)) setSize(getWidth() + zoomStep, getHeight() + zoomStep);
+	}
+}
+//
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::SeparateGraphPanel(Image& _image) {
 	//
-	imageComponent = new ImageComponent(_image);
+	imageComponent = new ImageComponent(*this, _image);
 	imageComponent->setSize(_image.getWidth(), _image.getHeight());
 	//
 	viewport = new Viewport("ImageViewport");
@@ -397,26 +410,39 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::
 	viewport->setBounds(0, 0, getWidth(), getHeight());
 }
 //
-MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::ImageComponent(Image& _image) {
+MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::ImageComponent(SeparateGraphPanel& _parent, Image& _image) {
 	picture = &_image;
+	parent = &_parent;
+	setSize(picture->getWidth(), picture->getHeight());
 	addMouseListener(this, true);
 }
 
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::~ImageComponent() {}
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::paint(juce::Graphics& g) {
-	g.drawImage(*picture, 0, 0, picture->getWidth(), picture->getHeight(), 0, 0, picture->getWidth(), picture->getHeight(), false);
+	g.drawImage(*picture, 0, 0, getWidth(), getHeight(), 0, 0, picture->getWidth(), picture->getHeight(), false);
 
 }
 
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::resized() {
-	setSize(picture->getWidth(), picture->getHeight());
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
 	if (wheel.deltaY < 0) {
+		if ((getWidth() - parent->zoomStep > parent->minZoom) && (getHeight() - parent->zoomStep > parent->minZoom)) setSize(getWidth() - parent->zoomStep, getHeight() - parent->zoomStep);
 	}
 	if (wheel.deltaY > 0) {
+		if ((getWidth() + parent->zoomStep < parent->maxZoom) && (getHeight() + parent->zoomStep < parent->maxZoom)) setSize(getWidth() + parent->zoomStep, getHeight() + parent->zoomStep);
+	}
+}
+//
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
+	if (wheel.deltaY < 0) {
+		if ((imageComponent->getWidth() - zoomStep > minZoom) && (imageComponent->getHeight() - zoomStep > minZoom)) imageComponent->setSize(imageComponent->getWidth() - zoomStep, imageComponent->getHeight() - zoomStep);
+	}
+	//
+	if (wheel.deltaY > 0) {
+		if ((imageComponent->getWidth() + zoomStep < maxZoom) && (imageComponent->getHeight() + zoomStep < maxZoom)) imageComponent->setSize(imageComponent->getWidth() + zoomStep, imageComponent->getHeight() + zoomStep);
 	}
 }
 //

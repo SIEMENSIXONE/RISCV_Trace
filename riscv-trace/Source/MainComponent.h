@@ -92,6 +92,7 @@ public:
         private:
             void buttonClicked(Button* button) override;
             void mouseDoubleClick(const MouseEvent& event) override;
+            void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
             //
             class SeparateGraphPanel : public Component {
             public:
@@ -99,18 +100,26 @@ public:
                 ~SeparateGraphPanel() override;
                 void paint(juce::Graphics&) override;
                 void resized() override;
+                //
+                int zoomStep = 100;
+                int minZoom = 100;
+                int maxZoom = 5000;
             private:
                 class ImageComponent : public Component {
                 public:
-                    ImageComponent(Image&);
+                    ImageComponent(SeparateGraphPanel&, Image&);
                     ~ImageComponent() override;
                     void paint(juce::Graphics&) override;
                     void resized() override;
                 private:
                     void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
                     //
+                    SeparateGraphPanel* parent;
                     Image* picture;
                 };
+                //
+                void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
+                //
                 ImageComponent *imageComponent;
                 Viewport *viewport;
             };
@@ -147,6 +156,10 @@ public:
             string pictureFileath;
             Image picture;
             SeparateGraphPanelWindow* separateWindow = nullptr;
+            //
+            int zoomStep = 150;
+            int minZoom = 100;
+            int maxZoom = 5000;
         };
         //
         struct MyTabbedComponent final : public TabbedComponent
