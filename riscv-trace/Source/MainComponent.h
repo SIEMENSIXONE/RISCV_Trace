@@ -59,17 +59,19 @@ public:
             class MyLookAndFeel : public LookAndFeel_V4
             {
             public:
-                MyLookAndFeel();
+                MyLookAndFeel(MainComponent&);
                 //
                 void drawTableHeaderColumn(Graphics& g, TableHeaderComponent& header, const String& columnName, int /*columnId*/, int width, int height, bool isMouseOver, bool isMouseDown, int columnFlags) override;
+            private:
+                MainComponent* mainComponent;
             };
             //
             void cellClicked(int rowNumber, int columnId, const MouseEvent&) override;
             void selectedRowsChanged(int lastRowSelected) override;
             //
-            MainComponent *mainComponent;
+            MainComponent *mainComponent = nullptr;
             TableListBox box;
-            MyLookAndFeel myLookAndFeel;
+            MyLookAndFeel *myLookAndFeel = nullptr;
             vector<array<std::string, 6>> *data;
             string selectedFunc = "";
             map<string, juce::Colour> funcColoursMap;

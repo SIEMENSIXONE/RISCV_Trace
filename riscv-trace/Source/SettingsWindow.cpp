@@ -12,6 +12,18 @@
 #include "SettingsWindow.h"
 
 //==============================================================================
+MyLookAndFeel::MyLookAndFeel(TSettingsParser::Settings& _settings) {
+    settings = _settings;
+}
+//
+Font MyLookAndFeel::getComboBoxFont(ComboBox&){
+    return((float) settings.interfaceFontSize);
+}
+//
+Font MyLookAndFeel::getPopupMenuFont() {
+    return((float)settings.interfaceFontSize);
+}
+//
 SettingsPanel::SettingsPanel(juce::TextButton & _saveButton, juce::String lang)
 {
     saveButton = &_saveButton;
@@ -25,12 +37,15 @@ SettingsPanel::SettingsPanel(juce::TextButton & _saveButton, juce::String lang)
     //
     setLang(currentSettings.lang);
     //
+    myLookAndFeel = new MyLookAndFeel(currentSettings);
+    //
     settingsLines->emplace_back(new SettingsPanelLine(SettingsTraceFontSizeText, *this, currentSettings, 0));
     settingsLines->emplace_back(new SettingsPanelLine(SettingsCodeFontSizeText, *this, currentSettings, 1));
     settingsLines->emplace_back(new SettingsPanelLine(SettingsTableFontSizeText, *this, currentSettings, 2));
     settingsLines->emplace_back(new SettingsPanelLine(SettingsInterfaceFontSizeText, *this, currentSettings, 3));
     //
     langComboBox = new ComboBox("LanguageComboBox");
+    langComboBox->setLookAndFeel(myLookAndFeel);
     langComboBox->setText(ChooseLangText);
     langComboBox->setJustificationType(Justification::centred);
     langComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
@@ -63,6 +78,8 @@ SettingsPanel::~SettingsPanel()
 {
     delete(settingsLines);
     delete(langComboBox);
+    //
+    if (myLookAndFeel != nullptr) delete(myLookAndFeel);
 }
 //
 void SettingsPanel::paint (juce::Graphics& g)
@@ -161,7 +178,7 @@ void SettingsPanel::SettingsPanelLine::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
     //
     g.setColour(juce::Colours::white);
-    g.setFont(15.0f);
+    //textEditor->setFont((float)settings->interfaceFontSize);
     g.drawText("Line", getLocalBounds(),
         juce::Justification::centred, true);   // draw some placeholder text
     //
@@ -217,6 +234,8 @@ SettingsPanel::SettingsPanelLine::LineTitle::LineTitle(juce::String& _text, TSet
 {
     text = &_text;
     settings = &_settings;
+    //
+    fontSize = (float) settings->interfaceFontSize;
 }
 //
 SettingsPanel::SettingsPanelLine::LineTitle::~LineTitle()
@@ -229,7 +248,7 @@ void SettingsPanel::SettingsPanelLine::LineTitle::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white);
     g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
     g.setColour(juce::Colours::white);
-    g.setFont((float) settings->interfaceFontSize);
+    g.setFont(fontSize);
     g.drawText(*text, getLocalBounds(),
         juce::Justification::centred, true);   // draw some placeholder text
 }

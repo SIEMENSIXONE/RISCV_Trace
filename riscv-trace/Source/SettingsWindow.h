@@ -17,6 +17,16 @@
 //==============================================================================
 /*
 */
+class MyLookAndFeel : public juce::LookAndFeel_V4
+{
+public:
+    MyLookAndFeel(TSettingsParser::Settings&);
+    Font getComboBoxFont(ComboBox&) override;
+    Font getPopupMenuFont() override;
+private:
+    TSettingsParser::Settings settings;
+};
+//
 class SettingsPanel  : public juce::Component
 {
 public:
@@ -51,6 +61,7 @@ private:
         private:
             juce::String *text;
             TSettingsParser::Settings* settings = nullptr;
+            float fontSize = 5;
         };
         //
         LineTitle *title = nullptr;
@@ -60,6 +71,7 @@ private:
         TSettingsParser::Settings *settings = nullptr;
         SettingsPanel *settingsPanel = nullptr;
     };
+    MyLookAndFeel* myLookAndFeel = nullptr;
     //
     vector<std::unique_ptr<SettingsPanelLine>> *settingsLines;
     ComboBox* langComboBox;

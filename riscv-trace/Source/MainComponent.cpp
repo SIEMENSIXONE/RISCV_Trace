@@ -461,11 +461,14 @@ void MainComponent::PerformanceAnalyzer::MyTabbedComponent::updateTabNames() {
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
+	//
 	data = &_data;
 	mainComponent = &_mainComponent;
 	funcColoursMap = _funcColoursMap;
 	funcColoursTempMap = _funcColoursTempMap;
 	rowsColoursMap;
+	//
+	myLookAndFeel = new MyLookAndFeel(*mainComponent);
 	//
 	refreshRowsColoursMap();
 	//
@@ -479,13 +482,14 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
 	//
 	box.setHeaderHeight(50);
 	//
-	box.getHeader().addColumn(TableNameColomnTitleText, 1, 2 * singleColumnWidth);
-	box.getHeader().addColumn(TableTimeColomnTitleText, 2, singleColumnWidth);
-	box.getHeader().addColumn(TableTimePrecentColomnTitleText, 3, singleColumnWidth);
-	box.getHeader().addColumn(TableCalledColomnTitleText, 4, singleColumnWidth);
-	box.getHeader().addColumn(TableChildrenColomnTitleText, 5, singleColumnWidth);
-	box.getHeader().addColumn(TableSelfColomnTitleText, 6, singleColumnWidth);
-	box.getHeader().setLookAndFeel(&myLookAndFeel);
+	box.getHeader().addColumn(TableNameColomnTitleText, 1, 2 * singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	box.getHeader().addColumn(TableTimeColomnTitleText, 2, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	box.getHeader().addColumn(TableTimePrecentColomnTitleText, 3, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	box.getHeader().addColumn(TableCalledColomnTitleText, 4, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	box.getHeader().addColumn(TableChildrenColomnTitleText, 5, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	box.getHeader().addColumn(TableSelfColomnTitleText, 6, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	box.getHeader().setLookAndFeel(myLookAndFeel);
+	box.getHeader().setPopupMenuActive(false);
 	//
 	box.getVerticalScrollBar().setVisible(true);
 	box.getVerticalScrollBar().setAutoHide(true);
@@ -497,6 +501,7 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
 	box.getHeader().setLookAndFeel(nullptr);
+	if (myLookAndFeel != nullptr) delete(myLookAndFeel);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
@@ -678,8 +683,9 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::setFontSize(const int siz
 	box.getHeader().setColumnName(6, TableSelfColomnTitleText);
 }
 //
-MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::MyLookAndFeel()
+MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::MyLookAndFeel(MainComponent& _mainComponent)
 {
+	mainComponent = &_mainComponent;
 	setColour(juce::Slider::thumbColourId, Colour(37, 11, 46));
 }
 //
@@ -712,7 +718,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
 	}
 	//
 	g.setColour(juce::Colours::white);
-	g.setFont(16.0f);
+	if (mainComponent != nullptr) g.setFont((float) mainComponent->currentSettings.interfaceFontSize);
 	//
 	g.drawFittedText(columnName, area, Justification::centred, 1);
 	g.setColour(juce::Colours::white);
@@ -1636,6 +1642,12 @@ void MainComponent::buttonClicked(Button* button) {
 	if (button == saveSettingsButton) {
 		loadSettings();
 		updateCurrentSettings();
+		//
+		if (settingsWindow != nullptr) {
+			settingsWindow->setVisible(false);
+			delete(settingsWindow); 
+			settingsWindow = nullptr;
+		}
 	}
 }
 //
