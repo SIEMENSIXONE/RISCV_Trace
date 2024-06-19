@@ -3,6 +3,59 @@
 //==============================================================================
 using namespace juce;
 //
+MainComponent::MyStretchableLayoutResizerBar::MyStretchableLayoutResizerBar(StretchableLayoutManager* layout_, const int index, const bool vertical, MainComponent& _mainComponent)
+	: layout(layout_),
+	itemIndex(index),
+	isVertical(vertical)
+{
+	mainComponent = &_mainComponent;
+	//
+	setRepaintsOnMouseActivity(true);
+	setMouseCursor(vertical ? MouseCursor::LeftRightResizeCursor
+		: MouseCursor::UpDownResizeCursor);
+}
+
+MainComponent::MyStretchableLayoutResizerBar::~MyStretchableLayoutResizerBar()
+{
+}
+
+//==============================================================================
+void MainComponent::MyStretchableLayoutResizerBar::paint(Graphics& g)
+{
+	getLookAndFeel().drawStretchableLayoutResizerBar(g, getWidth(), getHeight(), isVertical, isMouseOver(), isMouseButtonDown());
+}
+
+void MainComponent::MyStretchableLayoutResizerBar::mouseDown(const MouseEvent&)
+{
+	mouseDownPos = layout->getItemCurrentPosition(itemIndex);
+	mainComponent->toggleSectionsVisibility(false);
+}
+
+void MainComponent::MyStretchableLayoutResizerBar::mouseUp(const MouseEvent&)
+{
+	mainComponent->resizeRealSections();
+	mainComponent->toggleSectionsVisibility(true);
+	//hasBeenMoved();
+}
+
+void MainComponent::MyStretchableLayoutResizerBar::mouseDrag(const MouseEvent& e)
+{
+	const int desiredPos = mouseDownPos + (isVertical ? e.getDistanceFromDragStartX() : e.getDistanceFromDragStartY());
+	//
+	if (layout->getItemCurrentPosition(itemIndex) != desiredPos)
+	{
+		newPos = desiredPos;
+		layout->setItemPosition(itemIndex, desiredPos);
+		hasBeenMoved();
+	}
+}
+
+void MainComponent::MyStretchableLayoutResizerBar::hasBeenMoved()
+{
+	if (Component* parent = getParentComponent())
+		parent->resized();
+}
+//
 MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::TraceLineStruct>& _linesInfoVector, map<string, vector<string>>& _funcAddrMap, map<string, set<string>>& _callingMap, map<string, vector<string>>& _callersMap, map<string, pair<string, string>>& _addrCallingCalledMap, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent)
 {
 	mainComponent = &_mainComponent;
@@ -1277,15 +1330,33 @@ void MainComponent::AnalyzerSubComponent::setFontSize(const int size) {
 	performanceAnalyzer->setFontSize(size);
 }
 //
-MainComponent::PlaceholderSubComponent::PlaceholderSubComponent() {}
+MainComponent::PlaceholderSubComponent::PlaceholderSubComponent(String& _sectionName) {
+	sectionName = &_sectionName;
+}
 //
 MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent() {}
 //
 void MainComponent::PlaceholderSubComponent::paint(Graphics& g) {
 	g.fillAll(juce::Colour(187, 148, 174));
-	File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
-	String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
-	File pictureFile(pictureFileath);
+	Rectangle<float> textArea((float) 0, (float) 0, (float)getWidth(), (float)(getHeight() / 2));
+	//
+	g.setColour(Colour(94, 60, 82));
+	juce::Font font("Courier New", 55.0f, juce::Font::FontStyleFlags::bold);
+	g.setFont(font);
+	g.drawText(*sectionName, textArea, juce::Justification::horizontallyCentred);
+}
+//
+void MainComponent::PlaceholderSubComponent::resized() {}
+//
+MainComponent::MainPlaceholderSubComponent::MainPlaceholderSubComponent(const String& _placeholderPictureFilepath) {
+	placeholderPictureFilepath = _placeholderPictureFilepath;
+}
+//
+MainComponent::MainPlaceholderSubComponent::~MainPlaceholderSubComponent() {}
+//
+void MainComponent::MainPlaceholderSubComponent::paint(Graphics& g) {
+	g.fillAll(juce::Colour(187, 148, 174));
+	File pictureFile(placeholderPictureFilepath);
 	Image picture = ImageCache::getFromFile(pictureFile);
 	g.setOpacity(1.0f);
 	Rectangle<float> pictureArea((float)0, (float)(getHeight() / 4), (float)getWidth(), (float)(getHeight() / 2 - getHeight() / 4));
@@ -1298,7 +1369,7 @@ void MainComponent::PlaceholderSubComponent::paint(Graphics& g) {
 	g.drawText(WelcomeText, textArea, juce::Justification::horizontallyCentred);
 }
 //
-void MainComponent::PlaceholderSubComponent::resized() {}
+void MainComponent::MainPlaceholderSubComponent::resized() {}
 //
 MainComponent::MyAlertWindow::MyAlertWindow(const String& title,
 	const String& message,
@@ -1325,8 +1396,11 @@ MainComponent::MainComponent()
 	addAndMakeVisible(menuBar);
 	//
 	//
-	placeholderPanel = new PlaceholderSubComponent();
-	addAndMakeVisible(placeholderPanel);
+	File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
+	String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
+	mainPlaceholderPanel = new MainPlaceholderSubComponent(pictureFileath);
+	//
+	addAndMakeVisible(mainPlaceholderPanel);
 	//
 	double thickness = 4;
 	verticalLayout.setItemLayout(0, -0.1, -1.0, -0.65);
@@ -1335,11 +1409,10 @@ MainComponent::MainComponent()
 	verticalLayout.setItemLayout(3, thickness, thickness, thickness);
 	verticalLayout.setItemLayout(4, -0.1, -1.0, -0.65);
 	//
-	verticalDividerBarLeft.reset(new StretchableLayoutResizerBar(&verticalLayout, 1, true));
+	verticalDividerBarLeft.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 1, true, *this));
 	addAndMakeVisible(verticalDividerBarLeft.get());
-	verticalDividerBarRight.reset(new StretchableLayoutResizerBar(&verticalLayout, 2, true));
+	verticalDividerBarRight.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 2, true, *this));
 	addAndMakeVisible(verticalDividerBarRight.get());
-	//
 	//
 	setSize(1440, 800);
 }
@@ -1347,7 +1420,12 @@ MainComponent::MainComponent()
 MainComponent::~MainComponent()
 {
 	if (menuBar != nullptr) delete(menuBar);
-	if (placeholderPanel != nullptr) delete(placeholderPanel);
+	if (mainPlaceholderPanel != nullptr) delete(mainPlaceholderPanel);
+	//
+	if (asPlaceholderPanel != nullptr) delete(asPlaceholderPanel);
+	if (codePlaceholderPanel != nullptr) delete(codePlaceholderPanel);
+	if (analyzerPlaceholderPanel != nullptr) delete(analyzerPlaceholderPanel);
+	//
 	if (asPanel != nullptr) delete(asPanel);
 	if (codePanel != nullptr) delete(codePanel);
 	if (analyzerPanel != nullptr) delete(analyzerPanel);
@@ -1368,7 +1446,7 @@ void MainComponent::paint(Graphics& g)
 //
 void MainComponent::resized()
 {
-	placeholderPanel->setSize(getWidth(), getHeight());
+	mainPlaceholderPanel->setSize(getWidth(), getHeight());
 	//
 	Rectangle<int> menuArea = Rectangle<int>(0, 0, getWidth(), menuHeight);
 	Rectangle<int> workspaceArea = Rectangle<int>(0, menuHeight, getWidth(), getHeight() - menuHeight);
@@ -1380,26 +1458,41 @@ void MainComponent::resized()
 	//
 	if (projectOpened) {
 		//
-		placeholderPanel->setVisible(false);
+		mainPlaceholderPanel->setVisible(false);
 		auto r = getLocalBounds();
-		Component* vcomps[] = { asPanel, verticalDividerBarLeft.get(), codePanel, verticalDividerBarRight.get(), analyzerPanel };
-		verticalLayout.layOutComponents(vcomps, 5, r.getX(), r.getY() + menuBar->getHeight(), r.getWidth(), r.getHeight() - menuBar->getHeight(), false, true);
 		//
-		r.removeFromLeft(verticalDividerBarLeft->getRight());
-		r.removeFromRight(verticalDividerBarLeft->getRight());
-		r.removeFromLeft(verticalDividerBarRight->getRight());
-		r.removeFromRight(verticalDividerBarRight->getRight());
+		Component* vcomps[] = { asPlaceholderPanel, verticalDividerBarLeft.get(), codePlaceholderPanel, verticalDividerBarRight.get(), analyzerPlaceholderPanel };
+		verticalLayout.layOutComponents(vcomps, 5, r.getX(), r.getY() + menuBar->getHeight(), r.getWidth(), r.getHeight() - menuBar->getHeight(), false, true);
 	}
 	else {
-		placeholderPanel->setBounds(workspaceArea);
-		placeholderPanel->setVisible(true);
+		mainPlaceholderPanel->setBounds(workspaceArea);
+		mainPlaceholderPanel->setVisible(true);
 	}
+}
+//
+void MainComponent::resizeRealSections()
+{
+	asPanel->setBounds(asPlaceholderPanel->getBounds());
+	codePanel->setBounds(codePlaceholderPanel->getBounds());
+	analyzerPanel->setBounds(analyzerPlaceholderPanel->getBounds());
 }
 //
 void MainComponent::setSelectedFunc(const string& funcName, int callerID) {
 	if (callerID != 1) asPanel->setSelectedFunc(funcName);
 	if (callerID != 2) codePanel->selectFunc(funcName);
 	if (callerID != 3) analyzerPanel->setSelectedFunc(funcName);
+}
+//
+void MainComponent::toggleSectionsVisibility(bool flag) {
+	realSectionsVisible = flag;
+	//
+	asPanel->setVisible(realSectionsVisible);
+	codePanel->setVisible(realSectionsVisible);
+	analyzerPanel->setVisible(realSectionsVisible);
+	//
+	asPlaceholderPanel->setVisible(!realSectionsVisible);
+	codePlaceholderPanel->setVisible(!realSectionsVisible);
+	analyzerPlaceholderPanel->setVisible(!realSectionsVisible);
 }
 //
 void MainComponent::loadSettings() {
@@ -1430,6 +1523,18 @@ void MainComponent::openProjectFile(const string filepath) {
 				if (asPanel != nullptr) delete(asPanel);
 				if (codePanel != nullptr) delete(codePanel);
 				if (analyzerPanel != nullptr) delete(analyzerPanel);
+				//
+				if (asPlaceholderPanel != nullptr) delete(asPlaceholderPanel);
+				if (codePlaceholderPanel != nullptr) delete(codePlaceholderPanel);
+				if (analyzerPlaceholderPanel != nullptr) delete(analyzerPlaceholderPanel);
+				//
+				asPlaceholderPanel = new PlaceholderSubComponent(TraceSectionTitle);
+				codePlaceholderPanel = new PlaceholderSubComponent(CodeSectionTitle);
+				analyzerPlaceholderPanel = new PlaceholderSubComponent(AnalyzerSectionTitle);
+				//
+				addAndMakeVisible(asPlaceholderPanel);
+				addAndMakeVisible(codePlaceholderPanel);
+				addAndMakeVisible(analyzerPlaceholderPanel);
 				//
 				//Objdump parsing
 				TObjdumpParser* parser = new TObjdumpParser();
@@ -1469,8 +1574,13 @@ void MainComponent::openProjectFile(const string filepath) {
 				addAndMakeVisible(asPanel);
 				addAndMakeVisible(codePanel);
 				addAndMakeVisible(analyzerPanel);
+				//
 				projectOpened = true;
 				resized();
+				//
+				realSectionsVisible = true;
+				resizeRealSections();
+				toggleSectionsVisibility(true);
 			}
 			else {
 				showAlertWindow();
@@ -1564,7 +1674,7 @@ void MainComponent::updateCurrentSettings() {
 	}
 	else {
 		//
-		if (placeholderPanel != nullptr) placeholderPanel->resized();
+		if (mainPlaceholderPanel != nullptr) mainPlaceholderPanel->resized();
 		//
 		repaint();
 		resized();

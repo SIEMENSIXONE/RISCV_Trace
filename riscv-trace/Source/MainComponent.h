@@ -10,12 +10,8 @@
 #include "AboutWindow.h"
 #include "UsageWindow.h"
 #include <array>
-
+//
 //==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
 using namespace juce;
 //
 class MainComponent  : public Component, public MenuBarModel, public ComponentListener, public Button::Listener
@@ -23,6 +19,32 @@ class MainComponent  : public Component, public MenuBarModel, public ComponentLi
 public:
     //==============================================================================
     //
+    class MyStretchableLayoutResizerBar : public Component
+    {
+    public:
+        MyStretchableLayoutResizerBar(StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical, MainComponent& _mainComponent);
+        ~MyStretchableLayoutResizerBar() override;
+        virtual void hasBeenMoved();
+        struct JUCE_API  LookAndFeelMethods
+        {
+            virtual ~LookAndFeelMethods() = default;
+
+            virtual void drawStretchableLayoutResizerBar(Graphics&, int w, int h,
+                bool isVerticalBar, bool isMouseOver, bool isMouseDragging) = 0;
+        };
+        void paint(Graphics&) override;
+        void mouseDown(const MouseEvent&) override;
+        void mouseUp(const MouseEvent&) override;
+        void mouseDrag(const MouseEvent&) override;
+    private:
+        StretchableLayoutManager* layout;
+        MainComponent* mainComponent;
+        int itemIndex, mouseDownPos;
+        bool isVertical;
+        int newPos = 0;
+        //
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyStretchableLayoutResizerBar)
+    };
     class PerformanceAnalyzer : public juce::Component
     {
     public:
@@ -387,16 +409,30 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AsSubComponent)
     };
     //
-    class PlaceholderSubComponent: public Component
+    class PlaceholderSubComponent : public Component
     {
     public:
-        PlaceholderSubComponent();
+        PlaceholderSubComponent(String&);
         ~PlaceholderSubComponent() override;
+        void paint(Graphics&) override;
+        void resized() override;
+    private:
+        String *sectionName;
+        //
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaceholderSubComponent)
+    };
+    //
+    class MainPlaceholderSubComponent: public Component
+    {
+    public:
+        MainPlaceholderSubComponent(const String&);
+        ~MainPlaceholderSubComponent() override;
         void paint (Graphics&) override;
         void resized() override;
     private:
+        String placeholderPictureFilepath;
         //
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaceholderSubComponent)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainPlaceholderSubComponent)
     };
     //
     class MyAlertWindow : public AlertWindow
@@ -414,7 +450,9 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+    void resizeRealSections();
     void setSelectedFunc(const string&, int callerID);
+    void toggleSectionsVisibility(bool);
     //
     TSettingsParser::Settings currentSettings;
     //
@@ -449,7 +487,12 @@ private:
     AsSubComponent *asPanel = nullptr;
     CodeSubComponent *codePanel = nullptr;
     AnalyzerSubComponent* analyzerPanel = nullptr;
-    PlaceholderSubComponent *placeholderPanel = nullptr;
+    //
+    PlaceholderSubComponent* asPlaceholderPanel = nullptr;
+    PlaceholderSubComponent* codePlaceholderPanel = nullptr;
+    PlaceholderSubComponent* analyzerPlaceholderPanel = nullptr;
+    //
+    MainPlaceholderSubComponent *mainPlaceholderPanel = nullptr;
     //
     CreateProjectWindow* createProjWindow = nullptr;
     SettingsWindow* settingsWindow = nullptr;
@@ -457,8 +500,8 @@ private:
     UsageWindow* usageWindow = nullptr;
     //
     StretchableLayoutManager verticalLayout;
-    std::unique_ptr<StretchableLayoutResizerBar> verticalDividerBarLeft;
-    std::unique_ptr<StretchableLayoutResizerBar> verticalDividerBarRight;
+    std::unique_ptr<MyStretchableLayoutResizerBar> verticalDividerBarLeft;
+    std::unique_ptr<MyStretchableLayoutResizerBar> verticalDividerBarRight;
     //
     ScopedMessageBox messageBox;
     //
@@ -470,6 +513,7 @@ private:
     //
     int menuHeight = 20;
     bool projectOpened = false;
+    bool realSectionsVisible = true;
     //
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
