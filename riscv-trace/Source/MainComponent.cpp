@@ -1463,6 +1463,7 @@ void MainComponent::resized()
 		//
 		Component* vcomps[] = { asPlaceholderPanel, verticalDividerBarLeft.get(), codePlaceholderPanel, verticalDividerBarRight.get(), analyzerPlaceholderPanel };
 		verticalLayout.layOutComponents(vcomps, 5, r.getX(), r.getY() + menuBar->getHeight(), r.getWidth(), r.getHeight() - menuBar->getHeight(), false, true);
+		if (realSectionsVisible) resizeRealSections();
 	}
 	else {
 		mainPlaceholderPanel->setBounds(workspaceArea);
