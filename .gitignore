@@ -4,4 +4,3 @@ build
 .vs
 /riscv-trace/Projects/project.JSON
 /riscv-trace/Resources/graph.txt
-/riscv-trace/Resources/graph.png

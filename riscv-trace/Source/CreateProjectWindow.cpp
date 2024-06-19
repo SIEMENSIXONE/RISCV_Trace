@@ -81,7 +81,7 @@ void CreateProjectPanel::SetPathPanel::paint(juce::Graphics& g)
 void CreateProjectPanel::SetPathPanel::resized()
 {
     int space = 15;
-    int buttonHeight = 17;
+    int buttonHeight = 20;
     int buttonWidth = 90;
     //
     if (textField != nullptr) textField->setBounds(0, 0, getWidth() - buttonWidth - space, getHeight());
@@ -237,7 +237,7 @@ void CreateProjectPanel::resized()
     using Track = Grid::TrackInfo;
     using Fr = Grid::Fr;
     Grid grid;
-    grid.templateRows = { Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)), Track(Fr(5)), Track(Fr(2)), Track(Fr(1)), Track(Fr(2)) };
+    grid.templateRows = { Track(Fr(4)), Track(Fr(2)), Track(Fr(4)), Track(Fr(2)), Track(Fr(4)), Track(Fr(10)), Track(Fr(4)), Track(Fr(3)), Track(Fr(4)) };
     grid.templateColumns = { Track(Fr(1)) };
     grid.items = { GridItem(titleTracePanel),GridItem(setTracePathPanel),GridItem(titleObjdumpPanel), GridItem(setObjdumpPathPanel), GridItem(titleCodePanel) ,
         GridItem(setCodePathPanel), GridItem(spacerPanel), GridItem(saveProjectButton).withWidth((float) width / 5).withJustifySelf(GridItem::JustifySelf::center), GridItem(spacerPanel)};
