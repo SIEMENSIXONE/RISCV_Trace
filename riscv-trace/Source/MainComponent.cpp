@@ -225,7 +225,6 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	//
 	std::string command = "dot -Tpng -o " + graphPNGFilepath + " " + graphTXTFilepath;
 	const char* c = command.c_str();
-	//    std::cout << c << std::endl;
 	std::system(c);
 	//
 	graph = new ProfileGraphPanel(graphPNGFilepath);
@@ -378,48 +377,30 @@ MainComponent::PerformanceAnalyzer::ProfileGraphPanel::ProfileGraphPanel(const s
 	picture = ImageFileFormat::loadFrom(pictureFile);
 	setSize(max(getParentWidth(), picture.getWidth()), max(getParentHeight(), picture.getHeight()));
 	//
-	//openSeparateWindowButton = new TextButton("Open in separate window");
-	//openSeparateWindowButton->addListener(this);
-	//openSeparateWindowButton->setBounds(0, 0, 80, 50);
-	//addAndMakeVisible(openSeparateWindowButton);
-	//
 	addMouseListener(this, true);
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::~ProfileGraphPanel() {
 	if (separateWindow != nullptr) delete(separateWindow);
-	//openSeparateWindowButton->removeListener(this);
-	//if (openSeparateWindowButton != nullptr) delete(openSeparateWindowButton);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics& g) {
 	g.fillAll(Colours::white);
 	g.setOpacity(1.0f);
 	
-	if (picture.isNull())  g.drawText("The graph display function is only available when graphviz is installed.", getLocalBounds(), Justification::centred, true);
+	if (picture.isNull())  g.drawText(NoGraphviz, getLocalBounds(), Justification::centred, true);
 	else g.drawImage(picture, 0, 0, min(getWidth(), picture.getWidth()), min(getHeight(), picture.getHeight()), 0, 0, picture.getWidth(), picture.getHeight());
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::resized() {
-	//setSize(max(getParentWidth(), picture.getWidth()), max(getParentHeight(), picture.getHeight()));
-	//if (openSeparateWindowButton != nullptr) openSeparateWindowButton->setBounds(0, offset, buttonWidth, buttonHeight);
-}
+void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::resized() {}
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::openSeparateGraphWindow() {
 	if (separateWindow != nullptr) delete(separateWindow);
 	separateWindow = new SeparateGraphPanelWindow("Graph window", picture);
 }
 //
-void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::buttonClicked(Button* /*button*/) {
-
-	//if (button == openSeparateWindowButton)
-	//{
-	//    separateWindow = new SeparateGraphPanelWindow("Graph window", picture);
-	//}
-}
-//
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseDoubleClick(const MouseEvent& /*event*/) {
-	openSeparateGraphWindow();
+	if (!picture.isNull()) openSeparateGraphWindow();
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {

@@ -106,7 +106,7 @@ public:
 
         };
         //
-        class ProfileGraphPanel : public Component, public Button::Listener {
+        class ProfileGraphPanel : public Component {
         public:
             ProfileGraphPanel(const string&);
             ~ProfileGraphPanel() override;
@@ -114,7 +114,6 @@ public:
             void resized() override;
             void openSeparateGraphWindow();
         private:
-            void buttonClicked(Button* button) override;
             void mouseDoubleClick(const MouseEvent& event) override;
             void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
             //

@@ -102,6 +102,8 @@ static String graphTabText;
     static String saveButtonText;
 //Chooser
 static String ChooseFileText;;
+// No graphviz installed text
+static String NoGraphviz;
 //
 static void setLang(String lang) {
     if (lang == String("ENG")) currentLang = lang;
@@ -200,6 +202,8 @@ static void setLang(String lang) {
             saveButtonText = String((std::wstring(L"Сохранить...")).c_str());
             //
             ChooseFileText = String((std::wstring(L"Выберите файл...")).c_str());
+            //
+            NoGraphviz = String((std::wstring(L"Функция отображения графа вызовов доступна только при установленном graphviz.")).c_str());
     }
     else {
         //
@@ -294,6 +298,8 @@ static void setLang(String lang) {
         saveButtonText = String((std::wstring(L"Save...")).c_str());
         //
         ChooseFileText = String((std::wstring(L"Choose file...")).c_str());
+        //
+        NoGraphviz = String((std::wstring(L"The graph display function is only available when graphviz is installed.")).c_str());
     }
 }
 #endif
