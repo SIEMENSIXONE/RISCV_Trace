@@ -84,9 +84,9 @@ SettingsPanel::~SettingsPanel()
 //
 void SettingsPanel::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colour(94, 60, 82));   // clear the background
+    g.fillAll (juce::Colour(94, 60, 82));
     g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    g.drawRect (getLocalBounds(), 1);
     //
     setLang(currentSettings.lang);
     for (int i = 0; i < settingsLines->size(); i++) {
@@ -172,15 +172,14 @@ SettingsPanel::SettingsPanelLine::~SettingsPanelLine()
 //
 void SettingsPanel::SettingsPanelLine::paint(juce::Graphics& g)
 {
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     //
     g.setColour(juce::Colours::grey);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
+    g.drawRect(getLocalBounds(), 1);
     //
     g.setColour(juce::Colours::white);
-    //textEditor->setFont((float)settings->interfaceFontSize);
     g.drawText("Line", getLocalBounds(),
-        juce::Justification::centred, true);   // draw some placeholder text
+        juce::Justification::centred, true);
     //
     title->resized();
     textEditor->resized();
@@ -244,13 +243,13 @@ SettingsPanel::SettingsPanelLine::LineTitle::~LineTitle()
 //
 void SettingsPanel::SettingsPanelLine::LineTitle::paint(juce::Graphics& g)
 {
-    g.fillAll(juce::Colour(37, 11, 46));   // clear the background
+    g.fillAll(juce::Colour(37, 11, 46));
     g.setColour(juce::Colours::white);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
+    g.drawRect(getLocalBounds(), 1);
     g.setColour(juce::Colours::white);
     g.setFont(fontSize);
     g.drawText(*text, getLocalBounds(),
-        juce::Justification::centred, true);   // draw some placeholder text
+        juce::Justification::centred, true);
 }
 //
 void SettingsPanel::SettingsPanelLine::LineTitle::resized()

@@ -35,10 +35,6 @@ void TObjdumpParser::parseFile(const string& filename) {
 	//
 	if (!fin.is_open())
 	{
-		//TODO: Exception
-		//cout<< "-----------------------------------" <<endl;
-		//cout<<"Error! Failed to open file."<<endl;
-		//cout<< "-----------------------------------" <<endl;
 		return;
 	}
 	//
@@ -210,28 +206,13 @@ string TObjdumpParser::parseFuncName(const string& str) {
 	}
 	//
 	if ((openingBracketPos < 0) || (closingBracketPos < 0) || ((closingBracketPos - openingBracketPos) <= 1)) {
-		//TODO: Exception
-		//cout<< "-----------------------------------" <<endl;
-		//cout<<"Error! Not a func name."<<endl;
-		//cout<< "-----------------------------------" <<endl;
 		return "";
 	}
 	//
 	if ((str[openingBracketPos + 1] == 'm') && (str[openingBracketPos + 2] == 'a') && (str[openingBracketPos + 3] == 'i') && (str[openingBracketPos + 4] == 'n')) return "main";
 	//
-//    if ((str[openingBracketPos + 1] != '_') || (str[openingBracketPos + 2] != 'Z') || (!isANumber(str[openingBracketPos + 3]))){
-//        //TODO: Exception
-//        cout<< "-----------------------------------" <<endl;
-//        cout<<"Error! Wrong func name format."<<endl;
-//        cout<< "-----------------------------------" <<endl;
-//        return "Error! Wrong func name format.";
-//    }
-	//
 	string name;
-	//    int nameLength = str[openingBracketPos + 3] - '0';
-	//    for (int i = openingBracketPos + 4; i < nameLength + openingBracketPos + 4; i++){
-	//        name+= str[i];
-	//    }
+	//
 	for (int i = openingBracketPos + 1; i < closingBracketPos; i++) {
 		char c = str[i];
 		//

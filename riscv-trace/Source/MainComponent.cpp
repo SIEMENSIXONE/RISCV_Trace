@@ -175,8 +175,6 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		//time %
 		newRow.at(2) = "-";
 		if (totalExecTime != 0) newRow.at(2) = to_string((totalExecTime * 100) / totalTime);
-		//red = 255, 0, 0
-		//green = 0, 255, 0
 		long maxSelfTime = 0;
 		//
 		for (map<string, long>::iterator it1 = execTimeMapTotalSelf->begin(); it1 != execTimeMapTotalSelf->end(); it1++) if (it1->second > maxSelfTime) maxSelfTime = it1->second;
@@ -184,7 +182,6 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		double selfTime = 0;
 		if (execTimeMapTotalSelf->find(funcName) != execTimeMapTotalSelf->end()) selfTime = execTimeMapTotalSelf->at(funcName);
 		double precentage = selfTime / maxSelfTime;
-		//if ((int) precentage == 0) precentage = 1;
 		int maxColour = 200;
 		_funcColoursMap.insert({ funcName, Colour((juce::uint8)(rand() % 200), (juce::uint8)(rand() % 100), (juce::uint8)(rand() % 200)) });
 		_funcColoursTempMap.insert({ funcName, Colour((juce::uint8)(maxColour * precentage), (juce::uint8)(maxColour - (maxColour * precentage)),/*(juce::uint8) (255 * precentage / 2)*/ 20) });
@@ -197,15 +194,8 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 		//
 		//self
 		if (execTimeMapTotalSelf->find(funcName) != execTimeMapTotalSelf->end()) {
-
-			// от общего времени
 			newRow.at(4) = to_string(((totalExecTime - execTimeMapTotalSelf->at(funcName)) * 100) / totalTime);
 			newRow.at(5) = to_string((execTimeMapTotalSelf->at(funcName) * 100) / totalTime);
-
-
-			//// от собственного времени функции
-			//newRow.at(4) = to_string(((totalExecTime - execTimeMapTotalSelf->at(funcName)) * 100) / totalExecTime);
-			//newRow.at(5) = to_string((execTimeMapTotalSelf->at(funcName) * 100) / totalExecTime);
 		}
 		//
 		if (totalExecTime != 0) tableData->push_back(newRow);
@@ -316,16 +306,10 @@ string MainComponent::PerformanceAnalyzer::getGraphCode(map<string, juce::Colour
 		streamSelf << std::fixed << std::setprecision(2) << selfPrecentage;
 		std::string selfPrecentageString = streamSelf.str();
 		//
-		//double childPrecentage = (((double)totalTime - (double) execTimeMapTotalSelf->at(func)) * 100) / (double)totalTime;
-		//std::stringstream streamChild;
-		//streamChild << std::fixed << std::setprecision(2) << childPrecentage;
-		//std::string childPrecentageString = streamChild.str();
-		//
 		string node = "N" + nodeNumber + "[label = \"" + func
 			+ "\n---------------------------------" +
 			+"\nTotal: " + totalPrecentageString + "%"
 			+ "\nSelf: " + selfPrecentageString + "%"
-			//+ "\nChildren: " + childPrecentageString + "%"
 			+ "\" id = \"node" + nodeNumber + "\" fontsize = 18 shape = box tooltip = \"" + func + "\"  color = \"#ffffff\" fillcolor = \"#" + funcColourString + "\"]";
 		nodes += node + "\n";
 	}
@@ -396,7 +380,7 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::resized() {}
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::openSeparateGraphWindow() {
 	if (separateWindow != nullptr) delete(separateWindow);
-	separateWindow = new SeparateGraphPanelWindow("Graph window", picture);
+	separateWindow = new SeparateGraphPanelWindow(GraphWindowTitle, picture);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseDoubleClick(const MouseEvent& /*event*/) {
@@ -541,7 +525,6 @@ MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
 void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
 {
 	//
-	//g.setColour(juce::Colours::white);
 	if ((rowsColoursMap.size() != 0) && (rowsColoursMap.find(rowNumber) != rowsColoursMap.end())) g.setColour(rowsColoursMap.at(rowNumber));
 	if (rowIsSelected) g.setColour(juce::Colours::lightpink);
 	g.fillRect(0, 0, width, height);
@@ -779,14 +762,14 @@ MainComponent::TitlePanel::~TitlePanel() {
 //
 void MainComponent::TitlePanel::paint(Graphics& g)
 {
-	g.fillAll(Colour(187, 148, 174));   // clear the background
+	g.fillAll(Colour(187, 148, 174));
 	g.setColour(Colour(37, 11, 46));
-	g.drawRect(getLocalBounds(), 2);   // draw an outline around the component
+	g.drawRect(getLocalBounds(), 2);
 	g.setColour(Colours::white);
 	juce::Font font("Candara", 25.0f, juce::Font::FontStyleFlags::plain);
 	g.setFont(font);
-	//g.setFont (14.0f);
-	g.drawText(*text, getLocalBounds(), Justification::centred, true);   // draw some placeholder text
+
+	g.drawText(*text, getLocalBounds(), Justification::centred, true);
 }
 //
 void MainComponent::TitlePanel::resized()
@@ -833,7 +816,6 @@ void MainComponent::AsSubComponent::ScrollableWindow::scrollToFunc(const string&
 	if (linesVector.size() != 0) {
 		if (!(((occuranceNum) < 0) || ((occuranceNum) > linesVector.size()))) index = occuranceNum;
 		int line = linesVector.at(index);
-		//TraceWindow->setTopLine(line);
 		TraceWindow->setSelectedLine(line);
 	}
 }
@@ -923,15 +905,15 @@ MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::~TitlePanel() {
 //
 void MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::paint(juce::Graphics& g)
 {
-	g.fillAll(Colour(94, 60, 82));   // clear the background
+	g.fillAll(Colour(94, 60, 82));
 
 	g.setColour(Colour(94, 60, 82));
-	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
+	g.drawRect(getLocalBounds(), 1);
 
 	g.setColour(juce::Colours::white);
 	g.setFont(14.0f);
 	g.drawText(*text, getLocalBounds(),
-		juce::Justification::centred, true);   // draw some placeholder text
+		juce::Justification::centred, true);
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::TitlePanel::resized()
@@ -1027,7 +1009,6 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	functionsComboBox->setJustificationType(Justification::centred);
 	functionsComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
 	functionsComboBox->setEditableText(false);
-	//
 	//
 	searchField = new MyTextEditor(*mainComponent);
 	juce::Font font("Courier New", 20.0f, juce::Font::FontStyleFlags::plain);
@@ -1376,7 +1357,6 @@ MainComponent::MainComponent()
 	menuBar = new MenuBarComponent(this);
 	addAndMakeVisible(menuBar);
 	//
-	//
 	File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
 	String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
 	mainPlaceholderPanel = new MainPlaceholderSubComponent(pictureFileath);
@@ -1551,7 +1531,6 @@ void MainComponent::openProjectFile(const string filepath) {
 				analyzerPanel = new AnalyzerSubComponent(*vec, funcAddrMap, callingMap, callersMap, addrCallerCalled, funcColoursMap, funcColoursTempMap, *this);
 				asPanel = new AsSubComponent(*vec, addrFuncMap, funcColoursMap, funcColoursTempMap, *this);
 				setFontSizes();
-				//
 				//
 				addAndMakeVisible(asPanel);
 				addAndMakeVisible(codePanel);

@@ -22,7 +22,7 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string& code, map<string, 
 	//
 	int symbNum = 0;
 	int lineNum = 0;
-	while (getline(fin, buf, '}')) { // читаем до
+	while (getline(fin, buf, '}')) {
 		for (vector<string>::iterator it = funcNameVector.begin(); it != funcNameVector.end(); it++) {
 			string funcName = *it;
 			//
@@ -30,7 +30,6 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string& code, map<string, 
 				int findResult = (int)buf.find(funcName);
 				if (findResult != -1) {
 					if ((findResult == 0) || ((findResult > 0) && (buf[findResult - 1] == ' ')) || ((findResult > 0) && (buf[findResult - 1] == '\n')) || ((findResult > 0) && (buf[findResult - 1] == '\t'))) {
-						//нашли название функции в строке
 						int ctr = findResult + (int)funcName.length();
 						//
 						bool ignoreNextSemiColon = false;
@@ -55,14 +54,13 @@ TCodeParser::CCode TCodeParser::getCodeFromFile(const string& code, map<string, 
 							}
 							//
 							if ((buf[ctr] == '{') && (inBrackets == 0)) {
-								//нашли! записываем
 								int lineNumInside = 0;
 								for (int i = 0; i < findResult; i++) {
 									if (buf[i] == '\n') lineNumInside++;
 								}
 								//
-								int funcLineNum = lineNum + lineNumInside; // нашли номер строки
-								int funcSymbPos = symbNum + findResult; // нашли номер символа
+								int funcLineNum = lineNum + lineNumInside;
+								int funcSymbPos = symbNum + findResult;
 								//
 								pair<int, int> tmp = make_pair(funcSymbPos, funcLineNum);
 								result.functions.insert({ funcName, tmp });
@@ -154,11 +152,5 @@ string TCodeParser::clearCommentsStringsSlashes(const string& code) {
 		metEscapeCharacter = false;
 	}
 	//
-	//std::ofstream file;
-	//file.open("test123.txt", std::ios::out);
-	//if (file.is_open()) {
-	//    file << result;
-	//}
-	//file.close();
 	return result;
 }

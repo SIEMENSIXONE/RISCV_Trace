@@ -29,10 +29,6 @@ TProjectParser::Project TProjectParser::getProjectFromFile(const string &filenam
     //
     if(!fin.is_open())
     {
-        //TODO: Exception
-        cout<< "-----------------------------------" <<endl;
-        cout<<"Error! Failed to open file."<<endl;
-        cout<< "-----------------------------------" <<endl;
         return project;
     }
     std::ifstream i(filename);

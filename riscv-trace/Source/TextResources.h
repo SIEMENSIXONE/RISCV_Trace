@@ -15,7 +15,6 @@
 #include <JuceHeader.h>
 using namespace juce;
 //
-    //String((std::wstring(L"Текст на русском")).c_str())
 static String currentLang = "ENG";
 //
 //Window titles

@@ -56,7 +56,7 @@ public:
     };
     //
     struct CCode{
-        map<string, pair<int, int>> functions; //также должна быть информация о файле, в котором представлена реализация функции
+        map<string, pair<int, int>> functions;
     };
     //
     TCodeParser();

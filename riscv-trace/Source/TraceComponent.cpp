@@ -32,8 +32,6 @@ void TraceComponent::TraceLine::TraceLineElement::paint (juce::Graphics& g){
     g.setFont(font);
     
     g.drawText (text, textXOffset, 0, getWidth(), getHeight(), textJustification, true);
-//    g.drawText (text, getLocalBounds(),
-//                textJustification, true);
 }
 //
 void TraceComponent::TraceLine::TraceLineElement::resized(){
@@ -46,16 +44,10 @@ string TraceComponent::TraceLine::TraceLineElement::getText() {
 TraceComponent::TraceLine::TraceFuncElement::TraceFuncElement(const std::string &str, TraceLine &_traceLine, TraceComponent &_traceComp)
 :TraceLineElement(str, _traceComp)
 {
-    //fontSize = lineHeight;
     traceLine = &_traceLine;
-    //traceComp = &_traceComp;
-    //addMouseListener(this, false);
 }
 //
-TraceComponent::TraceLine::TraceFuncElement::~TraceFuncElement()
-{
-    //removeMouseListener(this);
-}
+TraceComponent::TraceLine::TraceFuncElement::~TraceFuncElement(){}
 //
 void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
 	g.fillAll(backgroundColor);
@@ -113,7 +105,6 @@ TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct &lineInfoIn, j
     func = new TraceFuncElement(lineInfo.func, *this, *traceComp);
     instr = new TraceLineElement(lineInfo.instr, *traceComp);
     //
-    //time->backgroundColor = juce::Colour(125, 111, 111);
     time->backgroundColor = tempColour;
     time->borderColor = juce::Colours::black;
     time->textColor = juce::Colours::white;
@@ -144,10 +135,10 @@ TraceComponent::TraceLine::~TraceLine(){
 }
 //
 void TraceComponent::TraceLine::paint (juce::Graphics& g){
-    g.fillAll (juce::Colours::white);   // clear the background
+    g.fillAll (juce::Colours::white);
 
     g.setColour (juce::Colours::pink);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    g.drawRect (getLocalBounds(), 1);
     
     g.setColour (juce::Colours::white);
     g.setFont (14.0f);
@@ -155,7 +146,7 @@ void TraceComponent::TraceLine::paint (juce::Graphics& g){
     std::ostringstream ss;
     ss << lineInfo;
     g.drawText (ss.str(), getLocalBounds(),
-                juce::Justification::left, true);   // draw some placeholder text
+                juce::Justification::left, true);
     if (isLineSelected) {
         func->fontStyle = juce::Font::FontStyleFlags::bold;
         func->textColor = selectedFuncTextColour;
@@ -201,7 +192,6 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<st
     //
     FTraceLines = new std::vector<std::unique_ptr<TraceLine>>();
     //
-    //juce::Colour curFuncColour = juce::Colours::black;
     for (int i = 0; i < (&vec)->size(); i++) {
         juce::Colour curFuncColour = juce::Colours::black;
         juce::Colour curFuncTempColour = juce::Colours::black;

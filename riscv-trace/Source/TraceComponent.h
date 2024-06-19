@@ -15,10 +15,6 @@
 #include "TraceParser.hpp"
 //
 //==============================================================================
-/*
-*/
-//
-//
 class TraceComponent  : public juce::Component
 {
 public:
@@ -37,7 +33,6 @@ public:
             string getText();
             //
             juce::String fontTypeface = "Courier New";
-            //float fontSize = (float) (lineHeight - 4);
             juce::Font::FontStyleFlags fontStyle = juce::Font::FontStyleFlags::plain;
             //
             juce::Colour borderColor = juce::Colours::black;
@@ -102,7 +97,6 @@ public:
     void updateLines();
     int getTopLine();
     void setSelectedLine(int);
-    //void jumpToSelectedLine();
     void clearSelections();
     void setFontSize(const int);
     map<string, juce::Colour> getFuncColoursMap();

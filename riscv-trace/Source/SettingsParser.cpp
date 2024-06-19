@@ -22,7 +22,6 @@ TSettingsParser::~TSettingsParser() {}
 //
 TSettingsParser::Settings TSettingsParser::getSettingsFromFile(const string &filename) {
     //
-    //
     Settings settings = *new Settings();
     //
     string result;
@@ -31,10 +30,6 @@ TSettingsParser::Settings TSettingsParser::getSettingsFromFile(const string &fil
     //
     if(!fin.is_open())
     {
-        //TODO: Exception
-        cout<< "-----------------------------------" <<endl;
-        cout<<"Error! Failed to open file."<<endl;
-        cout<< "-----------------------------------" <<endl;
         return settings;
     }
     //

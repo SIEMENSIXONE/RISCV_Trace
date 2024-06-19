@@ -31,10 +31,6 @@ void TraceParser::parseTrace(const string& traceFilepath){
     string line;
     if(!fin.is_open())
     {
-        //TODO: Exception
-        cout<< "-----------------------------------" <<endl;
-        cout<<"Error! Failed to open file."<<endl;
-        cout<< "-----------------------------------" <<endl;
         return;
     }
     //
@@ -46,10 +42,6 @@ void TraceParser::parseTrace(const string& traceFilepath){
         }
         //
         if (delimCtr != DELIM_CTR){
-            //TODO: Exception
-            cout<< "-----------------------------------" <<endl;
-            cout<<"Error! Wrong trace format."<<endl;
-            cout<< "-----------------------------------" <<endl;
             return;
         }
         //
@@ -114,12 +106,7 @@ void TraceParser::markFirstLines(map<string, string>& firstLineAddrMap) {
 //
 void TraceParser::markLastLines(map<string, std::vector<string>> &retFuncAddrMap) {
     for (vector<TraceLineStruct>::iterator it = FTraceLines->begin(); it != FTraceLines->end(); it++) {
-        //if (it + 1 != FTraceLines->end()) {
-        //    if (((it->func) != ((it + 1)->func)) && (addrCallerCalled.find(it->addr) == addrCallerCalled.end())) {
-        //        it->isLastLine = true;
-        //    }
-        //}
-
+        //
         if (retFuncAddrMap.find(it->func) != retFuncAddrMap.end()) {
             vector<string> retAddrs = retFuncAddrMap.at(it->func);
             for (vector<string>::iterator it1 = retAddrs.begin(); it1 != retAddrs.end(); it1++) {
@@ -135,15 +122,6 @@ void TraceParser::markCallLines(map<string, string>& /*firstLineAddrMap*/, map<s
         string func = it->func;
         string instr = it->instr;
         //
-        //if (addrCallerCalled.find(addr) != addrCallerCalled.end()) {
-        //    pair<string, string> pair = addrCallerCalled.at(addr);
-        //    if (it + 1 != FTraceLines->end()) {
-        //        if ((it + 1)->func == pair.second) {
-        //            if ((firstLineAddrMap.find((it + 1)->addr) != firstLineAddrMap.end()) && (firstLineAddrMap.at((it + 1)->addr) == pair.second)) it->isCallLine = true;
-        //        }
-        //    }
-        //}
-
         if ((it + 1) != FTraceLines->end()) {
             if (((it + 1)->isFirstLine) && (!it->isLastLine)) {
                 addrCallerCalled.insert({addr, make_pair(func, (it + 1)->func)});

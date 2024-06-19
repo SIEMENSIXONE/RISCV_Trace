@@ -224,7 +224,7 @@ CreateProjectPanel::~CreateProjectPanel()
 //
 void CreateProjectPanel::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colour(94, 60, 82));   // clear the background
+    g.fillAll (juce::Colour(94, 60, 82));
 }
 //
 void CreateProjectPanel::resized()

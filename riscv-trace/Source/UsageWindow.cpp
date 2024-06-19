@@ -35,15 +35,15 @@ UsagePanel::~UsagePanel()
 //
 void UsagePanel::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colour(94, 60, 82));   // clear the background
+    g.fillAll (juce::Colour(94, 60, 82));
 
     g.setColour (juce::Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
+    g.drawRect (getLocalBounds(), 1);
 
     g.setColour (juce::Colours::white);
     g.setFont((float) settings->interfaceFontSize);
     g.drawText("text", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
+                juce::Justification::centred, true);
 }
 //
 void UsagePanel::resized()
