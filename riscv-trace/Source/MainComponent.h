@@ -452,6 +452,7 @@ public:
     void resizeRealSections();
     void setSelectedFunc(const string&, int callerID);
     void toggleSectionsVisibility(bool);
+    void darkenSections(bool);
     //
     TSettingsParser::Settings currentSettings;
     //

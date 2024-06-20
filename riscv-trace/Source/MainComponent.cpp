@@ -1380,8 +1380,7 @@ MainComponent::MainComponent()
 	darkenLabel->setColour(Label::ColourIds::backgroundColourId, Colour((uint8)0, (uint8)0, (uint8)0, (uint8)122));
 	if (darkenLabel != nullptr) darkenLabel->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
 	addChildComponent(darkenLabel);
-	darkenLabel->setVisible(false);
-	darkenLabel->setEnabled(false);
+	darkenSections(false);
 	//
 	setSize(1440, 800);
 }
@@ -1468,6 +1467,13 @@ void MainComponent::toggleSectionsVisibility(bool flag) {
 	asPlaceholderPanel->setVisible(!realSectionsVisible);
 	codePlaceholderPanel->setVisible(!realSectionsVisible);
 	analyzerPlaceholderPanel->setVisible(!realSectionsVisible);
+}
+//
+void MainComponent::darkenSections(bool flag) {
+	if (darkenLabel != nullptr) {
+		darkenLabel->setEnabled(flag);
+		darkenLabel->setVisible(flag);
+	}
 }
 //
 void MainComponent::loadSettings() {
@@ -1558,8 +1564,7 @@ void MainComponent::openProjectFile(File filepath) {
 				//
 				removeChildComponent(darkenLabel);
 				addChildComponent(darkenLabel);
-				darkenLabel->setEnabled(false);
-				darkenLabel->setVisible(false);
+				darkenSections(false);
 			}
 			else {
 				showAlertWindow();
@@ -1743,10 +1748,7 @@ void MainComponent::buttonClicked(Button* button) {
 void MainComponent::componentVisibilityChanged(Component& component) {
 	if (component.isVisible()) {
 		//visible
-		if (darkenLabel != nullptr) {
-			darkenLabel->setEnabled(true);
-			darkenLabel->setVisible(true);
-		}
+		darkenSections(true);
 		repaint();
 		resized();
 		//
@@ -1758,10 +1760,7 @@ void MainComponent::componentVisibilityChanged(Component& component) {
 	}
 	else {
 		//not visible
-		if (darkenLabel != nullptr) {
-			darkenLabel->setEnabled(false);
-			darkenLabel->setVisible(false);
-		}
+		darkenSections(false);
 		//
 		repaint();
 		resized();
