@@ -82,7 +82,6 @@ void TraceParser::parseTrace(juce::File traceFilepath){
         traceLine.instr = buf;
         this->addLine(traceLine);
     }
-    
 }
 //
 void TraceParser::addFuncAddresses(map<string, string> &addrFuncMap){

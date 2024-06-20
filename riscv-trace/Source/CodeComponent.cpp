@@ -23,7 +23,6 @@ CodeComponent::CodeComponent(std::string& _filename, std::string &code, map<stri
     codeEditor->setColour(juce::CodeEditorComponent::ColourIds::highlightColourId, juce::Colours::hotpink);
     codeEditor->getLookAndFeel().setColour(juce::ScrollBar::thumbColourId, juce::Colour(187, 148, 174));
     codeEditor->setScrollbarThickness(10);
-    codeEditor->setFont(100);
     codeEditor->loadContent(code);
     codeEditor->setReadOnly(true);
     ////////////////////////////////////////////////////////////////

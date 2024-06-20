@@ -21,7 +21,6 @@ class CodeComponent  : public juce::Component
 public:
     CodeComponent(std::string&, std::string &, map<string, string>&);
     ~CodeComponent() override;
-
     void paint (juce::Graphics&) override;
     void resized() override;
     string getFilename();
