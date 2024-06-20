@@ -27,11 +27,11 @@ TObjdumpParser::~TObjdumpParser() {
 	delete(FAddrCallerCalled);
 }
 //
-void TObjdumpParser::parseFile(const string& filename) {
+void TObjdumpParser::parseFile(juce::File filename) {
 	string result;
 	string buf;
 	set<string> funcNames;
-	ifstream fin(filename);
+	ifstream fin(filename.getFullPathName().toWideCharPointer());
 	//
 	if (!fin.is_open())
 	{

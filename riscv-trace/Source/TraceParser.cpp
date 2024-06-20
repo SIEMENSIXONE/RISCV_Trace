@@ -26,8 +26,8 @@ void TraceParser::addLine(const TraceParser::TraceLineStruct &line){
     FTraceLines->push_back(line);
 }
 //
-void TraceParser::parseTrace(const string& traceFilepath){
-    ifstream fin(traceFilepath);
+void TraceParser::parseTrace(juce::File traceFilepath){
+    ifstream fin(traceFilepath.getFullPathName().toWideCharPointer());
     string line;
     if(!fin.is_open())
     {

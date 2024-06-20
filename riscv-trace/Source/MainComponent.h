@@ -237,7 +237,7 @@ public:
     class CodeSubComponent : public Component
     {
     public:
-        CodeSubComponent(const std::vector<std::string>&, map<string, string>, MainComponent&);
+        CodeSubComponent(const std::vector<juce::File>&, map<string, string>, MainComponent&);
         ~CodeSubComponent() override;
         void paint(Graphics&) override;
         void resized() override;
@@ -458,7 +458,7 @@ public:
 private:
     void loadSettings();
     void createProjectFile();
-    void openProjectFile(const string);
+    void openProjectFile(File);
     void chooseProjectFile();
     void saveProject();
     void closeProjectFile();

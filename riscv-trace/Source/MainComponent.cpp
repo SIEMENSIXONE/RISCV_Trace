@@ -1173,7 +1173,7 @@ void MainComponent::AsSubComponent::MyTextEditor::returnPressed() {
 	mainComponent->setSelectedFunc(this->getText().toStdString(), 1);
 }
 //
-MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>& filepaths, map<string, string> map, MainComponent& _mainComponent) {
+MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<File>& filepaths, map<string, string> map, MainComponent& _mainComponent) {
 	//
 	titlePanel = new TitlePanel(CodeSectionTitle);
 	addAndMakeVisible(titlePanel);
@@ -1182,13 +1182,14 @@ MainComponent::CodeSubComponent::CodeSubComponent(const std::vector<std::string>
 	//
 	std::vector<std::string> filesContentVector;
 	std::vector<std::string> filesNamesVector;
-	std::vector<std::string> filepathsVector = filepaths;
+	std::vector<File> filepathsVector = filepaths;
 	//
-	for (std::vector<std::string>::iterator it = filepathsVector.begin(); it != filepathsVector.end(); it++) {
+	for (std::vector<File>::iterator it = filepathsVector.begin(); it != filepathsVector.end(); it++) {
 		string content;
-		std::getline(std::ifstream(*it), content, '\0');
+		std::getline(std::ifstream(it->getFullPathName().toWideCharPointer()), content, '\0');
 		filesContentVector.push_back(content);
-		filesNamesVector.push_back(it->substr(it->find_last_of("/\\") + 1));
+		string tmpString = it->getFullPathName().toStdString();
+		filesNamesVector.push_back(tmpString.substr(tmpString.find_last_of("/\\") + 1));
 	}
 	//
 	codeWindows = new vector<CodeComponent*>();
@@ -1469,7 +1470,7 @@ void MainComponent::createProjectFile() {
 	createProjWindow->setVisible(true);
 }
 //
-void MainComponent::openProjectFile(const string filepath) {
+void MainComponent::openProjectFile(File filepath) {
 	//
 	MyAlertWindow* processWnd = new MyAlertWindow(LoadingText,
 		LoadingSubText,
@@ -1479,7 +1480,7 @@ void MainComponent::openProjectFile(const string filepath) {
 	/*Flag = */MessageManager::callAsync([this, processWnd, filepath]()
 		{
 			TProjectParser::Project newProject = TProjectParser::getProjectFromFile(filepath);
-			if ((newProject.trace != "") && (newProject.objdump != "") && (newProject.code.size() != 0)) {
+			if ((newProject.trace != File()) && (newProject.objdump != File()) && (newProject.code.size() != 0)) {
 				project = newProject;
 				//
 				if (asPanel != nullptr) delete(asPanel);
@@ -1560,7 +1561,7 @@ void MainComponent::chooseProjectFile() {
 	chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
 		{
 			auto file = fc.getResult();
-			if (file != File{}) openProjectFile((file.getFullPathName().toStdString()));
+			if (file != File{}) openProjectFile((file));
 		});
 }
 //
@@ -1572,7 +1573,7 @@ void MainComponent::saveProject() {
 			auto file = fc.getResult();
 			if (file != File{})
 			{
-				TProjectParser::saveProjectToFile(project, file.getFullPathName().toStdString());
+				TProjectParser::saveProjectToFile(project, file);
 			}
 		});
 }

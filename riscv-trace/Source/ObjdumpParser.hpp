@@ -8,6 +8,7 @@
 #ifndef ObjdumpParser_hpp
 #define ObjdumpParser_hpp
 //
+#include <JuceHeader.h>
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
@@ -24,7 +25,7 @@ class TObjdumpParser {
 public:
     TObjdumpParser();
     ~TObjdumpParser();
-    void parseFile(const string &);
+    void parseFile(juce::File);
     void print();
     map<string, string> getFirstFuncAddrMap();
     map<string, std::vector<string>> getRetFuncAddrMap();

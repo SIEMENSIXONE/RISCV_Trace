@@ -35,12 +35,12 @@ public:
     class SetPathPanel : public Component, Button::Listener
     {
     public:
-        SetPathPanel(vector<string>&, CreateProjectPanel &, TSettingsParser::Settings&, bool multipleFilesFlag = false);
+        SetPathPanel(vector<File>&, CreateProjectPanel &, TSettingsParser::Settings&, bool multipleFilesFlag = false);
         ~SetPathPanel() override;
         void paint(Graphics&) override;
         void resized() override;
     private:
-        void addPath(const string&);
+        void addPath(File);
         void chooseProjectFile();
         void chooseProjectFiles();
         void buttonClicked(Button* button) override;
@@ -50,7 +50,7 @@ public:
         TextButton* chooseFileButton = nullptr;
         TextButton* chooseFilesButton = nullptr;
         TextEditor* textField = nullptr;
-        vector<string> *vals;
+        vector<File> *vals;
         CreateProjectPanel* parent;
         //
         TSettingsParser::Settings* settings;
@@ -82,9 +82,9 @@ public:
     String defaultSaveFilepath = parentDirecory.getFullPathName() + "/Projects/project.JSON";
     String defaultFilepath = parentDirecory.getFullPathName();
     //
-    vector<string>* tracePath;
-    vector<string> *codePaths;
-    vector<string>* objdumpPath;
+    vector<File>* tracePath;
+    vector<File> *codePaths;
+    vector<File>* objdumpPath;
     //
     TSettingsParser::Settings* settings = nullptr;
     //

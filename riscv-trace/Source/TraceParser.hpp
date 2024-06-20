@@ -8,6 +8,7 @@
 #ifndef TraceParser_hpp
 #define TraceParser_hpp
 //
+#include <JuceHeader.h>
 #include <stdio.h>
 #include <iomanip>
 #include <iostream>
@@ -40,7 +41,7 @@ public:
     TraceParser(vector<TraceLineStruct> &);
     ~TraceParser();
     void addLine(const TraceLineStruct&);
-    void parseTrace(const string& traceFilepath);
+    void parseTrace(juce::File);
     void addFuncAddresses(map<string, string> &);
     void markFirstLines(map<string, string>&);
     void markLastLines(map<string, std::vector<string>>&);

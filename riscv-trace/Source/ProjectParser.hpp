@@ -8,6 +8,7 @@
 #ifndef ProjectParser_hpp
 #define ProjectParser_hpp
 //
+#include <JuceHeader.h>
 #include <stdio.h>
 #include <sstream>
 #include <string>
@@ -22,15 +23,15 @@ class TProjectParser {
     //
 public:
     struct Project{
-        string trace = "";
-        string objdump = "";
-        vector<string> code;
+        juce::File trace;
+        juce::File objdump;
+        vector<juce::File> code;
     };
     //
     TProjectParser();
     ~TProjectParser();
-    static Project getProjectFromFile(const string &);
-    static bool saveProjectToFile(Project &, const string &);
+    static Project getProjectFromFile(juce::File);
+    static bool saveProjectToFile(Project &, juce::File);
 };
 //
 #endif /* ProjectParser_hpp */

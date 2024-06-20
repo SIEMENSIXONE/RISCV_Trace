@@ -23,7 +23,7 @@ CreateProjectPanel::MyAlertWindow::MyAlertWindow(const String& title,
 //
 CreateProjectPanel::MyAlertWindow::~MyAlertWindow() {}
 //
-CreateProjectPanel::SetPathPanel::SetPathPanel(vector<string>& _val, CreateProjectPanel& _parent, TSettingsParser::Settings& _settings, bool multipleFilesFlag)
+CreateProjectPanel::SetPathPanel::SetPathPanel(vector<File>& _val, CreateProjectPanel& _parent, TSettingsParser::Settings& _settings, bool multipleFilesFlag)
 {
     parent = &_parent;
     vals = &_val;
@@ -89,21 +89,21 @@ void CreateProjectPanel::SetPathPanel::resized()
     if (chooseFilesButton != nullptr) chooseFilesButton->setBounds(getWidth() - buttonWidth, 0, buttonWidth, buttonHeight);
 }
 //
-void CreateProjectPanel::SetPathPanel::addPath(const string& filepath) {
+void CreateProjectPanel::SetPathPanel::addPath(File filepath) {
     vals->push_back(filepath);
     //
-    string text = "";
+    wstring text;
     int pathsNum = (int)vals->size();
     //
-    if (pathsNum == 0) text = "No files choosen";
+    if (pathsNum == 0) text = wstring(L"No files choosen");
     else {
         for (int i = 0; i < pathsNum; i++) {
-            text += vals->at(i);
-            if (i < pathsNum - 1) text += ",\n";
+            text += vals->at(i).getFullPathName().toWideCharPointer();
+            if (i < pathsNum - 1) text += wstring(L",\n");
         }
     }
     //
-    textField->setText(text);
+    textField->setText(String(text.c_str()));
     parent->refresh();
 }
 //
@@ -114,7 +114,7 @@ void CreateProjectPanel::SetPathPanel::chooseProjectFile() {
         {
             auto file = fc.getResult();
             if (file != File{}) {
-                addPath((file.getFullPathName().toStdString()));
+                addPath(file);
                 parent->refresh();
             }
         });
@@ -128,7 +128,7 @@ void CreateProjectPanel::SetPathPanel::chooseProjectFiles() {
             Array< File > files = fc.getResults();
             for (File file : files) {
                 if (file != File{}) {
-                    addPath((file.getFullPathName().toStdString()));
+                    addPath(file);
                     parent->refresh();
                 }
             }
@@ -173,9 +173,9 @@ CreateProjectPanel::CreateProjectPanel(TSettingsParser::Settings& _settings)
     settings = &_settings;
     setLang(settings->lang);
     //
-    codePaths = new vector<string>();
-    tracePath = new vector<string>();
-    objdumpPath = new vector<string>();
+    codePaths = new vector<File>();
+    tracePath = new vector<File>();
+    objdumpPath = new vector<File>();
     //
     spacerPanel = new TitlePanel("", *settings);
     titleTracePanel = new TitlePanel(chooseTraceFileText.toStdString(), *settings);
@@ -265,7 +265,7 @@ void CreateProjectPanel::saveProject() {
                 project.code = *codePaths;
                 project.trace = tracePath->at(0);
                 project.objdump = objdumpPath->at(0);
-                TProjectParser::saveProjectToFile(project, file.getFullPathName().toStdString());
+                TProjectParser::saveProjectToFile(project, file);
                 showCongratsWindow();
                 getParentComponent()->setVisible(false);
             }
