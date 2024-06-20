@@ -509,6 +509,8 @@ private:
     String defaultFilepath = parentDirecory.getFullPathName() + "/Projects/";
     //
     LookAndFeel_V4 lf;
+
+    Label *darkenLabel = nullptr;
     //
     int menuHeight = 20;
     bool projectOpened = false;

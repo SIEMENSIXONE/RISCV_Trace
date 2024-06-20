@@ -1376,6 +1376,13 @@ MainComponent::MainComponent()
 	verticalDividerBarRight.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 2, true, *this));
 	addAndMakeVisible(verticalDividerBarRight.get());
 	//
+	darkenLabel = new Label();
+	darkenLabel->setColour(Label::ColourIds::backgroundColourId, Colour((uint8)0, (uint8)0, (uint8)0, (uint8)122));
+	if (darkenLabel != nullptr) darkenLabel->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
+	addChildComponent(darkenLabel);
+	darkenLabel->setVisible(false);
+	darkenLabel->setEnabled(false);
+	//
 	setSize(1440, 800);
 }
 //
@@ -1387,6 +1394,8 @@ MainComponent::~MainComponent()
 	if (asPlaceholderPanel != nullptr) delete(asPlaceholderPanel);
 	if (codePlaceholderPanel != nullptr) delete(codePlaceholderPanel);
 	if (analyzerPlaceholderPanel != nullptr) delete(analyzerPlaceholderPanel);
+	//
+	if (darkenLabel != nullptr) delete(darkenLabel);
 	//
 	if (asPanel != nullptr) delete(asPanel);
 	if (codePanel != nullptr) delete(codePanel);
@@ -1418,6 +1427,8 @@ void MainComponent::resized()
 	using Track = Grid::TrackInfo;
 	using Fr = Grid::Fr;
 	//
+	if (darkenLabel != nullptr) darkenLabel->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
+	//
 	if (projectOpened) {
 		//
 		mainPlaceholderPanel->setVisible(false);
@@ -1426,6 +1437,7 @@ void MainComponent::resized()
 		Component* vcomps[] = { asPlaceholderPanel, verticalDividerBarLeft.get(), codePlaceholderPanel, verticalDividerBarRight.get(), analyzerPlaceholderPanel };
 		verticalLayout.layOutComponents(vcomps, 5, r.getX(), r.getY() + menuBar->getHeight(), r.getWidth(), r.getHeight() - menuBar->getHeight(), false, true);
 		if (realSectionsVisible) resizeRealSections();
+		//
 	}
 	else {
 		mainPlaceholderPanel->setBounds(workspaceArea);
@@ -1543,6 +1555,11 @@ void MainComponent::openProjectFile(File filepath) {
 				realSectionsVisible = true;
 				resizeRealSections();
 				toggleSectionsVisibility(true);
+				//
+				removeChildComponent(darkenLabel);
+				addChildComponent(darkenLabel);
+				darkenLabel->setEnabled(false);
+				darkenLabel->setVisible(false);
 			}
 			else {
 				showAlertWindow();
@@ -1726,6 +1743,13 @@ void MainComponent::buttonClicked(Button* button) {
 void MainComponent::componentVisibilityChanged(Component& component) {
 	if (component.isVisible()) {
 		//visible
+		if (darkenLabel != nullptr) {
+			darkenLabel->setEnabled(true);
+			darkenLabel->setVisible(true);
+		}
+		repaint();
+		resized();
+		//
 		component.setAlwaysOnTop(true);
 		this->setEnabled(false);
 		//
@@ -1734,6 +1758,14 @@ void MainComponent::componentVisibilityChanged(Component& component) {
 	}
 	else {
 		//not visible
+		if (darkenLabel != nullptr) {
+			darkenLabel->setEnabled(false);
+			darkenLabel->setVisible(false);
+		}
+		//
+		repaint();
+		resized();
+		//
 		this->setEnabled(true);
 		//
 		repaint();
