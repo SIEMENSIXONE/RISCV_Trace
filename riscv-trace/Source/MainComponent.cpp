@@ -1368,6 +1368,16 @@ void MainComponent::MainPlaceholderSubComponent::paint(Graphics& g) {
 //
 void MainComponent::MainPlaceholderSubComponent::resized() {}
 //
+MainComponent::DarkeningComponent::DarkeningComponent() {}
+//
+MainComponent::DarkeningComponent::~DarkeningComponent() {}
+//
+void MainComponent::DarkeningComponent::paint(Graphics& g) {
+	g.fillAll(Colour((uint8)0, (uint8)0, (uint8)0, (uint8)122));
+}
+//
+void MainComponent::DarkeningComponent::resized() {}
+//
 MainComponent::MyAlertWindow::MyAlertWindow(const String& title,
 	const String& message,
 	MessageBoxIconType iconType,
@@ -1410,10 +1420,9 @@ MainComponent::MainComponent()
 	verticalDividerBarRight.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 3, true, *this));
 	addAndMakeVisible(verticalDividerBarRight.get());
 	//
-	darkenLabel = new Label();
-	darkenLabel->setColour(Label::ColourIds::backgroundColourId, Colour((uint8)0, (uint8)0, (uint8)0, (uint8)122));
-	if (darkenLabel != nullptr) darkenLabel->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
-	addChildComponent(darkenLabel);
+	darkeningComponent = new DarkeningComponent();
+	if (darkeningComponent != nullptr) darkeningComponent->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
+	addChildComponent(darkeningComponent);
 	darkenSections(false);
 	//
 	setSize(1440, 800);
@@ -1428,7 +1437,7 @@ MainComponent::~MainComponent()
 	if (codePlaceholderPanel != nullptr) delete(codePlaceholderPanel);
 	if (analyzerPlaceholderPanel != nullptr) delete(analyzerPlaceholderPanel);
 	//
-	if (darkenLabel != nullptr) delete(darkenLabel);
+	if (darkeningComponent != nullptr) delete(darkeningComponent);
 	if (topResizerBarLeft != nullptr) delete(topResizerBarLeft);
 	if (topResizerBarRight != nullptr) delete(topResizerBarRight);
 	//
@@ -1462,7 +1471,7 @@ void MainComponent::resized()
 	using Track = Grid::TrackInfo;
 	using Fr = Grid::Fr;
 	//
-	if (darkenLabel != nullptr) darkenLabel->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
+	if (darkeningComponent != nullptr) darkeningComponent->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
 	//
 	if (projectOpened) {
 		//
@@ -1509,9 +1518,9 @@ void MainComponent::toggleSectionsVisibility(bool flag) {
 }
 //
 void MainComponent::darkenSections(bool flag) {
-	if (darkenLabel != nullptr) {
-		darkenLabel->setEnabled(flag);
-		darkenLabel->setVisible(flag);
+	if (darkeningComponent != nullptr) {
+		darkeningComponent->setEnabled(flag);
+		darkeningComponent->setVisible(flag);
 	}
 }
 //
@@ -1609,8 +1618,8 @@ void MainComponent::openProjectFile(File filepath) {
 				if (topResizerBarRight != nullptr) topResizerBarRight->setBounds(verticalDividerBarRight.get()->getBounds());
 				addAndMakeVisible(topResizerBarRight);
 				//
-				removeChildComponent(darkenLabel);
-				addChildComponent(darkenLabel);
+				removeChildComponent(darkeningComponent);
+				addChildComponent(darkeningComponent);
 				darkenSections(false);
 			}
 			else {

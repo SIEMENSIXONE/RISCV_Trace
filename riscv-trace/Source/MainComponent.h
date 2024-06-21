@@ -455,6 +455,17 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainPlaceholderSubComponent)
     };
     //
+    class DarkeningComponent : public Component
+    {
+    public:
+        DarkeningComponent();
+        ~DarkeningComponent() override;
+        void paint(Graphics&) override;
+        void resized() override;
+        //
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DarkeningComponent)
+    };
+    //
     class MyAlertWindow : public AlertWindow
     {
     public:
@@ -533,7 +544,7 @@ private:
     //
     LookAndFeel_V4 lf;
     //
-    Label *darkenLabel = nullptr;
+    DarkeningComponent *darkeningComponent = nullptr;
     //
     int menuHeight = 20;
     bool projectOpened = false;
