@@ -405,7 +405,7 @@ MainComponent::PerformanceAnalyzer::ProfileGraphPanel::~ProfileGraphPanel() {
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics& g) {
 	g.fillAll(Colours::white);
 	g.setOpacity(1.0f);
-	
+
 	if (picture.isNull())  g.drawText(NoGraphviz, getLocalBounds(), Justification::centred, true);
 	else g.drawImage(picture, 0, 0, min(getWidth(), picture.getWidth()), min(getHeight(), picture.getHeight()), 0, 0, picture.getWidth(), picture.getHeight());
 }
@@ -769,7 +769,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
 	}
 	//
 	g.setColour(juce::Colours::white);
-	if (mainComponent != nullptr) g.setFont((float) mainComponent->currentSettings.interfaceFontSize);
+	if (mainComponent != nullptr) g.setFont((float)mainComponent->currentSettings.interfaceFontSize);
 	//
 	g.drawFittedText(columnName, area, Justification::centred, 1);
 	g.setColour(juce::Colours::white);
@@ -1335,7 +1335,7 @@ MainComponent::PlaceholderSubComponent::~PlaceholderSubComponent() {}
 //
 void MainComponent::PlaceholderSubComponent::paint(Graphics& g) {
 	g.fillAll(juce::Colour(187, 148, 174));
-	Rectangle<float> textArea((float) 0, (float) 0, (float)getWidth(), (float)(getHeight() / 2));
+	Rectangle<float> textArea((float)0, (float)0, (float)getWidth(), (float)(getHeight() / 2));
 	//
 	g.setColour(Colour(94, 60, 82));
 	juce::Font font("Courier New", 55.0f, juce::Font::FontStyleFlags::bold);
@@ -1456,7 +1456,9 @@ MainComponent::~MainComponent()
 void MainComponent::paint(Graphics& g)
 {
 	g.fillAll(Colour(37, 11, 46));
-
+	//
+	if (isCurrentlyBlockedByAnotherModalComponent()) darkenSections(true);
+	else darkenSections(false);
 }
 //
 void MainComponent::resized()
@@ -1604,7 +1606,6 @@ void MainComponent::openProjectFile(File filepath) {
 				addAndMakeVisible(analyzerPanel);
 				//
 				projectOpened = true;
-				resized();
 				//
 				realSectionsVisible = true;
 				resizeRealSections();
@@ -1621,6 +1622,7 @@ void MainComponent::openProjectFile(File filepath) {
 				removeChildComponent(darkeningComponent);
 				addChildComponent(darkeningComponent);
 				darkenSections(false);
+				resized();
 			}
 			else {
 				showAlertWindow();
@@ -1661,9 +1663,15 @@ void MainComponent::closeProjectFile() {
 	if (codePanel != nullptr) delete(codePanel);
 	if (analyzerPanel != nullptr) delete(analyzerPanel);
 	//
+	if (topResizerBarLeft != nullptr) delete(topResizerBarLeft);
+	if (topResizerBarRight != nullptr) delete(topResizerBarRight);
+	//
 	asPanel = nullptr;
 	codePanel = nullptr;
 	analyzerPanel = nullptr;
+	//
+	topResizerBarLeft = nullptr;
+	topResizerBarRight = nullptr;
 	//
 	projectOpened = false;
 	//
@@ -1677,6 +1685,7 @@ void MainComponent::openSettingsWindow() {
 	settingsWindow->setVisible(false);
 	settingsWindow->addComponentListener(this);
 	settingsWindow->setVisible(true);
+	settingsWindow->enterModalState();
 
 }
 //
@@ -1686,6 +1695,7 @@ void MainComponent::openAboutWindow() {
 	aboutWindow->setVisible(false);
 	aboutWindow->addComponentListener(this);
 	aboutWindow->setVisible(true);
+	aboutWindow->enterModalState();
 }
 //
 void MainComponent::openUsageWindow() {
@@ -1694,6 +1704,7 @@ void MainComponent::openUsageWindow() {
 	usageWindow->setVisible(false);
 	usageWindow->addComponentListener(this);
 	usageWindow->setVisible(true);
+	usageWindow->enterModalState();
 }
 //
 void MainComponent::updateCurrentSettings() {
@@ -1703,8 +1714,8 @@ void MainComponent::updateCurrentSettings() {
 	menuBar = new MenuBarComponent(this);
 	addAndMakeVisible(menuBar);
 	//
-	if (settingsWindow != nullptr) { 
-		settingsWindow->repaint(); 
+	if (settingsWindow != nullptr) {
+		settingsWindow->repaint();
 		settingsWindow->resized();
 	}
 	saveSettingsButton->setButtonText(SaveSettingsButtonText);
@@ -1744,7 +1755,11 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 		if (index == 0) {
 			//
 			std::function<void()> createProjFunc = [this]() { createProjectFile(); };
-			std::function<void()> chooseProjFunc = [this]() { chooseProjectFile(); };
+			std::function<void()> chooseProjFunc = [this]() {
+				//
+				chooseProjectFile(); 
+				};
+			//
 			std::function<void()> saveProjFunc = [this]() { saveProject(); };
 			std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
 			//
@@ -1780,12 +1795,13 @@ void MainComponent::menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex
 //
 void  MainComponent::showAlertWindow()
 {
+	//
 	MyAlertWindow* processWnd = new MyAlertWindow(FailText,
 		FailSubText,
 		MessageBoxIconType::WarningIcon, this);
 	processWnd->addButton("Ok", 0);
 	processWnd->enterModalState(true, nullptr, true);
-	MessageManager::callAsync([this, processWnd](){});
+	MessageManager::callAsync([this, processWnd]() {});
 }
 //
 void MainComponent::buttonClicked(Button* button) {
@@ -1795,7 +1811,7 @@ void MainComponent::buttonClicked(Button* button) {
 		//
 		if (settingsWindow != nullptr) {
 			settingsWindow->setVisible(false);
-			delete(settingsWindow); 
+			delete(settingsWindow);
 			settingsWindow = nullptr;
 		}
 	}
@@ -1804,9 +1820,6 @@ void MainComponent::buttonClicked(Button* button) {
 void MainComponent::componentVisibilityChanged(Component& component) {
 	if (component.isVisible()) {
 		//visible
-		darkenSections(true);
-		repaint();
-		resized();
 		//
 		component.setAlwaysOnTop(true);
 		this->setEnabled(false);
@@ -1816,10 +1829,6 @@ void MainComponent::componentVisibilityChanged(Component& component) {
 	}
 	else {
 		//not visible
-		darkenSections(false);
-		//
-		repaint();
-		resized();
 		//
 		this->setEnabled(true);
 		//
