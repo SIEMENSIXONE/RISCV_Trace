@@ -3,6 +3,56 @@
 //==============================================================================
 using namespace juce;
 //
+
+MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::TopResizerBar(MyStretchableLayoutResizerBar& _resizerBar) {
+	resizerBar = &_resizerBar;
+	//
+	defaultColour = Colour(37, 11, 46);
+	mouseOverColour = Colours::hotpink;
+	currentColour = defaultColour;
+}
+//
+MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::~TopResizerBar() {}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::paint(Graphics& g) {
+	g.fillAll(currentColour);
+}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::resized() {}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::mouseEnter(const MouseEvent& /*event*/) {
+	setMouseCursor(MouseCursor::StandardCursorType::LeftRightResizeCursor);
+	//
+	currentColour = mouseOverColour;
+	repaint();
+}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::mouseExit(const MouseEvent& /*event*/) {
+	currentColour = defaultColour;
+	repaint();
+}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::mouseDown(const MouseEvent&)
+{
+	mouseDownPos = resizerBar->getX();
+}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::mouseUp(const MouseEvent&)
+{
+	resizerBar->hasBeenMoved();
+}
+//
+void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::mouseDrag(const MouseEvent& e)
+{
+	const int desiredPos = mouseDownPos + e.getDistanceFromDragStartX();
+	//
+	if (getX() != desiredPos)
+	{
+		setTopLeftPosition(desiredPos, getY());
+		resizerBar->setPosition(desiredPos);
+	}
+}
+//
 MainComponent::MyStretchableLayoutResizerBar::MyStretchableLayoutResizerBar(StretchableLayoutManager* layout_, const int index, const bool vertical, MainComponent& _mainComponent)
 	: layout(layout_),
 	itemIndex(index),
@@ -14,42 +64,26 @@ MainComponent::MyStretchableLayoutResizerBar::MyStretchableLayoutResizerBar(Stre
 	setMouseCursor(vertical ? MouseCursor::LeftRightResizeCursor
 		: MouseCursor::UpDownResizeCursor);
 }
-
-MainComponent::MyStretchableLayoutResizerBar::~MyStretchableLayoutResizerBar()
-{
-}
-
+//
+MainComponent::MyStretchableLayoutResizerBar::~MyStretchableLayoutResizerBar() {}
+//
 //==============================================================================
 void MainComponent::MyStretchableLayoutResizerBar::paint(Graphics& g)
 {
 	getLookAndFeel().drawStretchableLayoutResizerBar(g, getWidth(), getHeight(), isVertical, isMouseOver(), isMouseButtonDown());
 }
-
-void MainComponent::MyStretchableLayoutResizerBar::mouseDown(const MouseEvent&)
+//
+void MainComponent::MyStretchableLayoutResizerBar::setPosition(int _newPos)
 {
-	mouseDownPos = layout->getItemCurrentPosition(itemIndex);
-	mainComponent->toggleSectionsVisibility(false);
-}
-
-void MainComponent::MyStretchableLayoutResizerBar::mouseUp(const MouseEvent&)
-{
-	mainComponent->resizeRealSections();
-	mainComponent->toggleSectionsVisibility(true);
-	//hasBeenMoved();
-}
-
-void MainComponent::MyStretchableLayoutResizerBar::mouseDrag(const MouseEvent& e)
-{
-	const int desiredPos = mouseDownPos + (isVertical ? e.getDistanceFromDragStartX() : e.getDistanceFromDragStartY());
+	const int desiredPos = _newPos;
 	//
 	if (layout->getItemCurrentPosition(itemIndex) != desiredPos)
 	{
-		newPos = desiredPos;
+		_newPos = desiredPos;
 		layout->setItemPosition(itemIndex, desiredPos);
-		hasBeenMoved();
 	}
 }
-
+//
 void MainComponent::MyStretchableLayoutResizerBar::hasBeenMoved()
 {
 	if (Component* parent = getParentComponent())
@@ -1373,7 +1407,7 @@ MainComponent::MainComponent()
 	//
 	verticalDividerBarLeft.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 1, true, *this));
 	addAndMakeVisible(verticalDividerBarLeft.get());
-	verticalDividerBarRight.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 2, true, *this));
+	verticalDividerBarRight.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 3, true, *this));
 	addAndMakeVisible(verticalDividerBarRight.get());
 	//
 	darkenLabel = new Label();
@@ -1395,6 +1429,8 @@ MainComponent::~MainComponent()
 	if (analyzerPlaceholderPanel != nullptr) delete(analyzerPlaceholderPanel);
 	//
 	if (darkenLabel != nullptr) delete(darkenLabel);
+	if (topResizerBarLeft != nullptr) delete(topResizerBarLeft);
+	if (topResizerBarRight != nullptr) delete(topResizerBarRight);
 	//
 	if (asPanel != nullptr) delete(asPanel);
 	if (codePanel != nullptr) delete(codePanel);
@@ -1436,6 +1472,9 @@ void MainComponent::resized()
 		Component* vcomps[] = { asPlaceholderPanel, verticalDividerBarLeft.get(), codePlaceholderPanel, verticalDividerBarRight.get(), analyzerPlaceholderPanel };
 		verticalLayout.layOutComponents(vcomps, 5, r.getX(), r.getY() + menuBar->getHeight(), r.getWidth(), r.getHeight() - menuBar->getHeight(), false, true);
 		if (realSectionsVisible) resizeRealSections();
+		//
+		if (topResizerBarLeft != nullptr) topResizerBarLeft->setBounds(verticalDividerBarLeft.get()->getBounds());
+		if (topResizerBarRight != nullptr) topResizerBarRight->setBounds(verticalDividerBarRight.get()->getBounds());
 		//
 	}
 	else {
@@ -1561,6 +1600,14 @@ void MainComponent::openProjectFile(File filepath) {
 				realSectionsVisible = true;
 				resizeRealSections();
 				toggleSectionsVisibility(true);
+				//
+				topResizerBarLeft = new MyStretchableLayoutResizerBar::TopResizerBar(*verticalDividerBarLeft);
+				if (topResizerBarLeft != nullptr) topResizerBarLeft->setBounds(verticalDividerBarLeft.get()->getBounds());
+				addAndMakeVisible(topResizerBarLeft);
+				//
+				topResizerBarRight = new MyStretchableLayoutResizerBar::TopResizerBar(*verticalDividerBarRight);
+				if (topResizerBarRight != nullptr) topResizerBarRight->setBounds(verticalDividerBarRight.get()->getBounds());
+				addAndMakeVisible(topResizerBarRight);
 				//
 				removeChildComponent(darkenLabel);
 				addChildComponent(darkenLabel);

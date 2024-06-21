@@ -22,6 +22,29 @@ public:
     class MyStretchableLayoutResizerBar : public Component
     {
     public:
+        //
+        class TopResizerBar : public Component
+        {
+        public:
+            TopResizerBar(MyStretchableLayoutResizerBar&);
+            ~TopResizerBar() override;
+            void paint(Graphics&) override;
+            void resized() override;
+        private:
+            void mouseEnter(const MouseEvent& event) override;
+            void mouseExit(const MouseEvent& event) override;
+            void mouseDown(const MouseEvent&) override;
+            void mouseUp(const MouseEvent&) override;
+            void mouseDrag(const MouseEvent&) override;
+            //
+            int mouseDownPos;
+            MyStretchableLayoutResizerBar* resizerBar = nullptr;
+            //
+            Colour currentColour;
+            Colour defaultColour;
+            Colour mouseOverColour;
+        };
+        //
         MyStretchableLayoutResizerBar(StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical, MainComponent& _mainComponent);
         ~MyStretchableLayoutResizerBar() override;
         virtual void hasBeenMoved();
@@ -33,9 +56,7 @@ public:
                 bool isVerticalBar, bool isMouseOver, bool isMouseDragging) = 0;
         };
         void paint(Graphics&) override;
-        void mouseDown(const MouseEvent&) override;
-        void mouseUp(const MouseEvent&) override;
-        void mouseDrag(const MouseEvent&) override;
+        void setPosition(int);
     private:
         StretchableLayoutManager* layout;
         MainComponent* mainComponent;
@@ -455,7 +476,6 @@ public:
     void darkenSections(bool);
     //
     TSettingsParser::Settings currentSettings;
-    //
 private:
     void loadSettings();
     void createProjectFile();
@@ -502,6 +522,8 @@ private:
     StretchableLayoutManager verticalLayout;
     std::unique_ptr<MyStretchableLayoutResizerBar> verticalDividerBarLeft;
     std::unique_ptr<MyStretchableLayoutResizerBar> verticalDividerBarRight;
+    MyStretchableLayoutResizerBar::TopResizerBar* topResizerBarLeft = nullptr;
+    MyStretchableLayoutResizerBar::TopResizerBar* topResizerBarRight = nullptr;
     //
     ScopedMessageBox messageBox;
     //
@@ -510,7 +532,7 @@ private:
     String defaultFilepath = parentDirecory.getFullPathName() + "/Projects/";
     //
     LookAndFeel_V4 lf;
-
+    //
     Label *darkenLabel = nullptr;
     //
     int menuHeight = 20;
