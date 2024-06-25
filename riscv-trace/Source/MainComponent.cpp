@@ -261,6 +261,7 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	graphViewport->getHorizontalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(187, 148, 174));
 	graphViewport->setScrollBarThickness(10);
 	graphViewport->setBounds(0, 0, getWidth(), getHeight());
+//	graphViewport->list
 	//
 	tabs = new MyTabbedComponent(*table, *graphViewport);
 	addAndMakeVisible(tabs);

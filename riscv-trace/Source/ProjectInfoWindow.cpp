@@ -124,8 +124,6 @@ void ProjectInfoPanel::ProjectInfoPanelLine::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds(), 1);
     //
     g.setColour(juce::Colours::white);
-    g.drawText("Line", getLocalBounds(),
-        juce::Justification::centred, true);
     //
     title->resized();
     textEditor->resized();
