@@ -32,7 +32,7 @@ CreateProjectPanel::SetPathPanel::SetPathPanel(vector<File>& _val, CreateProject
     textField = new TextEditor();
     textField->setReadOnly(true);
     textField->setMultiLine(true, false);
-    textField->setText("");
+    textField->setTextToShowWhenEmpty(NoPathChoosenText, Colours::white);
     textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
     textField->getLookAndFeel().setColour(ScrollBar::thumbColourId, Colour(187, 148, 174));
     textField->setFont((float) settings->interfaceFontSize);
@@ -178,9 +178,9 @@ CreateProjectPanel::CreateProjectPanel(TSettingsParser::Settings& _settings)
     objdumpPath = new vector<File>();
     //
     spacerPanel = new TitlePanel("", *settings);
-    titleTracePanel = new TitlePanel(chooseTraceFileText.toStdString(), *settings);
-    titleCodePanel = new TitlePanel(chooseCodeFilesText.toStdString(), *settings);
-    titleObjdumpPanel = new TitlePanel(chooseObjdumpFileText.toStdString(), *settings);
+    titleTracePanel = new TitlePanel(ChooseTraceFileText.toStdString(), *settings);
+    titleCodePanel = new TitlePanel(ChooseCodeFilesText.toStdString(), *settings);
+    titleObjdumpPanel = new TitlePanel(ChooseObjdumpFileText.toStdString(), *settings);
     //
     addAndMakeVisible(spacerPanel);
     addAndMakeVisible(titleTracePanel);
@@ -195,7 +195,7 @@ CreateProjectPanel::CreateProjectPanel(TSettingsParser::Settings& _settings)
     addAndMakeVisible(setCodePathPanel);
     addAndMakeVisible(setObjdumpPathPanel);
     //
-    saveProjectButton = new TextButton(saveButtonText);
+    saveProjectButton = new TextButton(SaveButtonText);
     saveProjectButton->setEnabled(false);
     addAndMakeVisible(saveProjectButton);
     saveProjectButton->addListener(this);

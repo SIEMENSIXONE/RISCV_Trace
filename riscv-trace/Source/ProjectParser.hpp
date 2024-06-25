@@ -23,6 +23,7 @@ class TProjectParser {
     //
 public:
     struct Project{
+        juce::File project;
         juce::File trace;
         juce::File objdump;
         vector<juce::File> code;

@@ -16,6 +16,8 @@
 using namespace juce;
 //
 static String currentLang = "ENG";
+static String RussianLangTitle = String((std::wstring(L"Русский")).c_str());
+static String EnglishLangTitle = String((std::wstring(L"English")).c_str());
 //
 //Window titles
 static String MainWindowTitle;
@@ -24,6 +26,7 @@ static String SettingsWindowTitle;
 static String AboutWindowTitle;
 static String UsageWindowTitle;
 static String GraphWindowTitle;
+static String ProjectInfoWindowTitle;
 //
 static String WelcomeText;
 //
@@ -41,6 +44,7 @@ static String HelpButtonText;
     //File
     static String FileNewButtonText;
     static String FileOpenButtonText;
+    static String FileAboutProjectButtonText;
     static String FileSaveButtonText;
     static String FileCloseButtonText;
     //
@@ -58,8 +62,8 @@ static String OccuranceText;
 static String OutOfText;
 //
 //Analyzer section menu
-static String tableTabText;
-static String graphTabText;
+static String TableTabText;
+static String GraphTabText;
     //Table
     static String TableNameColomnTitleText;
     static String TableTimeColomnTitleText;
@@ -86,6 +90,10 @@ static String graphTabText;
     static String LoadingText;
     static String LoadingSubText;
 //
+// Project closing
+    static String ClosingProjectText;
+    static String ClosingProjectSubText;
+//
 //Failed to open file window
     static String FailText;
     static String FailSubText;
@@ -95,10 +103,16 @@ static String graphTabText;
     static String SuccessSubText;
     //
 // Project creation window
-    static String chooseTraceFileText;
-    static String chooseObjdumpFileText;
-    static String chooseCodeFilesText;
-    static String saveButtonText;
+    static String ChooseTraceFileText;
+    static String ChooseObjdumpFileText;
+    static String ChooseCodeFilesText;
+    static String SaveButtonText;
+    static String NoPathChoosenText;
+// Project creation window
+    static String ProjectFileTitleText;
+    static String TraceFilesTitleText;
+    static String ObjumpFilesTitleText;
+    static String CodeFilesTitleText;
 //Chooser
 static String ChooseFileText;;
 // No graphviz installed text
@@ -117,6 +131,7 @@ static void setLang(String lang) {
         AboutWindowTitle = String((std::wstring(L"О программе")).c_str());
         UsageWindowTitle = String((std::wstring(L"Инструкция")).c_str());
         GraphWindowTitle = String((std::wstring(L"Граф")).c_str());
+        ProjectInfoWindowTitle = String((std::wstring(L"О проекте")).c_str());
         //
         WelcomeText = String((std::wstring(L"Создайте новый проект или откройте существующий!")).c_str());
         //
@@ -134,6 +149,7 @@ static void setLang(String lang) {
             //File
             FileNewButtonText = String((std::wstring(L"Новый")).c_str());
             FileOpenButtonText = String((std::wstring(L"Открыть..")).c_str());
+            FileAboutProjectButtonText = String((std::wstring(L"О проекте")).c_str());
             FileSaveButtonText = String((std::wstring(L"Сохранить...")).c_str());
             FileCloseButtonText = String((std::wstring(L"Закрыть")).c_str());
             //
@@ -151,8 +167,8 @@ static void setLang(String lang) {
         OutOfText = String((std::wstring(L"из")).c_str());
         //
         //Analyzer section menu
-        tableTabText = String((std::wstring(L"Таблица")).c_str());
-        graphTabText = String((std::wstring(L"Граф")).c_str());
+        TableTabText = String((std::wstring(L"Таблица")).c_str());
+        GraphTabText = String((std::wstring(L"Граф")).c_str());
         //Table
         TableNameColomnTitleText = String((std::wstring(L"Имя")).c_str());
         TableTimeColomnTitleText = String((std::wstring(L"Время")).c_str());
@@ -184,8 +200,12 @@ static void setLang(String lang) {
         \n* Откройте созданный проект с помощью Файл->Открыть")).c_str());
             //
        //Loading window
-            LoadingText = String((std::wstring(L"Загрузка...")).c_str());
+            LoadingText = String((std::wstring(L"Загрузка проекта ")).c_str());
             LoadingSubText = String((std::wstring(L"Пожалуйста, подождите, пока проект загрузится.")).c_str());
+            //
+       // Project closing
+            ClosingProjectText = String((std::wstring(L"Закрытие проекта ")).c_str());
+            ClosingProjectSubText = String((std::wstring(L"Пожалуйста, подождите, пока проект закроется.")).c_str());
             //
             //Failed to open file window
             FailText = String((std::wstring(L"Не удалось открыть проект...")).c_str());
@@ -195,10 +215,16 @@ static void setLang(String lang) {
             SuccessText = String((std::wstring(L"Новый проект успешно создан!")).c_str());
             SuccessSubText = String((std::wstring(L"Откройте его с помощью Файл->Открыть.")).c_str());
             //
-            chooseTraceFileText = String((std::wstring(L"Выберите файл с трассой:")).c_str());
-            chooseObjdumpFileText = String((std::wstring(L"Выберите файл ассемблера:")).c_str());
-            chooseCodeFilesText = String((std::wstring(L"Выберете файлы с исходным кодом:")).c_str());
-            saveButtonText = String((std::wstring(L"Сохранить...")).c_str());
+            ChooseTraceFileText = String((std::wstring(L"Выберите файл с трассой:")).c_str());
+            ChooseObjdumpFileText = String((std::wstring(L"Выберите файл ассемблера:")).c_str());
+            ChooseCodeFilesText = String((std::wstring(L"Выберете файлы с исходным кодом:")).c_str());
+            SaveButtonText = String((std::wstring(L"Сохранить...")).c_str());
+            NoPathChoosenText = String((std::wstring(L"Путь не указан")).c_str());
+            //
+            ProjectFileTitleText = String((std::wstring(L"Файл проекта")).c_str());
+            TraceFilesTitleText = String((std::wstring(L"Файл трассы")).c_str());
+            ObjumpFilesTitleText = String((std::wstring(L"Файл дизассемблера")).c_str());
+            CodeFilesTitleText = String((std::wstring(L"Файлы с исходным кодом")).c_str());
             //
             ChooseFileText = String((std::wstring(L"Выберите файл...")).c_str());
             //
@@ -213,6 +239,7 @@ static void setLang(String lang) {
         AboutWindowTitle = String((std::wstring(L"About")).c_str());
         UsageWindowTitle = String((std::wstring(L"How to use")).c_str());
         GraphWindowTitle = String((std::wstring(L"Graph")).c_str());
+        ProjectInfoWindowTitle = String((std::wstring(L"Project Info")).c_str());
         //
         WelcomeText = String((std::wstring(L"Create new project or open existing one!")).c_str());
         //
@@ -230,6 +257,7 @@ static void setLang(String lang) {
             //File
             FileNewButtonText = String((std::wstring(L"New")).c_str());
             FileOpenButtonText = String((std::wstring(L"Open..")).c_str());
+            FileAboutProjectButtonText = String((std::wstring(L"About project")).c_str());
             FileSaveButtonText = String((std::wstring(L"Save...")).c_str());
             FileCloseButtonText = String((std::wstring(L"Close")).c_str());
         //
@@ -247,8 +275,8 @@ static void setLang(String lang) {
         OutOfText = String((std::wstring(L"out of")).c_str());
         //
         //Analyzer section menu
-        tableTabText = String((std::wstring(L"Table")).c_str());
-        graphTabText = String((std::wstring(L"Graph")).c_str());
+        TableTabText = String((std::wstring(L"Table")).c_str());
+        GraphTabText = String((std::wstring(L"Graph")).c_str());
         //Table
         TableNameColomnTitleText = String((std::wstring(L"Name")).c_str());
         TableTimeColomnTitleText = String((std::wstring(L"Time")).c_str());
@@ -280,8 +308,12 @@ static void setLang(String lang) {
         \n* Open created project file using File->Open")).c_str());
         //
         //Loading window
-        LoadingText = String((std::wstring(L"Loading...")).c_str());
+        LoadingText = String((std::wstring(L"Loading project ")).c_str());
         LoadingSubText = String((std::wstring(L"Please, wait for project to load.")).c_str());
+        //
+        // Project closing
+        ClosingProjectText = String((std::wstring(L"CLosing project ")).c_str());
+        ClosingProjectSubText = String((std::wstring(L"Please, wait for project to close.")).c_str());
         //
         //Failed to open file window
         FailText = String((std::wstring(L"Failed to open project file...")).c_str());
@@ -291,10 +323,16 @@ static void setLang(String lang) {
         SuccessText = String((std::wstring(L"New project successfully created!")).c_str());
         SuccessSubText = String((std::wstring(L"You can open it using File->Open.")).c_str());
         //
-        chooseTraceFileText = String((std::wstring(L"Choose trace file:")).c_str());
-        chooseObjdumpFileText = String((std::wstring(L"Choose objdump file:")).c_str());
-        chooseCodeFilesText = String((std::wstring(L"Choose code files:")).c_str());
-        saveButtonText = String((std::wstring(L"Save...")).c_str());
+        ChooseTraceFileText = String((std::wstring(L"Choose trace file:")).c_str());
+        ChooseObjdumpFileText = String((std::wstring(L"Choose objdump file:")).c_str());
+        ChooseCodeFilesText = String((std::wstring(L"Choose code files:")).c_str());
+        SaveButtonText = String((std::wstring(L"Save...")).c_str());
+        NoPathChoosenText = String((std::wstring(L"No path set")).c_str());
+        //
+        ProjectFileTitleText = String((std::wstring(L"Project file")).c_str());
+        TraceFilesTitleText = String((std::wstring(L"Trace file")).c_str());
+        ObjumpFilesTitleText = String((std::wstring(L"Objdump file")).c_str());
+        CodeFilesTitleText = String((std::wstring(L"Source code files")).c_str());
         //
         ChooseFileText = String((std::wstring(L"Choose file...")).c_str());
         //

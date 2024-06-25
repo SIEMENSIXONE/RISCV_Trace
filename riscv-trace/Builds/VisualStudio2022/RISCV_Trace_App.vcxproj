@@ -141,6 +141,7 @@
     <Lib/>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\ProjectInfoWindow.cpp"/>
     <ClCompile Include="..\..\Source\UsageWindow.cpp"/>
     <ClCompile Include="..\..\Source\AboutWindow.cpp"/>
     <ClCompile Include="..\..\Source\SettingsParser.cpp"/>
@@ -1655,6 +1656,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Source\JSON\json.hpp"/>
+    <ClInclude Include="..\..\Source\ProjectInfoWindow.h"/>
     <ClInclude Include="..\..\Source\TextResources.h"/>
     <ClInclude Include="..\..\Source\UsageWindow.h"/>
     <ClInclude Include="..\..\Source\SettingsParser.hpp"/>

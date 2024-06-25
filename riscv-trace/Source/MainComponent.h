@@ -9,6 +9,7 @@
 #include "SettingsWindow.h"
 #include "AboutWindow.h"
 #include "UsageWindow.h"
+#include "ProjectInfoWindow.h"
 #include <array>
 //
 //==============================================================================
@@ -466,14 +467,18 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DarkeningComponent)
     };
     //
-    class MyAlertWindow : public AlertWindow
+    class MyAlertWindow : public AlertWindow, public LookAndFeel_V4
     {
     public:
         MyAlertWindow(const String& title,
             const String& message,
             MessageBoxIconType iconType,
-            Component* comp);
+            Component* comp, float _fontSize);
         ~MyAlertWindow() override;
+        Font getAlertWindowTitleFont() override;
+        Font getAlertWindowMessageFont() override;
+    private:
+        float fontSize;
     };
     //
     MainComponent();
@@ -491,6 +496,7 @@ private:
     void loadSettings();
     void createProjectFile();
     void openProjectFile(File);
+    void openProjectInfoWindow(TProjectParser::Project&);
     void chooseProjectFile();
     void saveProject();
     void closeProjectFile();
@@ -529,6 +535,7 @@ private:
     SettingsWindow* settingsWindow = nullptr;
     AboutWindow* aboutWindow = nullptr;
     UsageWindow* usageWindow = nullptr;
+    ProjectInfoWindow* projectInfoWindow = nullptr;
     //
     StretchableLayoutManager verticalLayout;
     std::unique_ptr<MyStretchableLayoutResizerBar> verticalDividerBarLeft;
@@ -547,6 +554,7 @@ private:
     DarkeningComponent *darkeningComponent = nullptr;
     //
     int menuHeight = 20;
+    File currentProjectFile;
     bool projectOpened = false;
     bool realSectionsVisible = true;
     //

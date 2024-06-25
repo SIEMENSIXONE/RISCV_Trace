@@ -51,8 +51,8 @@ SettingsPanel::SettingsPanel(juce::TextButton & _saveButton, juce::String lang)
     langComboBox->setColour(ComboBox::ColourIds::backgroundColourId, Colour(37, 11, 46));
     langComboBox->setEditableText(false);
     //
-    langComboBox->addItem(String((std::wstring(L"English")).c_str()), 1);
-    langComboBox->addItem(String((std::wstring(L"Русский")).c_str()), 2);
+    langComboBox->addItem(EnglishLangTitle, 1);
+    langComboBox->addItem(RussianLangTitle, 2);
     //
     langComboBox->onChange = [this] {
         if (langComboBox->getSelectedId() == 1) { 
@@ -97,13 +97,14 @@ void SettingsPanel::paint (juce::Graphics& g)
 //
 void SettingsPanel::resized()
 {
-    int offset = 20;
+    int offset = 30;
+    int offsetDiffProportion = 3;
     int buttonOffset = 20;
     int buttonHeight = 50;
     int comboBoxHeight = lineHeight;
     juce::Rectangle<int> buttonArea = juce::Rectangle<int>(getWidth()/2 - (getWidth() / 4) / 2, getHeight() - buttonHeight - buttonOffset, getWidth() / 4, buttonHeight);
     juce::Rectangle<int> comboBoxArea = juce::Rectangle<int>(offset, offset, getWidth() - 2 * offset, comboBoxHeight);
-    juce::Rectangle<int> linesArea = juce::Rectangle<int>(offset, comboBoxHeight + offset + offset, getWidth() - 2 * offset, getHeight() - buttonHeight - comboBoxHeight);
+    juce::Rectangle<int> linesArea = juce::Rectangle<int>(offsetDiffProportion * offset, comboBoxHeight + offset + offset, getWidth() - 2 * offsetDiffProportion * offset, getHeight() - buttonHeight - comboBoxHeight);
     //
     juce::FlexBox fb;
     fb.flexWrap = juce::FlexBox::Wrap::wrap;
@@ -111,7 +112,7 @@ void SettingsPanel::resized()
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
     for (int i = 0; i < settingsLines->size(); i++) {
-        fb.items.add(juce::FlexItem(*settingsLines->at(i)).withMinWidth((float)getWidth() - 2 * offset).withMinHeight((float) lineHeight).withMaxHeight((float) lineHeight));
+        fb.items.add(juce::FlexItem(*settingsLines->at(i)).withMinWidth((float)getWidth() - 2 * offsetDiffProportion * offset).withMinHeight((float) lineHeight).withMaxHeight((float) lineHeight));
     }
     //
     langComboBox->setBounds(comboBoxArea);
@@ -139,6 +140,8 @@ SettingsPanel::SettingsPanelLine::SettingsPanelLine(juce::String& text, Settings
     textEditor->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colours::white);
     textEditor->setColour(juce::TextEditor::ColourIds::textColourId, juce::Colours::black);
     textEditor->setFont((float) settings->interfaceFontSize);
+    textEditor->setJustification(Justification::Flags::centred);
+    textEditor->setInputRestrictions(2, *(new String("0123456789")));
     //
     switch (settingIndex)
     {
@@ -187,8 +190,11 @@ void SettingsPanel::SettingsPanelLine::paint(juce::Graphics& g)
 //
 void SettingsPanel::SettingsPanelLine::resized()
 {
-    title->setBounds(0, 0, getWidth() / 2, getHeight());
-    textEditor->setBounds(getWidth() / 2, 0, getWidth() / 2, getHeight());
+    int titleWidth = getWidth() * 9 / 10;
+    int textFieldWidth = getWidth() - titleWidth;
+    //
+    title->setBounds(0, 0, titleWidth, getHeight());
+    textEditor->setBounds(titleWidth, 0, textFieldWidth, getHeight());
 }
 //
 void SettingsPanel::SettingsPanelLine::textEditorTextChanged(juce::TextEditor& editor) {
@@ -248,8 +254,7 @@ void SettingsPanel::SettingsPanelLine::LineTitle::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds(), 1);
     g.setColour(juce::Colours::white);
     g.setFont(fontSize);
-    g.drawText(*text, getLocalBounds(),
-        juce::Justification::centred, true);
+    g.drawText(*text, getLocalBounds(), juce::Justification::centred, true);
 }
 //
 void SettingsPanel::SettingsPanelLine::LineTitle::resized()

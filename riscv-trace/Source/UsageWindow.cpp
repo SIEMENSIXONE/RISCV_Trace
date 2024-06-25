@@ -23,6 +23,7 @@ UsagePanel::UsagePanel(TSettingsParser::Settings& _settings)
     setLang(settings->lang);
     textField->setText(HelpUsageText);
     textField->setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+    textField->getLookAndFeel().setColour(ScrollBar::thumbColourId, Colour(187, 148, 174));
     //
     addAndMakeVisible(textField);
     setSize(getParentWidth(), getParentHeight());

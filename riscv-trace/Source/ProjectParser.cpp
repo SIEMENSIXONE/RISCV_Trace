@@ -53,6 +53,7 @@ TProjectParser::Project TProjectParser::getProjectFromFile(juce::File filename) 
         project.code.push_back(codeFile);
     }
     //
+    project.project = filename.getFullPathName().toWideCharPointer();
     fin.close();
     return project;
 }

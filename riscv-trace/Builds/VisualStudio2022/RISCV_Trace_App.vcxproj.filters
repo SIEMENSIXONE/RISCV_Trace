@@ -286,6 +286,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Source\ProjectInfoWindow.cpp">
+      <Filter>RISCV_Trace\Source</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\UsageWindow.cpp">
       <Filter>RISCV_Trace\Source</Filter>
     </ClCompile>
@@ -1949,6 +1952,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\Source\JSON\json.hpp">
       <Filter>RISCV_Trace\JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\ProjectInfoWindow.h">
+      <Filter>RISCV_Trace\Include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Source\TextResources.h">
       <Filter>RISCV_Trace\Include</Filter>

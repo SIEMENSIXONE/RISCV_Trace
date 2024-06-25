@@ -503,13 +503,13 @@ MainComponent::PerformanceAnalyzer::MyTabbedComponent::MyTabbedComponent(Profile
 {
 	auto colour = Colour(37, 11, 46);
 	//
-	addTab(tableTabText, colour, &table, true);
-	addTab(graphTabText, colour, &graphViewport, true);
+	addTab(TableTabText, colour, &table, true);
+	addTab(GraphTabText, colour, &graphViewport, true);
 }
 //
 void MainComponent::PerformanceAnalyzer::MyTabbedComponent::updateTabNames() {
-	setTabName(0, tableTabText);
-	setTabName(1, graphTabText);
+	setTabName(0, TableTabText);
+	setTabName(1, GraphTabText);
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
@@ -1381,14 +1381,26 @@ void MainComponent::DarkeningComponent::resized() {}
 MainComponent::MyAlertWindow::MyAlertWindow(const String& title,
 	const String& message,
 	MessageBoxIconType iconType,
-	Component* comp)
+	Component* comp, float _fontSize)
 	:AlertWindow(title, message, iconType, comp)
 {
-	setColour(AlertWindow::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
-	setColour(AlertWindow::ColourIds::outlineColourId, juce::Colours::white);
+	fontSize = _fontSize;
+	setLookAndFeel(this);
+	Component::setColour(AlertWindow::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+	Component::setColour(AlertWindow::ColourIds::outlineColourId, juce::Colours::white);
 }
 //
-MainComponent::MyAlertWindow::~MyAlertWindow() {}
+MainComponent::MyAlertWindow::~MyAlertWindow() {
+	setLookAndFeel(nullptr);
+}
+//
+Font MainComponent::MyAlertWindow::getAlertWindowTitleFont() {
+	return { fontSize, Font::bold };
+}
+//
+Font MainComponent::MyAlertWindow::getAlertWindowMessageFont() { 
+	return { fontSize };
+}
 //
 MainComponent::MainComponent()
 {
@@ -1449,6 +1461,7 @@ MainComponent::~MainComponent()
 	if (settingsWindow != nullptr) delete(settingsWindow);
 	if (aboutWindow != nullptr) delete(aboutWindow);
 	if (usageWindow != nullptr) delete(usageWindow);
+	if (projectInfoWindow != nullptr) delete(projectInfoWindow);
 	//
 	if (saveSettingsButton != nullptr) delete(saveSettingsButton);
 }
@@ -1532,6 +1545,8 @@ void MainComponent::loadSettings() {
 }
 //
 void MainComponent::createProjectFile() {
+	if (createProjWindow != nullptr) delete(createProjWindow);
+	//
 	createProjWindow = new CreateProjectWindow(NewProjectWindowTitle, currentSettings);
 	createProjWindow->setVisible(false);
 	createProjWindow->addComponentListener(this);
@@ -1540,9 +1555,10 @@ void MainComponent::createProjectFile() {
 //
 void MainComponent::openProjectFile(File filepath) {
 	//
-	MyAlertWindow* processWnd = new MyAlertWindow(LoadingText,
+	currentProjectFile = filepath;
+	MyAlertWindow* processWnd = new MyAlertWindow(LoadingText +	String(currentProjectFile.getFileNameWithoutExtension().toWideCharPointer()) + String("..."),
 		LoadingSubText,
-		MessageBoxIconType::NoIcon, this);
+		MessageBoxIconType::NoIcon, this, (float) currentSettings.interfaceFontSize);
 	processWnd->enterModalState(true, nullptr, true);
 	//
 	/*Flag = */MessageManager::callAsync([this, processWnd, filepath]()
@@ -1558,6 +1574,16 @@ void MainComponent::openProjectFile(File filepath) {
 				if (asPlaceholderPanel != nullptr) delete(asPlaceholderPanel);
 				if (codePlaceholderPanel != nullptr) delete(codePlaceholderPanel);
 				if (analyzerPlaceholderPanel != nullptr) delete(analyzerPlaceholderPanel);
+				//
+				if (topResizerBarLeft != nullptr) delete(topResizerBarLeft);
+				if (topResizerBarRight != nullptr) delete(topResizerBarRight);
+				//
+				asPanel = nullptr;
+				codePanel = nullptr;
+				analyzerPanel = nullptr;
+				//
+				topResizerBarLeft = nullptr;
+				topResizerBarRight = nullptr;
 				//
 				asPlaceholderPanel = new PlaceholderSubComponent(TraceSectionTitle);
 				codePlaceholderPanel = new PlaceholderSubComponent(CodeSectionTitle);
@@ -1593,7 +1619,6 @@ void MainComponent::openProjectFile(File filepath) {
 				traceParser.markCallLines(firstFuncAddrMap, addrCallerCalled, callingMap);
 				traceParser.markLastLines(retFuncAddrs);
 				//
-
 				map<string, juce::Colour> funcColoursMap;
 				map<string, juce::Colour> funcColoursTempMap;
 				codePanel = new CodeSubComponent(project.code, firstFuncAddrMap, *this);
@@ -1635,6 +1660,14 @@ void MainComponent::openProjectFile(File filepath) {
 		});
 }
 //
+void MainComponent::openProjectInfoWindow(TProjectParser::Project& _project) {
+	projectInfoWindow = new ProjectInfoWindow(ProjectInfoWindowTitle, _project, currentSettings);
+	projectInfoWindow->setVisible(false);
+	projectInfoWindow->addComponentListener(this);
+	projectInfoWindow->setVisible(true);
+	projectInfoWindow->enterModalState();
+}
+//
 void MainComponent::chooseProjectFile() {
 	chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.JSON");
 	auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
@@ -1659,27 +1692,43 @@ void MainComponent::saveProject() {
 }
 //
 void MainComponent::closeProjectFile() {
-	if (asPanel != nullptr) delete(asPanel);
-	if (codePanel != nullptr) delete(codePanel);
-	if (analyzerPanel != nullptr) delete(analyzerPanel);
 	//
-	if (topResizerBarLeft != nullptr) delete(topResizerBarLeft);
-	if (topResizerBarRight != nullptr) delete(topResizerBarRight);
+	MyAlertWindow* processWnd = new MyAlertWindow(ClosingProjectText + String(currentProjectFile.getFileNameWithoutExtension().toWideCharPointer()) + String("..."),
+		ClosingProjectSubText,
+		MessageBoxIconType::NoIcon, this, (float) currentSettings.interfaceFontSize);
+	processWnd->enterModalState(true, nullptr, true);
 	//
-	asPanel = nullptr;
-	codePanel = nullptr;
-	analyzerPanel = nullptr;
-	//
-	topResizerBarLeft = nullptr;
-	topResizerBarRight = nullptr;
-	//
-	projectOpened = false;
-	//
-	resized();
-	repaint();
+	/*Flag = */MessageManager::callAsync([this, processWnd]()
+		{
+			if (asPanel != nullptr) delete(asPanel);
+			if (codePanel != nullptr) delete(codePanel);
+			if (analyzerPanel != nullptr) delete(analyzerPanel);
+			//
+			if (topResizerBarLeft != nullptr) delete(topResizerBarLeft);
+			if (topResizerBarRight != nullptr) delete(topResizerBarRight);
+			//
+			asPanel = nullptr;
+			codePanel = nullptr;
+			analyzerPanel = nullptr;
+			//
+			topResizerBarLeft = nullptr;
+			topResizerBarRight = nullptr;
+			//
+			projectOpened = false;
+			//
+			resized();
+			repaint();
+			//
+			if (nullptr != processWnd)
+			{
+				processWnd->exitModalState();
+			}
+		});
 }
 //
 void MainComponent::openSettingsWindow() {
+	repaint();
+	//
 	if (settingsWindow != nullptr) delete(settingsWindow);
 	settingsWindow = new SettingsWindow(SettingsWindowTitle, *saveSettingsButton, currentSettings.lang);
 	settingsWindow->setVisible(false);
@@ -1690,6 +1739,8 @@ void MainComponent::openSettingsWindow() {
 }
 //
 void MainComponent::openAboutWindow() {
+	repaint();
+	//
 	if (aboutWindow != nullptr) delete(aboutWindow);
 	aboutWindow = new AboutWindow(AboutWindowTitle, currentSettings);
 	aboutWindow->setVisible(false);
@@ -1699,6 +1750,8 @@ void MainComponent::openAboutWindow() {
 }
 //
 void MainComponent::openUsageWindow() {
+	repaint();
+	//
 	if (usageWindow != nullptr) delete(usageWindow);
 	usageWindow = new UsageWindow(UsageWindowTitle, currentSettings);
 	usageWindow->setVisible(false);
@@ -1757,9 +1810,10 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 			std::function<void()> createProjFunc = [this]() { createProjectFile(); };
 			std::function<void()> chooseProjFunc = [this]() {
 				//
-				chooseProjectFile(); 
+				chooseProjectFile();
 				};
 			//
+			std::function<void()> aboutProjectFunc = [this]() { openProjectInfoWindow(project); };
 			std::function<void()> saveProjFunc = [this]() { saveProject(); };
 			std::function<void()> closeProjFunc = [this]() { closeProjectFile(); };
 			//
@@ -1767,6 +1821,7 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 			menu.addItem(FileOpenButtonText, chooseProjFunc);
 			//
 			if (projectOpened) {
+				menu.addItem(FileAboutProjectButtonText, aboutProjectFunc);
 				menu.addItem(FileSaveButtonText, saveProjFunc);
 				menu.addItem(FileCloseButtonText, closeProjFunc);
 			}
@@ -1788,6 +1843,7 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 			menu.addItem(HelpUsageButtonText, openUsageGuide);
 		}
 	}
+	repaint();
 	return menu;
 }
 //
@@ -1798,7 +1854,7 @@ void  MainComponent::showAlertWindow()
 	//
 	MyAlertWindow* processWnd = new MyAlertWindow(FailText,
 		FailSubText,
-		MessageBoxIconType::WarningIcon, this);
+		MessageBoxIconType::WarningIcon, this, (float) currentSettings.interfaceFontSize);
 	processWnd->addButton("Ok", 0);
 	processWnd->enterModalState(true, nullptr, true);
 	MessageManager::callAsync([this, processWnd]() {});

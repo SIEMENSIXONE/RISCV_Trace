@@ -72,6 +72,7 @@ ifeq ($(CONFIG),Release)
 endif
 
 OBJECTS_APP := \
+  $(JUCE_OBJDIR)/ProjectInfoWindow_f7958418.o \
   $(JUCE_OBJDIR)/UsageWindow_c16c82d2.o \
   $(JUCE_OBJDIR)/AboutWindow_ecd5b1be.o \
   $(JUCE_OBJDIR)/SettingsParser_28fd28ab.o \
@@ -107,6 +108,11 @@ $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) : $(OBJECTS_APP) $(JUCE_OBJDIR)/execinfo.cmd $
 	-$(V_AT)mkdir -p $(JUCE_LIBDIR)
 	-$(V_AT)mkdir -p $(JUCE_OUTDIR)
 	$(V_AT)$(CXX) -o $(JUCE_OUTDIR)/$(JUCE_TARGET_APP) $(OBJECTS_APP) $(JUCE_LDFLAGS) $(shell cat $(JUCE_OBJDIR)/execinfo.cmd) $(JUCE_LDFLAGS_APP) $(RESOURCES) $(TARGET_ARCH)
+
+$(JUCE_OBJDIR)/ProjectInfoWindow_f7958418.o: ../../Source/ProjectInfoWindow.cpp
+	-$(V_AT)mkdir -p $(@D)
+	@echo "Compiling ProjectInfoWindow.cpp"
+	$(V_AT)$(CXX) $(JUCE_CXXFLAGS) $(JUCE_CPPFLAGS_APP) $(JUCE_CFLAGS_APP) -o "$@" -c "$<"
 
 $(JUCE_OBJDIR)/UsageWindow_c16c82d2.o: ../../Source/UsageWindow.cpp
 	-$(V_AT)mkdir -p $(@D)
