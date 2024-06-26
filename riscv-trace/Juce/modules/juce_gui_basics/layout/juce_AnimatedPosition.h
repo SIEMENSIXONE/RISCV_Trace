@@ -169,7 +169,7 @@ private:
     {
         auto now = Time::getCurrentTime();
         releaseVelocity = getSpeed (lastDrag, position, now, newPos);
-        behaviour.releasedWithVelocity (newPos, 0);///!!!
+        behaviour.releasedWithVelocity (newPos, releaseVelocity);
         lastDrag = now;
 
         setPositionAndSendChange (newPos);

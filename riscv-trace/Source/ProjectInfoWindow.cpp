@@ -60,7 +60,7 @@ void ProjectInfoPanel::resized()
     fb.justifyContent = juce::FlexBox::JustifyContent::flexStart;
     fb.alignContent = juce::FlexBox::AlignContent::flexStart;
     //
-    int lineHeight = (getHeight() - (offset * 2)) / projectInfoLines->size();
+    int lineHeight = (getHeight() - (offset * 2)) /(int) projectInfoLines->size();
     //
     for (int i = 0; i < projectInfoLines->size(); i++) {
         fb.items.add(juce::FlexItem(*projectInfoLines->at(i)).withMinWidth((float)getWidth() - 2 * offset).withMinHeight((float)lineHeight).withMaxHeight((float)lineHeight));
@@ -83,7 +83,7 @@ ProjectInfoPanel::ProjectInfoPanelLine::ProjectInfoPanelLine(juce::String& text,
     textEditor->setReadOnly(true);
     //
     String strAccum;
-    int numberOfCodeFiles = _project.code.size();
+    int numberOfCodeFiles = (int) _project.code.size();
     switch (settingIndex)
     {
     case 0:
