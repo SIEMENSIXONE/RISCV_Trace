@@ -110,13 +110,13 @@ public:
 			~MyViewport() override;
 			void setViewedComponent(Component* newViewedComponent,
 				bool deleteComponentWhenNoLongerNeeded = true);
-
+			//
 			Component* getViewedComponent() const noexcept { return contentComp.get(); }
-
+			//
 			void setViewPosition(int xPixelsOffset, int yPixelsOffset);
 			void setViewPosition(Point<int> newPosition);
 			void setViewPositionProportionately(double proportionX, double proportionY);
-
+			//
 			bool autoScroll(int mouseX, int mouseY, int distanceFromEdge, int maximumSpeed);
 			Point<int> getViewPosition() const noexcept { return lastVisibleArea.getPosition(); }
 			Rectangle<int> getViewArea() const noexcept { return lastVisibleArea; }
@@ -154,7 +154,7 @@ public:
 
 			[[deprecated("Use getScrollOnDragMode instead.")]]
 			bool isScrollOnDragEnabled() const noexcept { return getScrollOnDragMode() == ScrollOnDragMode::all; }
-
+			//
 			enum class ScrollOnDragMode
 			{
 				never,          /**< Dragging will never scroll the viewport. */
@@ -185,7 +185,7 @@ public:
 			bool useMouseWheelMoveIfNeeded(const MouseEvent&, const MouseWheelDetails&);
 			/** @internal */
 			static bool respondsToKey(const KeyPress&);
-
+			//
 		protected:
 			virtual ScrollBar* createScrollBarComponent(bool isVertical);
 		private:
@@ -198,7 +198,7 @@ public:
 					return createIgnoredAccessibilityHandler(*this);
 				}
 			};
-
+			//
 			std::unique_ptr<ScrollBar> verticalScrollBar, horizontalScrollBar;
 			AccessibilityIgnoredComponent contentHolder;
 			WeakReference<Component> contentComp;
@@ -210,18 +210,17 @@ public:
 			bool customScrollBarThickness = false;
 			bool allowScrollingWithoutScrollbarV = false, allowScrollingWithoutScrollbarH = false;
 			bool vScrollbarRight = true, hScrollbarBottom = true;
-
+			//
 			struct MyDragToScrollListener;
 			std::unique_ptr<MyDragToScrollListener> dragToScrollListener;
-
+			//
 			Point<int> viewportPosToCompPos(Point<int>) const;
-
+			//
 			void updateVisibleArea();
 			void deleteOrRemoveContentComp();
-
+			//
 			JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyViewport)
 		};
-
 		//
 		class ProfileTable : public Component, public TableListBoxModel {
 		public:

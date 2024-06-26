@@ -170,7 +170,6 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 			else {
 				execTimeMapTotalSelf->at(funcName)++;
 			}
-
 		}
 	}
 	//
@@ -261,8 +260,8 @@ MainComponent::PerformanceAnalyzer::PerformanceAnalyzer(vector<TraceParser::Trac
 	graphMyViewport->getHorizontalScrollBar().setColour(ScrollBar::ColourIds::thumbColourId, Colour(187, 148, 174));
 	graphMyViewport->setScrollBarThickness(10);
 	graphMyViewport->setBounds(0, 0, getWidth(), getHeight());
-//	graphMyViewport->list
-	//
+	//	graphMyViewport->list
+		//
 	tabs = new MyTabbedComponent(*table, *graphMyViewport);
 	addAndMakeVisible(tabs);
 	tabs->setBounds(0, 0, getWidth(), getHeight());
@@ -390,630 +389,617 @@ void MainComponent::PerformanceAnalyzer::setFontSize(const int size) {
 	tabs->updateTabNames();
 }
 using MyViewportDragPosition = AnimatedPosition<AnimatedPositionBehaviours::ContinuousWithMomentum>;
-
+//
 struct MainComponent::PerformanceAnalyzer::MyViewport::MyDragToScrollListener final : private MouseListener,
-                                              private MyViewportDragPosition::Listener
+	private MyViewportDragPosition::Listener
 {
-    MyDragToScrollListener (MyViewport& v)  : viewport (v)
-    {
-        viewport.contentHolder.addMouseListener (this, true);
-        offsetX.addListener (this);
-        offsetY.addListener (this);
-        offsetX.behaviour.setMinimumVelocity (0);
-        offsetY.behaviour.setMinimumVelocity (0);
-    }
+	MyDragToScrollListener(MyViewport& v) : viewport(v)
+	{
+		viewport.contentHolder.addMouseListener(this, true);
+		offsetX.addListener(this);
+		offsetY.addListener(this);
+		offsetX.behaviour.setMinimumVelocity(0);
+		offsetY.behaviour.setMinimumVelocity(0);
+	}
+	//
+	~MyDragToScrollListener() override
+	{
+		viewport.contentHolder.removeMouseListener(this);
+		Desktop::getInstance().removeGlobalMouseListener(this);
+	}
+	//
+	void stopOngoingAnimation()
+	{
+		offsetX.setPosition(offsetX.getPosition());
+		offsetY.setPosition(offsetY.getPosition());
+	}
+	//
+	void positionChanged(MyViewportDragPosition&, double) override
+	{
+		viewport.setViewPosition(originalViewPos - Point<int>((int)offsetX.getPosition(),
+			(int)offsetY.getPosition()));
+	}
+	//
+	void mouseDown(const MouseEvent& e) override
+	{
+		if (!isGlobalMouseListener && MyViewportHelpers::wouldScrollOnEvent(&viewport, e.source))
+		{
+			offsetX.setPosition(offsetX.getPosition());
+			offsetY.setPosition(offsetY.getPosition());
 
-    ~MyDragToScrollListener() override
-    {
-        viewport.contentHolder.removeMouseListener (this);
-        Desktop::getInstance().removeGlobalMouseListener (this);
-    }
+			// switch to a global mouse listener so we still receive mouseUp events
+			// if the original event component is deleted
+			viewport.contentHolder.removeMouseListener(this);
+			Desktop::getInstance().addGlobalMouseListener(this);
 
-    void stopOngoingAnimation()
-    {
-        offsetX.setPosition (offsetX.getPosition());
-        offsetY.setPosition (offsetY.getPosition());
-    }
+			isGlobalMouseListener = true;
 
-    void positionChanged (MyViewportDragPosition&, double) override
-    {
-        viewport.setViewPosition (originalViewPos - Point<int> ((int) offsetX.getPosition(),
-                                                                (int) offsetY.getPosition()));
-    }
+			scrollSource = e.source;
+		}
+	}
+	//
+	void mouseDrag(const MouseEvent& e) override
+	{
+		if (e.source == scrollSource
+			&& !doesMouseEventComponentBlockMyViewportDrag(e.eventComponent))
+		{
+			auto totalOffset = e.getEventRelativeTo(&viewport).getOffsetFromDragStart().toFloat();
 
-    void mouseDown (const MouseEvent& e) override
-    {
-        if (! isGlobalMouseListener && MyViewportHelpers::wouldScrollOnEvent (&viewport, e.source))
-        {
-            offsetX.setPosition (offsetX.getPosition());
-            offsetY.setPosition (offsetY.getPosition());
+			if (!isDragging && totalOffset.getDistanceFromOrigin() > 8.0f && MyViewportHelpers::wouldScrollOnEvent(&viewport, e.source))
+			{
+				isDragging = true;
 
-            // switch to a global mouse listener so we still receive mouseUp events
-            // if the original event component is deleted
-            viewport.contentHolder.removeMouseListener (this);
-            Desktop::getInstance().addGlobalMouseListener (this);
+				originalViewPos = viewport.getViewPosition();
+				offsetX.setPosition(0.0);
+				offsetX.beginDrag();
+				offsetY.setPosition(0.0);
+				offsetY.beginDrag();
+			}
 
-            isGlobalMouseListener = true;
-
-            scrollSource = e.source;
-        }
-    }
-
-    void mouseDrag (const MouseEvent& e) override
-    {
-        if (e.source == scrollSource
-            && ! doesMouseEventComponentBlockMyViewportDrag (e.eventComponent))
-        {
-            auto totalOffset = e.getEventRelativeTo (&viewport).getOffsetFromDragStart().toFloat();
-
-            if (! isDragging && totalOffset.getDistanceFromOrigin() > 8.0f && MyViewportHelpers::wouldScrollOnEvent (&viewport, e.source))
-            {
-                isDragging = true;
-
-                originalViewPos = viewport.getViewPosition();
-                offsetX.setPosition (0.0);
-                offsetX.beginDrag();
-                offsetY.setPosition (0.0);
-                offsetY.beginDrag();
-            }
-
-            if (isDragging)
-            {
-            /*    offsetX.drag (totalOffset.x);
-                offsetY.drag (totalOffset.y);*/
+			if (isDragging)
+			{
+				/*    offsetX.drag (totalOffset.x);
+					offsetY.drag (totalOffset.y);*/
 				offsetX.setPosition(totalOffset.x);
 				offsetY.setPosition(totalOffset.y);
-            }
-        }
-    }
+			}
+		}
+	}
+	//
+	void mouseUp(const MouseEvent& e) override
+	{
+		if (isGlobalMouseListener && e.source == scrollSource)
+			endDragAndClearGlobalMouseListener();
+	}
+	//
+	void endDragAndClearGlobalMouseListener()
+	{
+		if (std::exchange(isDragging, false) == true)
+		{
+			offsetX.endDrag();
+			offsetY.endDrag();
+		}
 
-    void mouseUp (const MouseEvent& e) override
-    {
-        if (isGlobalMouseListener && e.source == scrollSource)
-            endDragAndClearGlobalMouseListener();
-    }
+		viewport.contentHolder.addMouseListener(this, true);
+		Desktop::getInstance().removeGlobalMouseListener(this);
 
-    void endDragAndClearGlobalMouseListener()
-    {
-        if (std::exchange (isDragging, false) == true)
-        {
-            offsetX.endDrag();
-            offsetY.endDrag();
-        }
+		isGlobalMouseListener = false;
+	}
+	//
+	bool doesMouseEventComponentBlockMyViewportDrag(const Component* eventComp)
+	{
+		for (auto c = eventComp; c != nullptr && c != &viewport; c = c->getParentComponent())
+			if (c->getViewportIgnoreDragFlag())
+				return true;
 
-        viewport.contentHolder.addMouseListener (this, true);
-        Desktop::getInstance().removeGlobalMouseListener (this);
+		return false;
+	}
 
-        isGlobalMouseListener = false;
-    }
+	MyViewport& viewport;
+	MyViewportDragPosition offsetX, offsetY;
+	Point<int> originalViewPos;
+	MouseInputSource scrollSource = Desktop::getInstance().getMainMouseSource();
+	bool isDragging = false;
+	bool isGlobalMouseListener = false;
 
-    bool doesMouseEventComponentBlockMyViewportDrag (const Component* eventComp)
-    {
-        for (auto c = eventComp; c != nullptr && c != &viewport; c = c->getParentComponent())
-            if (c->getViewportIgnoreDragFlag())
-                return true;
-
-        return false;
-    }
-
-    MyViewport& viewport;
-    MyViewportDragPosition offsetX, offsetY;
-    Point<int> originalViewPos;
-    MouseInputSource scrollSource = Desktop::getInstance().getMainMouseSource();
-    bool isDragging = false;
-    bool isGlobalMouseListener = false;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MyDragToScrollListener)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyDragToScrollListener)
 };
-
+//
 //==============================================================================
-MainComponent::PerformanceAnalyzer::MyViewport::MyViewport (const String& name)
-    : Component (name),
-      dragToScrollListener (std::make_unique<MyDragToScrollListener> (*this))
+MainComponent::PerformanceAnalyzer::MyViewport::MyViewport(const String& name)
+	: Component(name),
+	dragToScrollListener(std::make_unique<MyDragToScrollListener>(*this))
 {
-    // content holder is used to clip the contents so they don't overlap the scrollbars
-    addAndMakeVisible (contentHolder);
-    contentHolder.setInterceptsMouseClicks (false, true);
+	// content holder is used to clip the contents so they don't overlap the scrollbars
+	addAndMakeVisible(contentHolder);
+	contentHolder.setInterceptsMouseClicks(false, true);
 
-    scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
+	scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
 
-    setInterceptsMouseClicks (false, true);
-    setWantsKeyboardFocus (true);
+	setInterceptsMouseClicks(false, true);
+	setWantsKeyboardFocus(true);
 
-    recreateScrollbars();
+	recreateScrollbars();
 }
-
+//
 MainComponent::PerformanceAnalyzer::MyViewport::~MyViewport()
 {
-    deleteOrRemoveContentComp();
+	deleteOrRemoveContentComp();
 }
-
+//
 //==============================================================================
-void MainComponent::PerformanceAnalyzer::MyViewport::visibleAreaChanged (const Rectangle<int>&) {}
-void MainComponent::PerformanceAnalyzer::MyViewport::viewedComponentChanged (Component*) {}
-
+void MainComponent::PerformanceAnalyzer::MyViewport::visibleAreaChanged(const Rectangle<int>&) {}
+void MainComponent::PerformanceAnalyzer::MyViewport::viewedComponentChanged(Component*) {}
+//
 //==============================================================================
 void MainComponent::PerformanceAnalyzer::MyViewport::deleteOrRemoveContentComp()
 {
-    if (contentComp != nullptr)
-    {
-        contentComp->removeComponentListener (this);
+	if (contentComp != nullptr)
+	{
+		contentComp->removeComponentListener(this);
 
-        if (deleteContent)
-        {
-            // This sets the content comp to a null pointer before deleting the old one, in case
-            // anything tries to use the old one while it's in mid-deletion..
-            std::unique_ptr<Component> oldCompDeleter (contentComp.get());
-            contentComp = nullptr;
-        }
-        else
-        {
-            contentHolder.removeChildComponent (contentComp);
-            contentComp = nullptr;
-        }
-    }
+		if (deleteContent)
+		{
+			// This sets the content comp to a null pointer before deleting the old one, in case
+			// anything tries to use the old one while it's in mid-deletion..
+			std::unique_ptr<Component> oldCompDeleter(contentComp.get());
+			contentComp = nullptr;
+		}
+		else
+		{
+			contentHolder.removeChildComponent(contentComp);
+			contentComp = nullptr;
+		}
+	}
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setViewedComponent (Component* const newViewedComponent, const bool deleteComponentWhenNoLongerNeeded)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setViewedComponent(Component* const newViewedComponent, const bool deleteComponentWhenNoLongerNeeded)
 {
-    if (contentComp.get() != newViewedComponent)
-    {
-        deleteOrRemoveContentComp();
-        contentComp = newViewedComponent;
-        deleteContent = deleteComponentWhenNoLongerNeeded;
+	if (contentComp.get() != newViewedComponent)
+	{
+		deleteOrRemoveContentComp();
+		contentComp = newViewedComponent;
+		deleteContent = deleteComponentWhenNoLongerNeeded;
 
-        if (contentComp != nullptr)
-        {
-            contentHolder.addAndMakeVisible (contentComp);
-            setViewPosition (Point<int>());
-            contentComp->addComponentListener (this);
-        }
+		if (contentComp != nullptr)
+		{
+			contentHolder.addAndMakeVisible(contentComp);
+			setViewPosition(Point<int>());
+			contentComp->addComponentListener(this);
+		}
 
-        viewedComponentChanged (contentComp);
-        updateVisibleArea();
-    }
+		viewedComponentChanged(contentComp);
+		updateVisibleArea();
+	}
 }
-
+//
 void MainComponent::PerformanceAnalyzer::MyViewport::recreateScrollbars()
 {
-    verticalScrollBar.reset();
-    horizontalScrollBar.reset();
+	verticalScrollBar.reset();
+	horizontalScrollBar.reset();
 
-    verticalScrollBar  .reset (createScrollBarComponent (true));
-    horizontalScrollBar.reset (createScrollBarComponent (false));
+	verticalScrollBar.reset(createScrollBarComponent(true));
+	horizontalScrollBar.reset(createScrollBarComponent(false));
 
-    addChildComponent (verticalScrollBar.get());
-    addChildComponent (horizontalScrollBar.get());
+	addChildComponent(verticalScrollBar.get());
+	addChildComponent(horizontalScrollBar.get());
 
-    getVerticalScrollBar().addListener (this);
-    getHorizontalScrollBar().addListener (this);
-    getVerticalScrollBar().addMouseListener (this, true);
-    getHorizontalScrollBar().addMouseListener (this, true);
+	getVerticalScrollBar().addListener(this);
+	getHorizontalScrollBar().addListener(this);
+	getVerticalScrollBar().addMouseListener(this, true);
+	getHorizontalScrollBar().addMouseListener(this, true);
 
-    resized();
+	resized();
 }
-
-int MainComponent::PerformanceAnalyzer::MyViewport::getMaximumVisibleWidth() const            { return contentHolder.getWidth(); }
-int MainComponent::PerformanceAnalyzer::MyViewport::getMaximumVisibleHeight() const           { return contentHolder.getHeight(); }
-
-bool MainComponent::PerformanceAnalyzer::MyViewport::canScrollVertically() const noexcept     { return contentComp->getY() < 0 || contentComp->getBottom() > getHeight(); }
-bool MainComponent::PerformanceAnalyzer::MyViewport::canScrollHorizontally() const noexcept   { return contentComp->getX() < 0 || contentComp->getRight()  > getWidth(); }
-
-Point<int> MainComponent::PerformanceAnalyzer::MyViewport::viewportPosToCompPos (Point<int> pos) const
+//
+int MainComponent::PerformanceAnalyzer::MyViewport::getMaximumVisibleWidth() const { return contentHolder.getWidth(); }
+int MainComponent::PerformanceAnalyzer::MyViewport::getMaximumVisibleHeight() const { return contentHolder.getHeight(); }
+//
+bool MainComponent::PerformanceAnalyzer::MyViewport::canScrollVertically() const noexcept { return contentComp->getY() < 0 || contentComp->getBottom() > getHeight(); }
+bool MainComponent::PerformanceAnalyzer::MyViewport::canScrollHorizontally() const noexcept { return contentComp->getX() < 0 || contentComp->getRight() > getWidth(); }
+//
+Point<int> MainComponent::PerformanceAnalyzer::MyViewport::viewportPosToCompPos(Point<int> pos) const
 {
-    jassert (contentComp != nullptr);
+	jassert(contentComp != nullptr);
 
-    auto contentBounds = contentHolder.getLocalArea (contentComp.get(), contentComp->getLocalBounds());
+	auto contentBounds = contentHolder.getLocalArea(contentComp.get(), contentComp->getLocalBounds());
 
-    Point<int> p (jmax (jmin (0, contentHolder.getWidth()  - contentBounds.getWidth()),  jmin (0, -(pos.x))),
-                  jmax (jmin (0, contentHolder.getHeight() - contentBounds.getHeight()), jmin (0, -(pos.y))));
+	Point<int> p(jmax(jmin(0, contentHolder.getWidth() - contentBounds.getWidth()), jmin(0, -(pos.x))),
+		jmax(jmin(0, contentHolder.getHeight() - contentBounds.getHeight()), jmin(0, -(pos.y))));
 
-    return p.transformedBy (contentComp->getTransform().inverted());
+	return p.transformedBy(contentComp->getTransform().inverted());
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setViewPosition (const int xPixelsOffset, const int yPixelsOffset)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setViewPosition(const int xPixelsOffset, const int yPixelsOffset)
 {
-    setViewPosition ({ xPixelsOffset, yPixelsOffset });
+	setViewPosition({ xPixelsOffset, yPixelsOffset });
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setViewPosition (Point<int> newPosition)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setViewPosition(Point<int> newPosition)
 {
-    if (contentComp != nullptr)
-        contentComp->setTopLeftPosition (viewportPosToCompPos (newPosition));
+	if (contentComp != nullptr)
+		contentComp->setTopLeftPosition(viewportPosToCompPos(newPosition));
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setViewPositionProportionately (const double x, const double y)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setViewPositionProportionately(const double x, const double y)
 {
-    if (contentComp != nullptr)
-        setViewPosition (jmax (0, roundToInt (x * (contentComp->getWidth()  - getWidth()))),
-                         jmax (0, roundToInt (y * (contentComp->getHeight() - getHeight()))));
+	if (contentComp != nullptr)
+		setViewPosition(jmax(0, roundToInt(x * (contentComp->getWidth() - getWidth()))),
+			jmax(0, roundToInt(y * (contentComp->getHeight() - getHeight()))));
 }
-
-bool MainComponent::PerformanceAnalyzer::MyViewport::autoScroll (const int mouseX, const int mouseY, const int activeBorderThickness, const int maximumSpeed)
+//
+bool MainComponent::PerformanceAnalyzer::MyViewport::autoScroll(const int mouseX, const int mouseY, const int activeBorderThickness, const int maximumSpeed)
 {
-    if (contentComp != nullptr)
-    {
-        int dx = 0, dy = 0;
+	if (contentComp != nullptr)
+	{
+		int dx = 0, dy = 0;
 
-        if (getHorizontalScrollBar().isVisible() || canScrollHorizontally())
-        {
-            if (mouseX < activeBorderThickness)
-                dx = activeBorderThickness - mouseX;
-            else if (mouseX >= contentHolder.getWidth() - activeBorderThickness)
-                dx = (contentHolder.getWidth() - activeBorderThickness) - mouseX;
+		if (getHorizontalScrollBar().isVisible() || canScrollHorizontally())
+		{
+			if (mouseX < activeBorderThickness)
+				dx = activeBorderThickness - mouseX;
+			else if (mouseX >= contentHolder.getWidth() - activeBorderThickness)
+				dx = (contentHolder.getWidth() - activeBorderThickness) - mouseX;
 
-            if (dx < 0)
-                dx = jmax (dx, -maximumSpeed, contentHolder.getWidth() - contentComp->getRight());
-            else
-                dx = jmin (dx, maximumSpeed, -contentComp->getX());
-        }
+			if (dx < 0)
+				dx = jmax(dx, -maximumSpeed, contentHolder.getWidth() - contentComp->getRight());
+			else
+				dx = jmin(dx, maximumSpeed, -contentComp->getX());
+		}
 
-        if (getVerticalScrollBar().isVisible() || canScrollVertically())
-        {
-            if (mouseY < activeBorderThickness)
-                dy = activeBorderThickness - mouseY;
-            else if (mouseY >= contentHolder.getHeight() - activeBorderThickness)
-                dy = (contentHolder.getHeight() - activeBorderThickness) - mouseY;
+		if (getVerticalScrollBar().isVisible() || canScrollVertically())
+		{
+			if (mouseY < activeBorderThickness)
+				dy = activeBorderThickness - mouseY;
+			else if (mouseY >= contentHolder.getHeight() - activeBorderThickness)
+				dy = (contentHolder.getHeight() - activeBorderThickness) - mouseY;
 
-            if (dy < 0)
-                dy = jmax (dy, -maximumSpeed, contentHolder.getHeight() - contentComp->getBottom());
-            else
-                dy = jmin (dy, maximumSpeed, -contentComp->getY());
-        }
+			if (dy < 0)
+				dy = jmax(dy, -maximumSpeed, contentHolder.getHeight() - contentComp->getBottom());
+			else
+				dy = jmin(dy, maximumSpeed, -contentComp->getY());
+		}
 
-        if (dx != 0 || dy != 0)
-        {
-            contentComp->setTopLeftPosition (contentComp->getX() + dx,
-                                             contentComp->getY() + dy);
+		if (dx != 0 || dy != 0)
+		{
+			contentComp->setTopLeftPosition(contentComp->getX() + dx,
+				contentComp->getY() + dy);
 
-            return true;
-        }
-    }
+			return true;
+		}
+	}
 
-    return false;
+	return false;
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::componentMovedOrResized (Component&, bool, bool)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::componentMovedOrResized(Component&, bool, bool)
 {
-    updateVisibleArea();
+	updateVisibleArea();
 }
-
+//
 //==============================================================================
-void MainComponent::PerformanceAnalyzer::MyViewport::setScrollOnDragMode (const ScrollOnDragMode mode)
+void MainComponent::PerformanceAnalyzer::MyViewport::setScrollOnDragMode(const ScrollOnDragMode mode)
 {
-    scrollOnDragMode = mode;
+	scrollOnDragMode = mode;
 }
-
+//
 bool MainComponent::PerformanceAnalyzer::MyViewport::isCurrentlyScrollingOnDrag() const noexcept
 {
-    return dragToScrollListener->isDragging;
+	return dragToScrollListener->isDragging;
 }
-
+//
 //==============================================================================
 void MainComponent::PerformanceAnalyzer::MyViewport::lookAndFeelChanged()
 {
-    if (! customScrollBarThickness)
-    {
-        scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
-        resized();
-    }
+	if (!customScrollBarThickness)
+	{
+		scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
+		resized();
+	}
 }
-
+//
 void MainComponent::PerformanceAnalyzer::MyViewport::resized()
 {
-    updateVisibleArea();
+	updateVisibleArea();
 }
-
+//
 //==============================================================================
 void MainComponent::PerformanceAnalyzer::MyViewport::updateVisibleArea()
 {
-    auto scrollbarWidth = getScrollBarThickness();
-    const bool canShowAnyBars = getWidth() > scrollbarWidth && getHeight() > scrollbarWidth;
-    const bool canShowHBar = showHScrollbar && canShowAnyBars;
-    const bool canShowVBar = showVScrollbar && canShowAnyBars;
+	auto scrollbarWidth = getScrollBarThickness();
+	const bool canShowAnyBars = getWidth() > scrollbarWidth && getHeight() > scrollbarWidth;
+	const bool canShowHBar = showHScrollbar && canShowAnyBars;
+	const bool canShowVBar = showVScrollbar && canShowAnyBars;
 
-    bool hBarVisible = false, vBarVisible = false;
-    Rectangle<int> contentArea;
+	bool hBarVisible = false, vBarVisible = false;
+	Rectangle<int> contentArea;
 
-    for (int i = 3; --i >= 0;)
-    {
-        hBarVisible = canShowHBar && ! getHorizontalScrollBar().autoHides();
-        vBarVisible = canShowVBar && ! getVerticalScrollBar().autoHides();
-        contentArea = getLocalBounds();
+	for (int i = 3; --i >= 0;)
+	{
+		hBarVisible = canShowHBar && !getHorizontalScrollBar().autoHides();
+		vBarVisible = canShowVBar && !getVerticalScrollBar().autoHides();
+		contentArea = getLocalBounds();
 
-        if (contentComp != nullptr && ! contentArea.contains (contentComp->getBounds()))
-        {
-            hBarVisible = canShowHBar && (hBarVisible || contentComp->getX() < 0 || contentComp->getRight() > contentArea.getWidth());
-            vBarVisible = canShowVBar && (vBarVisible || contentComp->getY() < 0 || contentComp->getBottom() > contentArea.getHeight());
+		if (contentComp != nullptr && !contentArea.contains(contentComp->getBounds()))
+		{
+			hBarVisible = canShowHBar && (hBarVisible || contentComp->getX() < 0 || contentComp->getRight() > contentArea.getWidth());
+			vBarVisible = canShowVBar && (vBarVisible || contentComp->getY() < 0 || contentComp->getBottom() > contentArea.getHeight());
 
-            if (vBarVisible)
-                contentArea.setWidth (getWidth() - scrollbarWidth);
+			if (vBarVisible)
+				contentArea.setWidth(getWidth() - scrollbarWidth);
 
-            if (hBarVisible)
-                contentArea.setHeight (getHeight() - scrollbarWidth);
+			if (hBarVisible)
+				contentArea.setHeight(getHeight() - scrollbarWidth);
 
-            if (! contentArea.contains (contentComp->getBounds()))
-            {
-                hBarVisible = canShowHBar && (hBarVisible || contentComp->getRight() > contentArea.getWidth());
-                vBarVisible = canShowVBar && (vBarVisible || contentComp->getBottom() > contentArea.getHeight());
-            }
-        }
+			if (!contentArea.contains(contentComp->getBounds()))
+			{
+				hBarVisible = canShowHBar && (hBarVisible || contentComp->getRight() > contentArea.getWidth());
+				vBarVisible = canShowVBar && (vBarVisible || contentComp->getBottom() > contentArea.getHeight());
+			}
+		}
 
-        if (vBarVisible)  contentArea.setWidth  (getWidth()  - scrollbarWidth);
-        if (hBarVisible)  contentArea.setHeight (getHeight() - scrollbarWidth);
+		if (vBarVisible)  contentArea.setWidth(getWidth() - scrollbarWidth);
+		if (hBarVisible)  contentArea.setHeight(getHeight() - scrollbarWidth);
 
-        if (! vScrollbarRight  && vBarVisible)
-            contentArea.setX (scrollbarWidth);
+		if (!vScrollbarRight && vBarVisible)
+			contentArea.setX(scrollbarWidth);
 
-        if (! hScrollbarBottom && hBarVisible)
-            contentArea.setY (scrollbarWidth);
+		if (!hScrollbarBottom && hBarVisible)
+			contentArea.setY(scrollbarWidth);
 
-        if (contentComp == nullptr)
-        {
-            contentHolder.setBounds (contentArea);
-            break;
-        }
+		if (contentComp == nullptr)
+		{
+			contentHolder.setBounds(contentArea);
+			break;
+		}
 
-        auto oldContentBounds = contentComp->getBounds();
-        contentHolder.setBounds (contentArea);
+		auto oldContentBounds = contentComp->getBounds();
+		contentHolder.setBounds(contentArea);
 
-        // If the content has changed its size, that might affect our scrollbars, so go round again and re-calculate..
-        if (oldContentBounds == contentComp->getBounds())
-            break;
-    }
+		// If the content has changed its size, that might affect our scrollbars, so go round again and re-calculate..
+		if (oldContentBounds == contentComp->getBounds())
+			break;
+	}
 
-    Rectangle<int> contentBounds;
+	Rectangle<int> contentBounds;
 
-    if (auto cc = contentComp.get())
-        contentBounds = contentHolder.getLocalArea (cc, cc->getLocalBounds());
+	if (auto cc = contentComp.get())
+		contentBounds = contentHolder.getLocalArea(cc, cc->getLocalBounds());
 
-    auto visibleOrigin = -contentBounds.getPosition();
+	auto visibleOrigin = -contentBounds.getPosition();
 
-    auto& hbar = getHorizontalScrollBar();
-    auto& vbar = getVerticalScrollBar();
+	auto& hbar = getHorizontalScrollBar();
+	auto& vbar = getVerticalScrollBar();
 
-    hbar.setBounds (contentArea.getX(), hScrollbarBottom ? contentArea.getHeight() : 0, contentArea.getWidth(), scrollbarWidth);
-    hbar.setRangeLimits (0.0, contentBounds.getWidth());
-    hbar.setCurrentRange (visibleOrigin.x, contentArea.getWidth());
-    hbar.setSingleStepSize (singleStepX);
+	hbar.setBounds(contentArea.getX(), hScrollbarBottom ? contentArea.getHeight() : 0, contentArea.getWidth(), scrollbarWidth);
+	hbar.setRangeLimits(0.0, contentBounds.getWidth());
+	hbar.setCurrentRange(visibleOrigin.x, contentArea.getWidth());
+	hbar.setSingleStepSize(singleStepX);
 
-    if (canShowHBar && ! hBarVisible)
-        visibleOrigin.setX (0);
+	if (canShowHBar && !hBarVisible)
+		visibleOrigin.setX(0);
 
-    vbar.setBounds (vScrollbarRight ? contentArea.getWidth() : 0, contentArea.getY(), scrollbarWidth, contentArea.getHeight());
-    vbar.setRangeLimits (0.0, contentBounds.getHeight());
-    vbar.setCurrentRange (visibleOrigin.y, contentArea.getHeight());
-    vbar.setSingleStepSize (singleStepY);
+	vbar.setBounds(vScrollbarRight ? contentArea.getWidth() : 0, contentArea.getY(), scrollbarWidth, contentArea.getHeight());
+	vbar.setRangeLimits(0.0, contentBounds.getHeight());
+	vbar.setCurrentRange(visibleOrigin.y, contentArea.getHeight());
+	vbar.setSingleStepSize(singleStepY);
 
-    if (canShowVBar && ! vBarVisible)
-        visibleOrigin.setY (0);
+	if (canShowVBar && !vBarVisible)
+		visibleOrigin.setY(0);
 
-    // Force the visibility *after* setting the ranges to avoid flicker caused by edge conditions in the numbers.
-    hbar.setVisible (hBarVisible);
-    vbar.setVisible (vBarVisible);
+	// Force the visibility *after* setting the ranges to avoid flicker caused by edge conditions in the numbers.
+	hbar.setVisible(hBarVisible);
+	vbar.setVisible(vBarVisible);
 
-    if (contentComp != nullptr)
-    {
-        auto newContentCompPos = viewportPosToCompPos (visibleOrigin);
+	if (contentComp != nullptr)
+	{
+		auto newContentCompPos = viewportPosToCompPos(visibleOrigin);
 
-        if (contentComp->getBounds().getPosition() != newContentCompPos)
-        {
-            contentComp->setTopLeftPosition (newContentCompPos);  // (this will re-entrantly call updateVisibleArea again)
-            return;
-        }
-    }
+		if (contentComp->getBounds().getPosition() != newContentCompPos)
+		{
+			contentComp->setTopLeftPosition(newContentCompPos);  // (this will re-entrantly call updateVisibleArea again)
+			return;
+		}
+	}
 
-    const Rectangle<int> visibleArea (visibleOrigin.x, visibleOrigin.y,
-                                      jmin (contentBounds.getWidth()  - visibleOrigin.x, contentArea.getWidth()),
-                                      jmin (contentBounds.getHeight() - visibleOrigin.y, contentArea.getHeight()));
+	const Rectangle<int> visibleArea(visibleOrigin.x, visibleOrigin.y,
+		jmin(contentBounds.getWidth() - visibleOrigin.x, contentArea.getWidth()),
+		jmin(contentBounds.getHeight() - visibleOrigin.y, contentArea.getHeight()));
 
-    if (lastVisibleArea != visibleArea)
-    {
-        lastVisibleArea = visibleArea;
-        visibleAreaChanged (visibleArea);
-    }
+	if (lastVisibleArea != visibleArea)
+	{
+		lastVisibleArea = visibleArea;
+		visibleAreaChanged(visibleArea);
+	}
 
-    hbar.handleUpdateNowIfNeeded();
-    vbar.handleUpdateNowIfNeeded();
+	hbar.handleUpdateNowIfNeeded();
+	vbar.handleUpdateNowIfNeeded();
 }
-
+//
 //==============================================================================
-void MainComponent::PerformanceAnalyzer::MyViewport::setSingleStepSizes (const int stepX, const int stepY)
+void MainComponent::PerformanceAnalyzer::MyViewport::setSingleStepSizes(const int stepX, const int stepY)
 {
-    if (singleStepX != stepX || singleStepY != stepY)
-    {
-        singleStepX = stepX;
-        singleStepY = stepY;
-        updateVisibleArea();
-    }
+	if (singleStepX != stepX || singleStepY != stepY)
+	{
+		singleStepX = stepX;
+		singleStepY = stepY;
+		updateVisibleArea();
+	}
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarsShown (const bool showVerticalScrollbarIfNeeded,
-                                   const bool showHorizontalScrollbarIfNeeded,
-                                   const bool allowVerticalScrollingWithoutScrollbar,
-                                   const bool allowHorizontalScrollingWithoutScrollbar)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarsShown(const bool showVerticalScrollbarIfNeeded,
+	const bool showHorizontalScrollbarIfNeeded,
+	const bool allowVerticalScrollingWithoutScrollbar,
+	const bool allowHorizontalScrollingWithoutScrollbar)
 {
-    allowScrollingWithoutScrollbarV = allowVerticalScrollingWithoutScrollbar;
-    allowScrollingWithoutScrollbarH = allowHorizontalScrollingWithoutScrollbar;
+	allowScrollingWithoutScrollbarV = allowVerticalScrollingWithoutScrollbar;
+	allowScrollingWithoutScrollbarH = allowHorizontalScrollingWithoutScrollbar;
 
-    if (showVScrollbar != showVerticalScrollbarIfNeeded
-         || showHScrollbar != showHorizontalScrollbarIfNeeded)
-    {
-        showVScrollbar = showVerticalScrollbarIfNeeded;
-        showHScrollbar = showHorizontalScrollbarIfNeeded;
-        updateVisibleArea();
-    }
+	if (showVScrollbar != showVerticalScrollbarIfNeeded
+		|| showHScrollbar != showHorizontalScrollbarIfNeeded)
+	{
+		showVScrollbar = showVerticalScrollbarIfNeeded;
+		showHScrollbar = showHorizontalScrollbarIfNeeded;
+		updateVisibleArea();
+	}
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarThickness (const int thickness)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarThickness(const int thickness)
 {
-    int newThickness;
+	int newThickness;
 
-    // To stay compatible with the previous code: use the
-    // default thickness if thickness parameter is zero
-    // or negative
-    if (thickness <= 0)
-    {
-        customScrollBarThickness = false;
-        newThickness = getLookAndFeel().getDefaultScrollbarWidth();
-    }
-    else
-    {
-        customScrollBarThickness = true;
-        newThickness = thickness;
-    }
+	// To stay compatible with the previous code: use the
+	// default thickness if thickness parameter is zero
+	// or negative
+	if (thickness <= 0)
+	{
+		customScrollBarThickness = false;
+		newThickness = getLookAndFeel().getDefaultScrollbarWidth();
+	}
+	else
+	{
+		customScrollBarThickness = true;
+		newThickness = thickness;
+	}
 
-    if (scrollBarThickness != newThickness)
-    {
-        scrollBarThickness = newThickness;
-        updateVisibleArea();
-    }
+	if (scrollBarThickness != newThickness)
+	{
+		scrollBarThickness = newThickness;
+		updateVisibleArea();
+	}
 }
-
+//
 int MainComponent::PerformanceAnalyzer::MyViewport::getScrollBarThickness() const
 {
-    return scrollBarThickness;
+	return scrollBarThickness;
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::scrollBarMoved (ScrollBar* scrollBarThatHasMoved, double newRangeStart)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart)
 {
-    auto newRangeStartInt = roundToInt (newRangeStart);
+	auto newRangeStartInt = roundToInt(newRangeStart);
 
-    if (scrollBarThatHasMoved == horizontalScrollBar.get())
-    {
-        setViewPosition (newRangeStartInt, getViewPositionY());
-    }
-    else if (scrollBarThatHasMoved == verticalScrollBar.get())
-    {
-        setViewPosition (getViewPositionX(), newRangeStartInt);
-    }
+	if (scrollBarThatHasMoved == horizontalScrollBar.get())
+	{
+		setViewPosition(newRangeStartInt, getViewPositionY());
+	}
+	else if (scrollBarThatHasMoved == verticalScrollBar.get())
+	{
+		setViewPosition(getViewPositionX(), newRangeStartInt);
+	}
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& wheel)
 {
-    if (e.eventComponent == this)
-        if (! useMouseWheelMoveIfNeeded (e, wheel))
-            Component::mouseWheelMove (e, wheel);
+	if (e.eventComponent == this)
+		if (!useMouseWheelMoveIfNeeded(e, wheel))
+			Component::mouseWheelMove(e, wheel);
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::mouseDown (const MouseEvent& e)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::mouseDown(const MouseEvent& e)
 {
-    if (e.eventComponent == horizontalScrollBar.get() || e.eventComponent == verticalScrollBar.get())
-        dragToScrollListener->stopOngoingAnimation();
+	if (e.eventComponent == horizontalScrollBar.get() || e.eventComponent == verticalScrollBar.get())
+		dragToScrollListener->stopOngoingAnimation();
 }
-
-//void MainComponent::PerformanceAnalyzer::MyViewport::mouseDrag(const MouseEvent& e)
-//{
-//	const int offsetX = e.getDistanceFromDragStartX();
-//	const int offsetY = e.getDistanceFromDragStartY();
-//	//
-//	if ((offsetX != 0) && (offsetY != 0))
-//	{
-//		setViewPosition(offsetX, offsetY);
-//	}
-//}
-
-static int rescaleMouseWheelDistance (float distance, int singleStepSize) noexcept
+//
+static int rescaleMouseWheelDistance(float distance, int singleStepSize) noexcept
 {
-    if (approximatelyEqual (distance, 0.0f))
-        return 0;
+	if (approximatelyEqual(distance, 0.0f))
+		return 0;
 
-    distance *= 14.0f * (float) singleStepSize;
+	distance *= 14.0f * (float)singleStepSize;
 
-    return roundToInt (distance < 0 ? jmin (distance, -1.0f)
-                                    : jmax (distance,  1.0f));
+	return roundToInt(distance < 0 ? jmin(distance, -1.0f)
+		: jmax(distance, 1.0f));
 }
-
-bool MainComponent::PerformanceAnalyzer::MyViewport::useMouseWheelMoveIfNeeded (const MouseEvent& e, const MouseWheelDetails& wheel)
+//
+bool MainComponent::PerformanceAnalyzer::MyViewport::useMouseWheelMoveIfNeeded(const MouseEvent& e, const MouseWheelDetails& wheel)
 {
-    if (! (e.mods.isAltDown() || e.mods.isCtrlDown() || e.mods.isCommandDown()))
-    {
-        const bool canScrollVert = (allowScrollingWithoutScrollbarV || getVerticalScrollBar().isVisible());
-        const bool canScrollHorz = (allowScrollingWithoutScrollbarH || getHorizontalScrollBar().isVisible());
+	if (!(e.mods.isAltDown() || e.mods.isCtrlDown() || e.mods.isCommandDown()))
+	{
+		const bool canScrollVert = (allowScrollingWithoutScrollbarV || getVerticalScrollBar().isVisible());
+		const bool canScrollHorz = (allowScrollingWithoutScrollbarH || getHorizontalScrollBar().isVisible());
 
-        if (canScrollHorz || canScrollVert)
-        {
-            auto deltaX = rescaleMouseWheelDistance (wheel.deltaX, singleStepX);
-            auto deltaY = rescaleMouseWheelDistance (wheel.deltaY, singleStepY);
+		if (canScrollHorz || canScrollVert)
+		{
+			auto deltaX = rescaleMouseWheelDistance(wheel.deltaX, singleStepX);
+			auto deltaY = rescaleMouseWheelDistance(wheel.deltaY, singleStepY);
 
-            auto pos = getViewPosition();
+			auto pos = getViewPosition();
 
-            if (deltaX != 0 && deltaY != 0 && canScrollHorz && canScrollVert)
-            {
-                pos.x -= deltaX;
-                pos.y -= deltaY;
-            }
-            else if (canScrollHorz && (deltaX != 0 || e.mods.isShiftDown() || ! canScrollVert))
-            {
-                pos.x -= deltaX != 0 ? deltaX : deltaY;
-            }
-            else if (canScrollVert && deltaY != 0)
-            {
-                pos.y -= deltaY;
-            }
+			if (deltaX != 0 && deltaY != 0 && canScrollHorz && canScrollVert)
+			{
+				pos.x -= deltaX;
+				pos.y -= deltaY;
+			}
+			else if (canScrollHorz && (deltaX != 0 || e.mods.isShiftDown() || !canScrollVert))
+			{
+				pos.x -= deltaX != 0 ? deltaX : deltaY;
+			}
+			else if (canScrollVert && deltaY != 0)
+			{
+				pos.y -= deltaY;
+			}
 
-            if (pos != getViewPosition())
-            {
-                setViewPosition (pos);
-                return true;
-            }
-        }
-    }
+			if (pos != getViewPosition())
+			{
+				setViewPosition(pos);
+				return true;
+			}
+		}
+	}
 
-    return false;
+	return false;
 }
-
-static bool isUpDownKeyPress (const KeyPress& key)
+//
+static bool isUpDownKeyPress(const KeyPress& key)
 {
-    return key == KeyPress::upKey
-        || key == KeyPress::downKey
-        || key == KeyPress::pageUpKey
-        || key == KeyPress::pageDownKey
-        || key == KeyPress::homeKey
-        || key == KeyPress::endKey;
+	return key == KeyPress::upKey
+		|| key == KeyPress::downKey
+		|| key == KeyPress::pageUpKey
+		|| key == KeyPress::pageDownKey
+		|| key == KeyPress::homeKey
+		|| key == KeyPress::endKey;
 }
-
-static bool isLeftRightKeyPress (const KeyPress& key)
+//
+static bool isLeftRightKeyPress(const KeyPress& key)
 {
-    return key == KeyPress::leftKey
-        || key == KeyPress::rightKey;
+	return key == KeyPress::leftKey
+		|| key == KeyPress::rightKey;
 }
-
-bool MainComponent::PerformanceAnalyzer::MyViewport::keyPressed (const KeyPress& key)
+//
+bool MainComponent::PerformanceAnalyzer::MyViewport::keyPressed(const KeyPress& key)
 {
-    const bool isUpDownKey = isUpDownKeyPress (key);
+	const bool isUpDownKey = isUpDownKeyPress(key);
 
-    if (getVerticalScrollBar().isVisible() && isUpDownKey)
-        return getVerticalScrollBar().keyPressed (key);
+	if (getVerticalScrollBar().isVisible() && isUpDownKey)
+		return getVerticalScrollBar().keyPressed(key);
 
-    const bool isLeftRightKey = isLeftRightKeyPress (key);
+	const bool isLeftRightKey = isLeftRightKeyPress(key);
 
-    if (getHorizontalScrollBar().isVisible() && (isUpDownKey || isLeftRightKey))
-        return getHorizontalScrollBar().keyPressed (key);
+	if (getHorizontalScrollBar().isVisible() && (isUpDownKey || isLeftRightKey))
+		return getHorizontalScrollBar().keyPressed(key);
 
-    return false;
+	return false;
 }
-
-bool MainComponent::PerformanceAnalyzer::MyViewport::respondsToKey (const KeyPress& key)
+//
+bool MainComponent::PerformanceAnalyzer::MyViewport::respondsToKey(const KeyPress& key)
 {
-    return isUpDownKeyPress (key) || isLeftRightKeyPress (key);
+	return isUpDownKeyPress(key) || isLeftRightKeyPress(key);
 }
-
-ScrollBar* MainComponent::PerformanceAnalyzer::MyViewport::createScrollBarComponent (bool isVertical)
+//
+ScrollBar* MainComponent::PerformanceAnalyzer::MyViewport::createScrollBarComponent(bool isVertical)
 {
-    return new ScrollBar (isVertical);
+	return new ScrollBar(isVertical);
 }
-
-void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarPosition (bool verticalScrollbarOnRight,
-                                     bool horizontalScrollbarAtBottom)
+//
+void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarPosition(bool verticalScrollbarOnRight,
+	bool horizontalScrollbarAtBottom)
 {
-    vScrollbarRight  = verticalScrollbarOnRight;
-    hScrollbarBottom = horizontalScrollbarAtBottom;
+	vScrollbarRight = verticalScrollbarOnRight;
+	hScrollbarBottom = horizontalScrollbarAtBottom;
 
-    resized();
+	resized();
 }
-
-
 //
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::ProfileGraphPanel(const string& _pictureFileath) {
 	pictureFileath = _pictureFileath;
@@ -1094,14 +1080,13 @@ MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::Image
 	setSize(picture->getWidth(), picture->getHeight());
 	addMouseListener(this, true);
 }
-
+//
 MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::~ImageComponent() {}
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::paint(juce::Graphics& g) {
 	g.drawImage(*picture, 0, 0, getWidth(), getHeight(), 0, 0, picture->getWidth(), picture->getHeight(), false);
-
 }
-
+//
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::resized() {
 }
 //
@@ -1417,7 +1402,6 @@ MainComponent::TitlePanel::TitlePanel(juce::String& str) {
 }
 //
 MainComponent::TitlePanel::~TitlePanel() {
-
 }
 //
 void MainComponent::TitlePanel::paint(Graphics& g)
@@ -1584,7 +1568,6 @@ MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::OccuranceN
 }
 //
 MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::~OccuranceNumberPanel() {
-
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::paint(Graphics& g) {
@@ -1602,7 +1585,6 @@ void MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::paint
 		text = "-";
 	}
 	g.drawText(text, getLocalBounds(), juce::Justification::centred, true);
-
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::OccuranceNumberPanel::resized() {
@@ -1641,7 +1623,6 @@ void MainComponent::AsSubComponent::OccurancesPanel::decrButtonClicked() {
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::buttonClicked(Button* button) {
-
 	if (button == incrButton)
 	{
 		incrButtonClicked();
@@ -1707,7 +1688,6 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 			comboBoxItemID->insert(tmp);
 			functionsComboBox->addItem(tmp.first, tmp.second);
 		}
-
 	}
 	//
 	lf;
@@ -2024,7 +2004,7 @@ Font MainComponent::MyAlertWindow::getAlertWindowTitleFont() {
 	return { fontSize, Font::bold };
 }
 //
-Font MainComponent::MyAlertWindow::getAlertWindowMessageFont() { 
+Font MainComponent::MyAlertWindow::getAlertWindowMessageFont() {
 	return { fontSize };
 }
 //
@@ -2182,9 +2162,9 @@ void MainComponent::createProjectFile() {
 void MainComponent::openProjectFile(File filepath) {
 	//
 	currentProjectFile = filepath;
-	MyAlertWindow* processWnd = new MyAlertWindow(LoadingText +	String(currentProjectFile.getFileNameWithoutExtension().toWideCharPointer()) + String("..."),
+	MyAlertWindow* processWnd = new MyAlertWindow(LoadingText + String(currentProjectFile.getFileNameWithoutExtension().toWideCharPointer()) + String("..."),
 		LoadingSubText,
-		MessageBoxIconType::NoIcon, this, (float) currentSettings.interfaceFontSize);
+		MessageBoxIconType::NoIcon, this, (float)currentSettings.interfaceFontSize);
 	processWnd->enterModalState(true, nullptr, true);
 	//
 	/*Flag = */MessageManager::callAsync([this, processWnd, filepath]()
@@ -2321,7 +2301,7 @@ void MainComponent::closeProjectFile() {
 	//
 	MyAlertWindow* processWnd = new MyAlertWindow(ClosingProjectText + String(currentProjectFile.getFileNameWithoutExtension().toWideCharPointer()) + String("..."),
 		ClosingProjectSubText,
-		MessageBoxIconType::NoIcon, this, (float) currentSettings.interfaceFontSize);
+		MessageBoxIconType::NoIcon, this, (float)currentSettings.interfaceFontSize);
 	processWnd->enterModalState(true, nullptr, true);
 	//
 	/*Flag = */MessageManager::callAsync([this, processWnd]()
@@ -2361,7 +2341,6 @@ void MainComponent::openSettingsWindow() {
 	settingsWindow->addComponentListener(this);
 	settingsWindow->setVisible(true);
 	settingsWindow->enterModalState();
-
 }
 //
 void MainComponent::openAboutWindow() {
@@ -2481,7 +2460,7 @@ void  MainComponent::showAlertWindow()
 	//
 	MyAlertWindow* processWnd = new MyAlertWindow(FailText,
 		FailSubText,
-		MessageBoxIconType::WarningIcon, this, (float) currentSettings.interfaceFontSize);
+		MessageBoxIconType::WarningIcon, this, (float)currentSettings.interfaceFontSize);
 	processWnd->addButton("Ok", 0);
 	processWnd->enterModalState(true, nullptr, true);
 	MessageManager::callAsync([this, processWnd]() {});
