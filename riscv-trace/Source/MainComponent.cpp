@@ -5,6 +5,7 @@ using namespace juce;
 //
 
 MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::TopResizerBar(MyStretchableLayoutResizerBar& _resizerBar) {
+	mouseDownPos = 0;
 	resizerBar = &_resizerBar;
 	//
 	defaultColour = Colour(37, 11, 46);
@@ -56,6 +57,7 @@ void MainComponent::MyStretchableLayoutResizerBar::TopResizerBar::mouseDrag(cons
 MainComponent::MyStretchableLayoutResizerBar::MyStretchableLayoutResizerBar(StretchableLayoutManager* layout_, const int index, const bool vertical, MainComponent& _mainComponent)
 	: layout(layout_),
 	itemIndex(index),
+	mouseDownPos(0),
 	isVertical(vertical)
 {
 	mainComponent = &_mainComponent;
