@@ -22,16 +22,19 @@ public:
 	//
 	class MyStretchableLayoutResizerBar : public Component
 	{
+	//
 	public:
 		//
 		class TopResizerBar : public Component
 		{
 		public:
+			//
 			TopResizerBar(MyStretchableLayoutResizerBar&);
 			~TopResizerBar() override;
 			void paint(Graphics&) override;
 			void resized() override;
 		private:
+			//
 			void mouseEnter(const MouseEvent& event) override;
 			void mouseExit(const MouseEvent& event) override;
 			void mouseDown(const MouseEvent&) override;
@@ -49,6 +52,7 @@ public:
 		MyStretchableLayoutResizerBar(StretchableLayoutManager* layoutToUse, int itemIndexInLayout, bool isBarVertical, MainComponent& _mainComponent);
 		~MyStretchableLayoutResizerBar() override;
 		virtual void hasBeenMoved();
+		//
 		struct JUCE_API  LookAndFeelMethods
 		{
 			virtual ~LookAndFeelMethods() = default;
@@ -59,6 +63,7 @@ public:
 		void paint(Graphics&) override;
 		void setPosition(int);
 	private:
+		//
 		StretchableLayoutManager* layout;
 		MainComponent* mainComponent;
 		int itemIndex, mouseDownPos;
@@ -79,11 +84,14 @@ public:
 		void tableSetSelectedRow(const string&);
 		//
 		void setFontSize(const int);
+		//
 	private:
+		//
 		class MyViewport : public Component,
 			private ComponentListener,
 			private ScrollBar::Listener
 		{
+		//
 		public:
 			//
 			struct MyViewportHelpers
@@ -151,7 +159,7 @@ public:
 			{
 				setScrollOnDragMode(shouldScrollOnDrag ? ScrollOnDragMode::all : ScrollOnDragMode::never);
 			}
-
+			//
 			[[deprecated("Use getScrollOnDragMode instead.")]]
 			bool isScrollOnDragEnabled() const noexcept { return getScrollOnDragMode() == ScrollOnDragMode::all; }
 			//
@@ -165,24 +173,23 @@ public:
 			ScrollOnDragMode getScrollOnDragMode() const { return scrollOnDragMode; }
 			bool isCurrentlyScrollingOnDrag() const noexcept;
 			//==============================================================================
-			/** @internal */
-			void resized() override;
-			/** @internal */
-			void scrollBarMoved(ScrollBar*, double newRangeStart) override;
-			/** @internal */
-			void mouseWheelMove(const MouseEvent&, const MouseWheelDetails&) override;
-			/** @internal */
-			void mouseDown(const MouseEvent& e) override;
 			//
-			/** @internal */
+			void resized() override;
+			//
+			void scrollBarMoved(ScrollBar*, double newRangeStart) override;
+			//
+			void mouseWheelMove(const MouseEvent&, const MouseWheelDetails&) override;
+			//
+			void mouseDown(const MouseEvent&);
+			//
 			bool keyPressed(const KeyPress&) override;
-			/** @internal */
+			//
 			void componentMovedOrResized(Component&, bool wasMoved, bool wasResized) override;
-			/** @internal */
+			//
 			void lookAndFeelChanged() override;
-			/** @internal */
+			//
 			bool useMouseWheelMoveIfNeeded(const MouseEvent&, const MouseWheelDetails&);
-			/** @internal */
+			//
 			static bool respondsToKey(const KeyPress&);
 			//
 		protected:
@@ -269,17 +276,20 @@ public:
 		//
 		class ProfileGraphPanel : public Component {
 		public:
+			// 
 			ProfileGraphPanel(const string&);
 			~ProfileGraphPanel() override;
 			void paint(juce::Graphics&) override;
 			void resized() override;
 			void openSeparateGraphWindow();
 		private:
+			//
 			void mouseDoubleClick(const MouseEvent& event) override;
 			void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
 			//
 			class SeparateGraphPanel : public Component {
 			public:
+				//
 				SeparateGraphPanel(Image&);
 				~SeparateGraphPanel() override;
 				void paint(juce::Graphics&) override;
@@ -289,13 +299,16 @@ public:
 				int minZoom = 100;
 				int maxZoom = 5000;
 			private:
+				//
 				class ImageComponent : public Component {
 				public:
+					//
 					ImageComponent(SeparateGraphPanel&, Image&);
 					~ImageComponent() override;
 					void paint(juce::Graphics&) override;
 					void resized() override;
 				private:
+					//
 					void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
 					//
 					SeparateGraphPanel* parent;
@@ -311,6 +324,7 @@ public:
 			class SeparateGraphPanelWindow : public juce::DocumentWindow
 			{
 			public:
+				//
 				SeparateGraphPanelWindow(juce::String name, Image& _image)
 					: DocumentWindow(name,
 						juce::Desktop::getInstance().getDefaultLookAndFeel()
@@ -332,6 +346,7 @@ public:
 				}
 				//
 			private:
+				//
 				JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SeparateGraphPanelWindow)
 			};
 			//
@@ -385,11 +400,13 @@ public:
 	class TitlePanel : public Component
 	{
 	public:
+		//
 		TitlePanel(juce::String&);
 		~TitlePanel() override;
 		void paint(Graphics&) override;
 		void resized() override;
 	private:
+		//
 		juce::String* text;
 		//
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TitlePanel)
@@ -398,6 +415,7 @@ public:
 	class CodeSubComponent : public Component
 	{
 	public:
+		//
 		CodeSubComponent(const std::vector<juce::File>&, map<string, string>, MainComponent&);
 		~CodeSubComponent() override;
 		void paint(Graphics&) override;
@@ -406,6 +424,7 @@ public:
 		//
 		void setFontSize(const int);
 	private:
+		//
 		struct MyTabbedComponent final : public TabbedComponent
 		{
 			MyTabbedComponent(vector<CodeComponent*>&);
@@ -414,7 +433,6 @@ public:
 		};
 		MainComponent* mainComponent;
 		MyTabbedComponent* tabs;
-		//CodeComponent* CodeWindow;
 		vector<CodeComponent*>* codeWindows;
 		//
 		int borderThickness = 2;
@@ -436,6 +454,7 @@ public:
 		//
 		void setFontSize(const int);
 	private:
+		//
 		MainComponent* mainComponent;
 		PerformanceAnalyzer* performanceAnalyzer;
 		int borderThickness = 2;
@@ -448,9 +467,11 @@ public:
 	class AsSubComponent : public Component, public TextEditor::Listener
 	{
 	public:
+		//
 		class ScrollableWindow : public Component, public ScrollBar::Listener
 		{
 		public:
+			//
 			ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&, map<string, juce::Colour>&);
 			~ScrollableWindow();
 			void paint(Graphics&) override;
@@ -464,6 +485,7 @@ public:
 			//
 			int scrollBarWidth = 10;
 		private:
+			//
 			void scrollBarMoved(juce::ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
 			//
 			TraceComponent* TraceWindow;
@@ -475,15 +497,18 @@ public:
 		class OccurancesPanel : public Component, public Button::Listener
 		{
 		public:
+			//
 			OccurancesPanel(AsSubComponent&);
 			~OccurancesPanel();
 			void paint(Graphics&) override;
 			void resized() override;
 			void setPanelNumbers(int, int);
 		private:
+			//
 			class TitlePanel :public Component
 			{
 			public:
+				//
 				TitlePanel(String&);
 				~TitlePanel() override;
 				void paint(Graphics&) override;
@@ -491,6 +516,7 @@ public:
 				void setText(const string&);
 				string getText();
 			private:
+				//
 				String* text;
 				//
 				JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TitlePanel)
@@ -499,12 +525,14 @@ public:
 			class OccuranceNumberPanel : public Component
 			{
 			public:
+				//
 				OccuranceNumberPanel(int);
 				~OccuranceNumberPanel();
 				void paint(Graphics&) override;
 				void resized() override;
 				void setNumber(int);
 			private:
+				//
 				int currentOccurNum;
 				//
 				JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OccuranceNumberPanel)
@@ -523,6 +551,7 @@ public:
 			//
 			JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OccurancesPanel)
 		};
+		//
 		AsSubComponent(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&, map<string, juce::Colour>&, MainComponent&);
 		~AsSubComponent() override;
 		void paint(Graphics&) override;
@@ -539,6 +568,7 @@ public:
 		//
 		void setFontSize(const int);
 	private:
+		//
 		class MyTextEditor : public TextEditor
 		{
 		public:
@@ -546,6 +576,7 @@ public:
 			~MyTextEditor() override;
 			//
 		private:
+			//
 			void returnPressed() override;
 			//
 			MainComponent* mainComponent;
@@ -572,11 +603,13 @@ public:
 	class PlaceholderSubComponent : public Component
 	{
 	public:
+		//
 		PlaceholderSubComponent(String&);
 		~PlaceholderSubComponent() override;
 		void paint(Graphics&) override;
 		void resized() override;
 	private:
+		//
 		String* sectionName;
 		//
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaceholderSubComponent)
@@ -585,11 +618,13 @@ public:
 	class MainPlaceholderSubComponent : public Component
 	{
 	public:
+		//
 		MainPlaceholderSubComponent(const String&);
 		~MainPlaceholderSubComponent() override;
 		void paint(Graphics&) override;
 		void resized() override;
 	private:
+		//
 		String placeholderPictureFilepath;
 		//
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainPlaceholderSubComponent)
@@ -598,6 +633,7 @@ public:
 	class DarkeningComponent : public Component
 	{
 	public:
+		//
 		DarkeningComponent();
 		~DarkeningComponent() override;
 		void paint(Graphics&) override;
@@ -609,6 +645,7 @@ public:
 	class MyAlertWindow : public AlertWindow, public LookAndFeel_V4
 	{
 	public:
+		//
 		MyAlertWindow(const String& title,
 			const String& message,
 			MessageBoxIconType iconType,
@@ -617,6 +654,7 @@ public:
 		Font getAlertWindowTitleFont() override;
 		Font getAlertWindowMessageFont() override;
 	private:
+		//
 		float fontSize;
 	};
 	//
@@ -632,6 +670,7 @@ public:
 	//
 	TSettingsParser::Settings currentSettings;
 private:
+	//
 	void loadSettings();
 	void createProjectFile();
 	void openProjectFile(File);

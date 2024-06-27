@@ -479,10 +479,10 @@ struct MainComponent::PerformanceAnalyzer::MyViewport::MyDragToScrollListener fi
 			offsetX.endDrag();
 			offsetY.endDrag();
 		}
-
+		//
 		viewport.contentHolder.addMouseListener(this, true);
 		Desktop::getInstance().removeGlobalMouseListener(this);
-
+		//
 		isGlobalMouseListener = false;
 	}
 	//
@@ -491,7 +491,6 @@ struct MainComponent::PerformanceAnalyzer::MyViewport::MyDragToScrollListener fi
 		for (auto c = eventComp; c != nullptr && c != &viewport; c = c->getParentComponent())
 			if (c->getViewportIgnoreDragFlag())
 				return true;
-
 		return false;
 	}
 	//
@@ -501,7 +500,7 @@ struct MainComponent::PerformanceAnalyzer::MyViewport::MyDragToScrollListener fi
 	MouseInputSource scrollSource = Desktop::getInstance().getMainMouseSource();
 	bool isDragging = false;
 	bool isGlobalMouseListener = false;
-
+	//
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MyDragToScrollListener)
 };
 //
@@ -513,12 +512,12 @@ MainComponent::PerformanceAnalyzer::MyViewport::MyViewport(const String& name)
 	// content holder is used to clip the contents so they don't overlap the scrollbars
 	addAndMakeVisible(contentHolder);
 	contentHolder.setInterceptsMouseClicks(false, true);
-
+	//
 	scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
-
+	//
 	setInterceptsMouseClicks(false, true);
 	setWantsKeyboardFocus(false);
-
+	//
 	recreateScrollbars();
 }
 //
@@ -529,6 +528,7 @@ MainComponent::PerformanceAnalyzer::MyViewport::~MyViewport()
 //
 //==============================================================================
 void MainComponent::PerformanceAnalyzer::MyViewport::visibleAreaChanged(const Rectangle<int>&) {}
+//
 void MainComponent::PerformanceAnalyzer::MyViewport::viewedComponentChanged(Component*) {}
 //
 //==============================================================================
@@ -537,7 +537,7 @@ void MainComponent::PerformanceAnalyzer::MyViewport::deleteOrRemoveContentComp()
 	if (contentComp != nullptr)
 	{
 		contentComp->removeComponentListener(this);
-
+		//
 		if (deleteContent)
 		{
 			// This sets the content comp to a null pointer before deleting the old one, in case
@@ -560,14 +560,14 @@ void MainComponent::PerformanceAnalyzer::MyViewport::setViewedComponent(Componen
 		deleteOrRemoveContentComp();
 		contentComp = newViewedComponent;
 		deleteContent = deleteComponentWhenNoLongerNeeded;
-
+		//
 		if (contentComp != nullptr)
 		{
 			contentHolder.addAndMakeVisible(contentComp);
 			setViewPosition(Point<int>());
 			contentComp->addComponentListener(this);
 		}
-
+		//
 		viewedComponentChanged(contentComp);
 		updateVisibleArea();
 	}
@@ -577,36 +577,38 @@ void MainComponent::PerformanceAnalyzer::MyViewport::recreateScrollbars()
 {
 	verticalScrollBar.reset();
 	horizontalScrollBar.reset();
-
+	//
 	verticalScrollBar.reset(createScrollBarComponent(true));
 	horizontalScrollBar.reset(createScrollBarComponent(false));
-
+	//
 	addChildComponent(verticalScrollBar.get());
 	addChildComponent(horizontalScrollBar.get());
-
+	//
 	getVerticalScrollBar().addListener(this);
 	getHorizontalScrollBar().addListener(this);
 	getVerticalScrollBar().addMouseListener(this, true);
 	getHorizontalScrollBar().addMouseListener(this, true);
-
+	//
 	resized();
 }
 //
 int MainComponent::PerformanceAnalyzer::MyViewport::getMaximumVisibleWidth() const { return contentHolder.getWidth(); }
+//
 int MainComponent::PerformanceAnalyzer::MyViewport::getMaximumVisibleHeight() const { return contentHolder.getHeight(); }
 //
 bool MainComponent::PerformanceAnalyzer::MyViewport::canScrollVertically() const noexcept { return contentComp->getY() < 0 || contentComp->getBottom() > getHeight(); }
+//
 bool MainComponent::PerformanceAnalyzer::MyViewport::canScrollHorizontally() const noexcept { return contentComp->getX() < 0 || contentComp->getRight() > getWidth(); }
 //
 Point<int> MainComponent::PerformanceAnalyzer::MyViewport::viewportPosToCompPos(Point<int> pos) const
 {
 	jassert(contentComp != nullptr);
-
+	//
 	auto contentBounds = contentHolder.getLocalArea(contentComp.get(), contentComp->getLocalBounds());
-
+	//
 	Point<int> p(jmax(jmin(0, contentHolder.getWidth() - contentBounds.getWidth()), jmin(0, -(pos.x))),
 		jmax(jmin(0, contentHolder.getHeight() - contentBounds.getHeight()), jmin(0, -(pos.y))));
-
+	//
 	return p.transformedBy(contentComp->getTransform().inverted());
 }
 //
@@ -633,7 +635,7 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::autoScroll(const int mouseX
 	if (contentComp != nullptr)
 	{
 		int dx = 0, dy = 0;
-
+		//
 		if (getHorizontalScrollBar().isVisible() || canScrollHorizontally())
 		{
 			if (mouseX < activeBorderThickness)
@@ -646,7 +648,7 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::autoScroll(const int mouseX
 			else
 				dx = jmin(dx, maximumSpeed, -contentComp->getX());
 		}
-
+		//
 		if (getVerticalScrollBar().isVisible() || canScrollVertically())
 		{
 			if (mouseY < activeBorderThickness)
@@ -659,7 +661,7 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::autoScroll(const int mouseX
 			else
 				dy = jmin(dy, maximumSpeed, -contentComp->getY());
 		}
-
+		//
 		if (dx != 0 || dy != 0)
 		{
 			contentComp->setTopLeftPosition(contentComp->getX() + dx,
@@ -668,7 +670,7 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::autoScroll(const int mouseX
 			return true;
 		}
 	}
-
+	//
 	return false;
 }
 //
@@ -710,87 +712,87 @@ void MainComponent::PerformanceAnalyzer::MyViewport::updateVisibleArea()
 	const bool canShowAnyBars = getWidth() > scrollbarWidth && getHeight() > scrollbarWidth;
 	const bool canShowHBar = showHScrollbar && canShowAnyBars;
 	const bool canShowVBar = showVScrollbar && canShowAnyBars;
-
+	//
 	bool hBarVisible = false, vBarVisible = false;
 	Rectangle<int> contentArea;
-
+	//
 	for (int i = 3; --i >= 0;)
 	{
 		hBarVisible = canShowHBar && !getHorizontalScrollBar().autoHides();
 		vBarVisible = canShowVBar && !getVerticalScrollBar().autoHides();
 		contentArea = getLocalBounds();
-
+		//
 		if (contentComp != nullptr && !contentArea.contains(contentComp->getBounds()))
 		{
 			hBarVisible = canShowHBar && (hBarVisible || contentComp->getX() < 0 || contentComp->getRight() > contentArea.getWidth());
 			vBarVisible = canShowVBar && (vBarVisible || contentComp->getY() < 0 || contentComp->getBottom() > contentArea.getHeight());
-
+			//
 			if (vBarVisible)
 				contentArea.setWidth(getWidth() - scrollbarWidth);
-
+			//
 			if (hBarVisible)
 				contentArea.setHeight(getHeight() - scrollbarWidth);
-
+			//
 			if (!contentArea.contains(contentComp->getBounds()))
 			{
 				hBarVisible = canShowHBar && (hBarVisible || contentComp->getRight() > contentArea.getWidth());
 				vBarVisible = canShowVBar && (vBarVisible || contentComp->getBottom() > contentArea.getHeight());
 			}
 		}
-
+		//
 		if (vBarVisible)  contentArea.setWidth(getWidth() - scrollbarWidth);
 		if (hBarVisible)  contentArea.setHeight(getHeight() - scrollbarWidth);
-
+		//
 		if (!vScrollbarRight && vBarVisible)
 			contentArea.setX(scrollbarWidth);
-
+		//
 		if (!hScrollbarBottom && hBarVisible)
 			contentArea.setY(scrollbarWidth);
-
+		//
 		if (contentComp == nullptr)
 		{
 			contentHolder.setBounds(contentArea);
 			break;
 		}
-
+		//
 		auto oldContentBounds = contentComp->getBounds();
 		contentHolder.setBounds(contentArea);
-
+		//
 		// If the content has changed its size, that might affect our scrollbars, so go round again and re-calculate..
 		if (oldContentBounds == contentComp->getBounds())
 			break;
 	}
-
+	//
 	Rectangle<int> contentBounds;
-
+	//
 	if (auto cc = contentComp.get())
 		contentBounds = contentHolder.getLocalArea(cc, cc->getLocalBounds());
-
+	//
 	auto visibleOrigin = -contentBounds.getPosition();
-
+	//
 	auto& hbar = getHorizontalScrollBar();
 	auto& vbar = getVerticalScrollBar();
-
+	//
 	hbar.setBounds(contentArea.getX(), hScrollbarBottom ? contentArea.getHeight() : 0, contentArea.getWidth(), scrollbarWidth);
 	hbar.setRangeLimits(0.0, contentBounds.getWidth());
 	hbar.setCurrentRange(visibleOrigin.x, contentArea.getWidth());
 	hbar.setSingleStepSize(singleStepX);
-
+	//
 	if (canShowHBar && !hBarVisible)
 		visibleOrigin.setX(0);
-
+	//
 	vbar.setBounds(vScrollbarRight ? contentArea.getWidth() : 0, contentArea.getY(), scrollbarWidth, contentArea.getHeight());
 	vbar.setRangeLimits(0.0, contentBounds.getHeight());
 	vbar.setCurrentRange(visibleOrigin.y, contentArea.getHeight());
 	vbar.setSingleStepSize(singleStepY);
-
+	//
 	if (canShowVBar && !vBarVisible)
 		visibleOrigin.setY(0);
-
+	//
 	// Force the visibility *after* setting the ranges to avoid flicker caused by edge conditions in the numbers.
 	hbar.setVisible(hBarVisible);
 	vbar.setVisible(vBarVisible);
-
+	//
 	if (contentComp != nullptr)
 	{
 		auto newContentCompPos = viewportPosToCompPos(visibleOrigin);
@@ -801,17 +803,17 @@ void MainComponent::PerformanceAnalyzer::MyViewport::updateVisibleArea()
 			return;
 		}
 	}
-
+	//
 	const Rectangle<int> visibleArea(visibleOrigin.x, visibleOrigin.y,
 		jmin(contentBounds.getWidth() - visibleOrigin.x, contentArea.getWidth()),
 		jmin(contentBounds.getHeight() - visibleOrigin.y, contentArea.getHeight()));
-
+	//
 	if (lastVisibleArea != visibleArea)
 	{
 		lastVisibleArea = visibleArea;
 		visibleAreaChanged(visibleArea);
 	}
-
+	//
 	hbar.handleUpdateNowIfNeeded();
 	vbar.handleUpdateNowIfNeeded();
 }
@@ -834,7 +836,7 @@ void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarsShown(const bo
 {
 	allowScrollingWithoutScrollbarV = allowVerticalScrollingWithoutScrollbar;
 	allowScrollingWithoutScrollbarH = allowHorizontalScrollingWithoutScrollbar;
-
+	//
 	if (showVScrollbar != showVerticalScrollbarIfNeeded
 		|| showHScrollbar != showHorizontalScrollbarIfNeeded)
 	{
@@ -847,7 +849,7 @@ void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarsShown(const bo
 void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarThickness(const int thickness)
 {
 	int newThickness;
-
+	//
 	// To stay compatible with the previous code: use the
 	// default thickness if thickness parameter is zero
 	// or negative
@@ -861,7 +863,7 @@ void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarThickness(const
 		customScrollBarThickness = true;
 		newThickness = thickness;
 	}
-
+	//
 	if (scrollBarThickness != newThickness)
 	{
 		scrollBarThickness = newThickness;
@@ -877,7 +879,7 @@ int MainComponent::PerformanceAnalyzer::MyViewport::getScrollBarThickness() cons
 void MainComponent::PerformanceAnalyzer::MyViewport::scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart)
 {
 	auto newRangeStartInt = roundToInt(newRangeStart);
-
+	//
 	if (scrollBarThatHasMoved == horizontalScrollBar.get())
 	{
 		setViewPosition(newRangeStartInt, getViewPositionY());
@@ -905,9 +907,9 @@ static int rescaleMouseWheelDistance(float distance, int singleStepSize) noexcep
 {
 	if (approximatelyEqual(distance, 0.0f))
 		return 0;
-
+	//
 	distance *= 14.0f * (float)singleStepSize;
-
+	//
 	return roundToInt(distance < 0 ? jmin(distance, -1.0f)
 		: jmax(distance, 1.0f));
 }
@@ -918,14 +920,14 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::useMouseWheelMoveIfNeeded(c
 	{
 		const bool canScrollVert = (allowScrollingWithoutScrollbarV || getVerticalScrollBar().isVisible());
 		const bool canScrollHorz = (allowScrollingWithoutScrollbarH || getHorizontalScrollBar().isVisible());
-
+		//
 		if (canScrollHorz || canScrollVert)
 		{
 			auto deltaX = rescaleMouseWheelDistance(wheel.deltaX, singleStepX);
 			auto deltaY = rescaleMouseWheelDistance(wheel.deltaY, singleStepY);
-
+			//
 			auto pos = getViewPosition();
-
+			//
 			if (deltaX != 0 && deltaY != 0 && canScrollHorz && canScrollVert)
 			{
 				pos.x -= deltaX;
@@ -939,7 +941,7 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::useMouseWheelMoveIfNeeded(c
 			{
 				pos.y -= deltaY;
 			}
-
+			//
 			if (pos != getViewPosition())
 			{
 				setViewPosition(pos);
@@ -947,7 +949,7 @@ bool MainComponent::PerformanceAnalyzer::MyViewport::useMouseWheelMoveIfNeeded(c
 			}
 		}
 	}
-
+	//
 	return false;
 }
 //
@@ -970,15 +972,15 @@ static bool isLeftRightKeyPress(const KeyPress& key)
 bool MainComponent::PerformanceAnalyzer::MyViewport::keyPressed(const KeyPress& key)
 {
 	const bool isUpDownKey = isUpDownKeyPress(key);
-
+	//
 	if (getVerticalScrollBar().isVisible() && isUpDownKey)
 		return getVerticalScrollBar().keyPressed(key);
-
+	//
 	const bool isLeftRightKey = isLeftRightKeyPress(key);
-
+	//
 	if (getHorizontalScrollBar().isVisible() && (isUpDownKey || isLeftRightKey))
 		return getHorizontalScrollBar().keyPressed(key);
-
+	//
 	return false;
 }
 //
@@ -997,7 +999,7 @@ void MainComponent::PerformanceAnalyzer::MyViewport::setScrollBarPosition(bool v
 {
 	vScrollbarRight = verticalScrollbarOnRight;
 	hScrollbarBottom = horizontalScrollbarAtBottom;
-
+	//
 	resized();
 }
 //
@@ -1017,7 +1019,7 @@ MainComponent::PerformanceAnalyzer::ProfileGraphPanel::~ProfileGraphPanel() {
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::paint(juce::Graphics& g) {
 	g.fillAll(Colours::white);
 	g.setOpacity(1.0f);
-
+	//
 	if (picture.isNull())  g.drawText(NoGraphviz, getLocalBounds(), Justification::centred, true);
 	else g.drawImage(picture, 0, 0, min(getWidth(), picture.getWidth()), min(getHeight(), picture.getHeight()), 0, 0, picture.getWidth(), picture.getHeight());
 }
@@ -1039,6 +1041,7 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseWheelMove(const
 		if (wheel.deltaY < 0) {
 			if ((getWidth() - zoomStep > getParentWidth()) && (getHeight() - zoomStep > getParentHeight())) setSize(getWidth() - zoomStep, getHeight() - zoomStep);
 		}
+		//
 		if (wheel.deltaY > 0) {
 			if ((getWidth() + zoomStep < maxZoom) && (getHeight() + zoomStep < maxZoom)) setSize(getWidth() + zoomStep, getHeight() + zoomStep);
 		}
@@ -1097,6 +1100,7 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::
 		if (wheel.deltaY < 0) {
 			if ((getWidth() - parent->zoomStep > parent->minZoom) && (getHeight() - parent->zoomStep > parent->minZoom)) setSize(getWidth() - parent->zoomStep, getHeight() - parent->zoomStep);
 		}
+		//
 		if (wheel.deltaY > 0) {
 			if ((getWidth() + parent->zoomStep < parent->maxZoom) && (getHeight() + parent->zoomStep < parent->maxZoom)) setSize(getWidth() + parent->zoomStep, getHeight() + parent->zoomStep);
 		}
@@ -1365,22 +1369,21 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
 	g.setColour(Colour(37, 11, 46));
 	g.fillRect(0, 0, width, height);
 	auto highlightColour = header.findColour(TableHeaderComponent::highlightColourId);
-
+	//
 	if (isMouseDown)
 		g.fillAll(highlightColour);
 	else if (isMouseOver)
 		g.fillAll(highlightColour.withMultipliedAlpha(0.625f));
-
+	//
 	Rectangle<int> area(width, height);
 	area.reduce(4, 0);
-
+	//
 	if ((columnFlags & (TableHeaderComponent::sortedForwards | TableHeaderComponent::sortedBackwards)) != 0)
 	{
 		Path sortArrow;
 		sortArrow.addTriangle(0.0f, 0.0f,
 			0.5f, (columnFlags & TableHeaderComponent::sortedForwards) != 0 ? -0.8f : 0.8f,
 			1.0f, 0.0f);
-
 		g.setColour(juce::Colours::hotpink);
 		g.fillPath(sortArrow, sortArrow.getTransformToScaleToFit(area.removeFromRight(height / 2).reduced(2).toFloat(), true));
 	}
@@ -1418,13 +1421,12 @@ void MainComponent::TitlePanel::paint(Graphics& g)
 	g.setColour(Colours::white);
 	juce::Font font("Candara", 25.0f, juce::Font::FontStyleFlags::plain);
 	g.setFont(font);
-
+	//
 	g.drawText(*text, getLocalBounds(), Justification::centred, true);
 }
 //
 void MainComponent::TitlePanel::resized()
-{
-}
+{}
 //
 MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>& funcColours, map<string, juce::Colour>& funcColoursTemp) {
 	scrollBar = new juce::ScrollBar(true);
@@ -1686,7 +1688,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	for (set<string>::iterator it = funcNames.begin(); it != funcNames.end(); it++) {
 		string funcName = *it;
 		int occurancesNum = scrollableWindow->getNumberOfOccurances(funcName);
-
+		//
 		if (funcName != "") {
 			funcOccurances->insert({ funcName, occurancesNum });
 			//
