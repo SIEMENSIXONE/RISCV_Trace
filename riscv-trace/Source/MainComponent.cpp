@@ -494,7 +494,7 @@ struct MainComponent::PerformanceAnalyzer::MyViewport::MyDragToScrollListener fi
 
 		return false;
 	}
-
+	//
 	MyViewport& viewport;
 	MyViewportDragPosition offsetX, offsetY;
 	Point<int> originalViewPos;
@@ -517,7 +517,7 @@ MainComponent::PerformanceAnalyzer::MyViewport::MyViewport(const String& name)
 	scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
 
 	setInterceptsMouseClicks(false, true);
-	setWantsKeyboardFocus(true);
+	setWantsKeyboardFocus(false);
 
 	recreateScrollbars();
 }
@@ -1035,11 +1035,13 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseDoubleClick(con
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
 	//
-	if (wheel.deltaY < 0) {
-		if ((getWidth() - zoomStep > getParentWidth()) && (getHeight() - zoomStep > getParentHeight())) setSize(getWidth() - zoomStep, getHeight() - zoomStep);
-	}
-	if (wheel.deltaY > 0) {
-		if ((getWidth() + zoomStep < maxZoom) && (getHeight() + zoomStep < maxZoom)) setSize(getWidth() + zoomStep, getHeight() + zoomStep);
+	if (ModifierKeys::currentModifiers.isCtrlDown()) {
+		if (wheel.deltaY < 0) {
+			if ((getWidth() - zoomStep > getParentWidth()) && (getHeight() - zoomStep > getParentHeight())) setSize(getWidth() - zoomStep, getHeight() - zoomStep);
+		}
+		if (wheel.deltaY > 0) {
+			if ((getWidth() + zoomStep < maxZoom) && (getHeight() + zoomStep < maxZoom)) setSize(getWidth() + zoomStep, getHeight() + zoomStep);
+		}
 	}
 }
 //
@@ -1091,21 +1093,25 @@ void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::ImageComponent::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
-	if (wheel.deltaY < 0) {
-		if ((getWidth() - parent->zoomStep > parent->minZoom) && (getHeight() - parent->zoomStep > parent->minZoom)) setSize(getWidth() - parent->zoomStep, getHeight() - parent->zoomStep);
-	}
-	if (wheel.deltaY > 0) {
-		if ((getWidth() + parent->zoomStep < parent->maxZoom) && (getHeight() + parent->zoomStep < parent->maxZoom)) setSize(getWidth() + parent->zoomStep, getHeight() + parent->zoomStep);
+	if (ModifierKeys::currentModifiers.isCtrlDown()) {
+		if (wheel.deltaY < 0) {
+			if ((getWidth() - parent->zoomStep > parent->minZoom) && (getHeight() - parent->zoomStep > parent->minZoom)) setSize(getWidth() - parent->zoomStep, getHeight() - parent->zoomStep);
+		}
+		if (wheel.deltaY > 0) {
+			if ((getWidth() + parent->zoomStep < parent->maxZoom) && (getHeight() + parent->zoomStep < parent->maxZoom)) setSize(getWidth() + parent->zoomStep, getHeight() + parent->zoomStep);
+		}
 	}
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileGraphPanel::SeparateGraphPanel::mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) {
-	if (wheel.deltaY < 0) {
-		if ((imageComponent->getWidth() - zoomStep > minZoom) && (imageComponent->getHeight() - zoomStep > minZoom)) imageComponent->setSize(imageComponent->getWidth() - zoomStep, imageComponent->getHeight() - zoomStep);
-	}
-	//
-	if (wheel.deltaY > 0) {
-		if ((imageComponent->getWidth() + zoomStep < maxZoom) && (imageComponent->getHeight() + zoomStep < maxZoom)) imageComponent->setSize(imageComponent->getWidth() + zoomStep, imageComponent->getHeight() + zoomStep);
+	if (ModifierKeys::currentModifiers.isCtrlDown()) {
+		if (wheel.deltaY < 0) {
+			if ((imageComponent->getWidth() - zoomStep > minZoom) && (imageComponent->getHeight() - zoomStep > minZoom)) imageComponent->setSize(imageComponent->getWidth() - zoomStep, imageComponent->getHeight() - zoomStep);
+		}
+		//
+		if (wheel.deltaY > 0) {
+			if ((imageComponent->getWidth() + zoomStep < maxZoom) && (imageComponent->getHeight() + zoomStep < maxZoom)) imageComponent->setSize(imageComponent->getWidth() + zoomStep, imageComponent->getHeight() + zoomStep);
+		}
 	}
 }
 //

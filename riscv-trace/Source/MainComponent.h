@@ -52,7 +52,7 @@ public:
 		struct JUCE_API  LookAndFeelMethods
 		{
 			virtual ~LookAndFeelMethods() = default;
-
+			//
 			virtual void drawStretchableLayoutResizerBar(Graphics&, int w, int h,
 				bool isVerticalBar, bool isMouseOver, bool isMouseDragging) = 0;
 		};
@@ -89,7 +89,7 @@ public:
 			struct MyViewportHelpers
 			{
 				MyViewportHelpers() = delete;
-
+				//
 				static bool wouldScrollOnEvent(const MyViewport* vp, const MouseInputSource& src)
 				{
 					if (vp != nullptr)
@@ -101,7 +101,7 @@ public:
 						case MyViewport::ScrollOnDragMode::never:         return false;
 						}
 					}
-
+					//
 					return false;
 				}
 			};
@@ -174,7 +174,6 @@ public:
 			/** @internal */
 			void mouseDown(const MouseEvent& e) override;
 			//
-			//void mouseDrag(const MouseEvent&) override;
 			/** @internal */
 			bool keyPressed(const KeyPress&) override;
 			/** @internal */
