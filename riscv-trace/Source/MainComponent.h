@@ -513,8 +513,6 @@ public:
 				~TitlePanel() override;
 				void paint(Graphics&) override;
 				void resized() override;
-				void setText(const string&);
-				string getText();
 			private:
 				//
 				String* text;
