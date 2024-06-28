@@ -289,17 +289,20 @@ void TraceComponent::setTopLine(int val) {
 	}
 	//
 	set<string> presentedFuncs;
+	string lastFunc = "";
 	//
 	for (int i = topLine; i < min((topLine + maxLinesOnScreen) + 1, (int)FTraceLines->size()); i++) {
 		string func = FTraceLines->at(i)->getFuncName();
 		//
-		if (presentedFuncs.find(func) == presentedFuncs.end()) {
-			presentedFuncs.insert(func);
+		if (func != lastFunc){
+		//if (presentedFuncs.find(func) == presentedFuncs.end()) {
+			//presentedFuncs.insert(func);
 			FTraceLines->at(i)->setOnScreen(true);
 		}
 		else {
 			FTraceLines->at(i)->setOnScreen(false);
 		}
+		lastFunc = func;
 		addAndMakeVisible(*(FTraceLines->at(i)));
 	}
 	//
