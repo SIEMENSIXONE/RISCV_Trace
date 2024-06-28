@@ -65,9 +65,9 @@ public:
         void resized() override;
         string getFuncName();
         void setSelected(bool);
-        void setOnScreen(bool);
+        void setShouldDisplayFuncName(bool);
         bool isSelected();
-        bool isOnScreen();
+        bool getShouldDisplayFuncName();
         TraceParser::TraceLineStruct getLineInfo();
         //
     private:
@@ -85,7 +85,7 @@ public:
         TraceLineElement *instr;
         //
         bool isLineSelected = false;
-        bool isLineOnScreen = false;
+        bool shouldDisplayFuncName = false;
         TraceComponent* traceComp;
         //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLine)

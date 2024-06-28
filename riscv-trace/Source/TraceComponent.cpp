@@ -81,7 +81,7 @@ void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
 		g.setFont(juce::Font(fontTypeface, (float)traceComp->fontSize / (float)1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold));
 		g.drawText("CALL ->", getLocalBounds(), textJustification, true);
 	}
-	else if (traceLine->isOnScreen()) {
+	else if (traceLine->getShouldDisplayFuncName()) {
 		if (text != "") {
 			if (firstLine) {
 				g.setColour(textColor);
@@ -185,16 +185,16 @@ void TraceComponent::TraceLine::setSelected(bool isSelected) {
 	isLineSelected = isSelected;
 }
 //
-void TraceComponent::TraceLine::setOnScreen(bool isVisible) {
-	isLineOnScreen = isVisible;
+void TraceComponent::TraceLine::setShouldDisplayFuncName(bool isVisible) {
+	shouldDisplayFuncName = isVisible;
 }
 //
 bool TraceComponent::TraceLine::isSelected() {
 	return isLineSelected;
 }
 //
-bool TraceComponent::TraceLine::isOnScreen() {
-	return isLineOnScreen;
+bool TraceComponent::TraceLine::getShouldDisplayFuncName() {
+	return shouldDisplayFuncName;
 }
 //
 TraceParser::TraceLineStruct TraceComponent::TraceLine::getLineInfo() {
@@ -288,19 +288,16 @@ void TraceComponent::setTopLine(int val) {
 		topLine = val;
 	}
 	//
-	set<string> presentedFuncs;
 	string lastFunc = "";
 	//
 	for (int i = topLine; i < min((topLine + maxLinesOnScreen) + 1, (int)FTraceLines->size()); i++) {
 		string func = FTraceLines->at(i)->getFuncName();
 		//
 		if (func != lastFunc){
-		//if (presentedFuncs.find(func) == presentedFuncs.end()) {
-			//presentedFuncs.insert(func);
-			FTraceLines->at(i)->setOnScreen(true);
+			FTraceLines->at(i)->setShouldDisplayFuncName(true);
 		}
 		else {
-			FTraceLines->at(i)->setOnScreen(false);
+			FTraceLines->at(i)->setShouldDisplayFuncName(false);
 		}
 		lastFunc = func;
 		addAndMakeVisible(*(FTraceLines->at(i)));
