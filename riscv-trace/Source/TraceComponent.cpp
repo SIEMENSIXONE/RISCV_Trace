@@ -81,19 +81,17 @@ void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
 		g.setFont(juce::Font(fontTypeface, (float)traceComp->fontSize / (float)1.4, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::bold));
 		g.drawText("CALL ->", getLocalBounds(), textJustification, true);
 	}
+	else if (firstLine) {
+		g.setColour(textColor);
+		juce::Font font(fontTypeface, (float)traceComp->fontSize, fontStyle);
+		g.setFont(font);
+		g.drawText(text, getLocalBounds(), textJustification, true);
+	}
 	else if (traceLine->getShouldDisplayFuncName()) {
 		if (text != "") {
-			if (firstLine) {
-				g.setColour(textColor);
-				juce::Font font(fontTypeface, (float)traceComp->fontSize, fontStyle);
-				g.setFont(font);
-				g.drawText(text, getLocalBounds(), textJustification, true);
-			}
-			else {
-				g.setColour(juce::Colours::white);
-				g.setFont(juce::Font(fontTypeface, (float)traceComp->fontSize / (float)1.2, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::plain));
-				g.drawText("[" + text + "]", getLocalBounds(), textJustification, true);
-			}
+			g.setColour(juce::Colours::white);
+			g.setFont(juce::Font(fontTypeface, (float)traceComp->fontSize / (float)1.2, juce::Font::FontStyleFlags::italic | juce::Font::FontStyleFlags::plain));
+			g.drawText("[" + text + "]", getLocalBounds(), textJustification, true);
 		}
 	}
 }
@@ -293,7 +291,7 @@ void TraceComponent::setTopLine(int val) {
 	for (int i = topLine; i < min((topLine + maxLinesOnScreen) + 1, (int)FTraceLines->size()); i++) {
 		string func = FTraceLines->at(i)->getFuncName();
 		//
-		if (func != lastFunc){
+		if (func != lastFunc) {
 			FTraceLines->at(i)->setShouldDisplayFuncName(true);
 		}
 		else {

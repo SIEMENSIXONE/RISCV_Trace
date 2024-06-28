@@ -218,7 +218,7 @@ string TObjdumpParser::parseFuncName(const string& str) {
 		//
 		if (c == '+') return "";
 		if (c == '-') return "";
-		if (c == '.') return "";
+		//!!! if (c == '.') return "";
 		//
 		name += c;
 	}
