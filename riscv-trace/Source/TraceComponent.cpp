@@ -100,7 +100,7 @@ void TraceComponent::TraceLine::TraceFuncElement::mouseEnter(const juce::MouseEv
 	if (text != "") traceComp->tooltipWindow->displayTip(mouseEvent.getScreenPosition(), text);
 }
 //
-void TraceComponent::TraceLine::TraceFuncElement::mouseExit(const juce::MouseEvent& mouseEvent) {
+void TraceComponent::TraceLine::TraceFuncElement::mouseExit(const juce::MouseEvent& /*mouseEvent*/) {
 	traceComp->tooltipWindow->hideTip();
 }
 //

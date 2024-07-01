@@ -2009,8 +2009,8 @@ void MainComponent::MainPlaceholderSubComponent::resized() {
 	int buttonsDistance = 30;
 	//
 	logoArea = Rectangle<float>((float)0, (float)(getHeight() / 4), (float)getWidth(), logoAreaHeight);
-	buttonsArea = Rectangle<int>(getWidth() / 2 - buttonsWidth/2, logoArea.getBottom(), buttonsWidth, buttonsAreaHeight);
-	textArea = Rectangle<float>((float)0, buttonsArea.getBottom(), (float)getWidth(), textAreaHeight);
+	buttonsArea = Rectangle<int>((int)getWidth() / 2 - buttonsWidth / 2, (int)logoArea.getBottom(), buttonsWidth, buttonsAreaHeight);
+	textArea = Rectangle<float>((float)0, (float)buttonsArea.getBottom(), (float)getWidth(), (float)textAreaHeight);
 	//
 	createProjectButton->setButtonText(WelcomeButtonCreateProject);
 	openProjectButton->setButtonText(WelcomeButtonOpenProject);
@@ -2019,17 +2019,17 @@ void MainComponent::MainPlaceholderSubComponent::resized() {
 	openProjectButton->setBounds(buttonsArea.getX(), createProjectButton->getBottom() + buttonsDistance / 6, buttonsArea.getWidth(), (buttonsAreaHeight - buttonsDistance) / 2 - buttonsDistance);
 }
 //
-void MainComponent::MainPlaceholderSubComponent::buttonClicked(Button * button)
+void MainComponent::MainPlaceholderSubComponent::buttonClicked(Button* button)
 {
-    if (button == openProjectButton)
-    {
-        mainComponent->chooseProjectFile();
-    }
-    //
-    if (button == createProjectButton)
-    {
+	if (button == openProjectButton)
+	{
+		mainComponent->chooseProjectFile();
+	}
+	//
+	if (button == createProjectButton)
+	{
 		mainComponent->createProjectFile();
-    }
+	}
 }
 //
 MainComponent::DarkeningComponent::DarkeningComponent() {}
