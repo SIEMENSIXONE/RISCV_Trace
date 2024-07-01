@@ -1540,13 +1540,14 @@ void MainComponent::AsSubComponent::OccurancesPanel::paint(Graphics& g) {
 }
 //
 void MainComponent::AsSubComponent::OccurancesPanel::resized() {
+	int margin = 4;
 	Rectangle<int> area = Rectangle<int>(0, 0, getWidth(), getHeight());
 	using Track = Grid::TrackInfo;
 	using Fr = Grid::Fr;
 	Grid grid;
 	grid.templateRows = { Track(Fr(1)) };
 	grid.templateColumns = { Track(Fr(1)), Track(Fr(1)), Track(Fr(4)), Track(Fr(1)), Track(Fr(4)), Track(Fr(1)) };
-	grid.items = { GridItem(decrButton), GridItem(incrButton), GridItem(occuranceTitlePanel), GridItem(numPanel), GridItem(outOfPanel), GridItem(totalPanel) };
+	grid.items = { GridItem(decrButton).withMargin(margin), GridItem(incrButton).withMargin(margin), GridItem(occuranceTitlePanel), GridItem(numPanel).withMargin(margin), GridItem(outOfPanel), GridItem(totalPanel).withMargin(margin)};
 	grid.performLayout(area);
 }
 //
@@ -1706,6 +1707,7 @@ MainComponent::AsSubComponent::AsSubComponent(vector<TraceParser::TraceLineStruc
 	//
 	functionsComboBox->onChange = [this] {
 		selectedFunction = functionsComboBox->getText().toStdString();
+
 		mainComponent->setSelectedFunc(selectedFunction, 1);
 		searchField->clear();
 		//
@@ -1727,11 +1729,14 @@ MainComponent::AsSubComponent::~AsSubComponent() {
 }
 //
 void MainComponent::AsSubComponent::paint(Graphics& g) {
-	g.fillAll(Colours::white);
+	//g.fillAll( Colour(37, 11, 46));
+	g.fillAll(Colour(94, 60, 82));
 }
 //
 void MainComponent::AsSubComponent::resized() {
+	//
 	int titleHeight = 50;
+	int margin = 4;
 	//
 	Rectangle<int> titleArea(0, 0, getWidth(), titleHeight);
 	Rectangle<int> mainArea(0, titleHeight, getWidth(), getHeight() - titleHeight);
@@ -1743,8 +1748,12 @@ void MainComponent::AsSubComponent::resized() {
 	Grid grid;
 	grid.templateRows = { Track(Fr(3)),Track(Fr(3)),Track(Fr(3)), Track(Fr(80)) };
 	grid.templateColumns = { Track(Fr(1)) };
-	grid.items = { GridItem(functionsComboBox),GridItem(searchField), GridItem(occurancesPanel), GridItem(scrollableWindow) };
+	grid.items = { GridItem(functionsComboBox).withMargin(margin),GridItem(searchField).withMargin(margin), GridItem(occurancesPanel), GridItem(scrollableWindow)};
 	grid.performLayout(mainArea);
+	//
+	juce::Font font("Courier New", (float) ((double) searchField->getHeight() / (double) 1.5), juce::Font::FontStyleFlags::plain);
+	searchField->setFont(font);
+
 }
 //
 void MainComponent::AsSubComponent::selectFuncInCombobox(const string& funcName) {
@@ -1803,10 +1812,10 @@ map<string, juce::Colour> MainComponent::AsSubComponent::getFuncColoursMap() {
 	return scrollableWindow->getFuncColoursMap();
 }
 //
-void MainComponent::AsSubComponent::setFontSize(const int size) {
-	if (size < 0) return;
+void MainComponent::AsSubComponent::setFontSize(const int traceFontSize) {
+	if (traceFontSize < 0) return;
 	//
-	scrollableWindow->setFontSize(size);
+	scrollableWindow->setFontSize(traceFontSize);
 	searchField->setTextToShowWhenEmpty(SearchFieldText, Colours::black);
 	functionsComboBox->setText(FunctionsDropdownText);
 }
