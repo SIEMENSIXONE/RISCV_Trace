@@ -261,15 +261,15 @@ public:
 			void selectedRowsChanged(int lastRowSelected) override;
 			//
 			MainComponent* mainComponent = nullptr;
-			TableListBox box;
+			TableListBox analyzerTable;
 			MyLookAndFeel* myLookAndFeel = nullptr;
-			vector<array<std::string, 6>>* data;
+			vector<array<std::string, 6>>* analyzerTableData;
 			string selectedFunc = "";
 			map<string, juce::Colour> funcColoursMap;
 			map<string, juce::Colour> funcColoursTempMap;
 			map<int, juce::Colour> rowsColoursMap;
 			map<int, juce::Colour> rowsColoursTempMap;
-			int selectedRow = -1;
+			int selectedRowNumber = -1;
 			//
 			int fontSize = 12;
 		};
@@ -472,7 +472,7 @@ public:
 		{
 		public:
 			//
-			ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>& addrFuncMap, map<string, juce::Colour>&, map<string, juce::Colour>&);
+			ScrollableWindow(vector<TraceParser::TraceLineStruct>& vec, map<string, string>&, map<string, juce::Colour>&, map<string, juce::Colour>&);
 			~ScrollableWindow();
 			void paint(Graphics&) override;
 			void resized() override;
@@ -488,7 +488,7 @@ public:
 			//
 			void scrollBarMoved(juce::ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
 			//
-			TraceComponent* TraceWindow;
+			TraceComponent* traceWindow;
 			ScrollBar* scrollBar = nullptr;
 			//
 			JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScrollableWindow)

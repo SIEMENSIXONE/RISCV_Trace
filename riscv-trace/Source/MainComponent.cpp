@@ -513,11 +513,11 @@ MainComponent::PerformanceAnalyzer::MyViewport::MyViewport(const String& name)
 {
 	// content holder is used to clip the contents so they don't overlap the scrollbars
 	addAndMakeVisible(contentHolder);
-	contentHolder.setInterceptsMouseClicks(false, true);
+	contentHolder.setInterceptsMouseClicks(true, true);
 	//
 	scrollBarThickness = getLookAndFeel().getDefaultScrollbarWidth();
 	//
-	setInterceptsMouseClicks(false, true);
+	setInterceptsMouseClicks(true, true);
 	setWantsKeyboardFocus(false);
 	//
 	recreateScrollbars();
@@ -1137,7 +1137,7 @@ void MainComponent::PerformanceAnalyzer::MyTabbedComponent::updateTabNames() {
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std::string, 6>>& _data, map<string, juce::Colour>& _funcColoursMap, map<string, juce::Colour>& _funcColoursTempMap, MainComponent& _mainComponent) {
 	//
-	data = &_data;
+	analyzerTableData = &_data;
 	mainComponent = &_mainComponent;
 	funcColoursMap = _funcColoursMap;
 	funcColoursTempMap = _funcColoursTempMap;
@@ -1147,35 +1147,35 @@ MainComponent::PerformanceAnalyzer::ProfileTable::ProfileTable(vector<array<std:
 	//
 	refreshRowsColoursMap();
 	//
-	box.setModel(this);
-	box.setColour(ListBox::backgroundColourId, Colour(94, 60, 82));
-	box.setRowHeight(30);
+	analyzerTable.setModel(this);
+	analyzerTable.setColour(ListBox::backgroundColourId, Colour(94, 60, 82));
+	analyzerTable.setRowHeight(30);
 	//
 	int width = getWidth();
 	if (width <= 0) width = 7;
 	int singleColumnWidth = width / 7;
 	//
-	box.setHeaderHeight(50);
+	analyzerTable.setHeaderHeight(50);
 	//
-	box.getHeader().addColumn(TableNameColomnTitleText, 1, 2 * singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
-	box.getHeader().addColumn(TableTimeColomnTitleText, 2, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
-	box.getHeader().addColumn(TableTimePrecentColomnTitleText, 3, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
-	box.getHeader().addColumn(TableCalledColomnTitleText, 4, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
-	box.getHeader().addColumn(TableChildrenColomnTitleText, 5, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
-	box.getHeader().addColumn(TableSelfColomnTitleText, 6, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
-	box.getHeader().setLookAndFeel(myLookAndFeel);
-	box.getHeader().setPopupMenuActive(false);
+	analyzerTable.getHeader().addColumn(TableNameColomnTitleText, 1, 2 * singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	analyzerTable.getHeader().addColumn(TableTimeColomnTitleText, 2, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	analyzerTable.getHeader().addColumn(TableTimePrecentColomnTitleText, 3, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	analyzerTable.getHeader().addColumn(TableCalledColomnTitleText, 4, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	analyzerTable.getHeader().addColumn(TableChildrenColomnTitleText, 5, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	analyzerTable.getHeader().addColumn(TableSelfColomnTitleText, 6, singleColumnWidth, 5, -1, TableHeaderComponent::ColumnPropertyFlags::visible /*| TableHeaderComponent::ColumnPropertyFlags::resizable*/ | TableHeaderComponent::ColumnPropertyFlags::sortable);
+	analyzerTable.getHeader().setLookAndFeel(myLookAndFeel);
+	analyzerTable.getHeader().setPopupMenuActive(false);
 	//
-	box.getVerticalScrollBar().setVisible(true);
-	box.getVerticalScrollBar().setAutoHide(true);
-	box.getVerticalScrollBar().setColour(Slider::ColourIds::thumbColourId, Colour(187, 148, 174));
+	analyzerTable.getVerticalScrollBar().setVisible(true);
+	analyzerTable.getVerticalScrollBar().setAutoHide(true);
+	analyzerTable.getVerticalScrollBar().setColour(Slider::ColourIds::thumbColourId, Colour(187, 148, 174));
 	//
-	addAndMakeVisible(box);
+	addAndMakeVisible(analyzerTable);
 	//
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::~ProfileTable() {
-	box.getHeader().setLookAndFeel(nullptr);
+	analyzerTable.getHeader().setLookAndFeel(nullptr);
 	if (myLookAndFeel != nullptr) delete(myLookAndFeel);
 }
 //
@@ -1186,7 +1186,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintRowBackground(Graphi
 	if (rowIsSelected) g.setColour(juce::Colours::lightpink);
 	g.fillRect(0, 0, width, height);
 	//!!!
-	box.getHorizontalScrollBar().setVisible(false);
+	analyzerTable.getHorizontalScrollBar().setVisible(false);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/)
@@ -1197,7 +1197,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::paintCell(Graphics& g, in
 	juce::Font font(fontTypeface, (float)fontSize, fontStyle);
 	g.setFont(font);
 	g.setColour(juce::Colours::black);
-	std::string val = (data->at(rowNumber)).at(columnId - 1);
+	std::string val = (analyzerTableData->at(rowNumber)).at(columnId - 1);
 	g.setColour(Colours::white);
 	g.drawText(val, 2, 0, width - 4, height, Justification::centred, true);
 	g.setColour(juce::Colours::white);
@@ -1214,33 +1214,33 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::sortOrderChanged(int newS
 		bool changesFlag = true;
 		while (changesFlag) {
 			changesFlag = false;
-			for (int i = 0; i < data->size() - 1; i++) {
+			for (int i = 0; i < analyzerTableData->size() - 1; i++) {
 				if (!isForwards)
 				{
 					if (newSortColumnId == 1) {
-						string val1 = data->at(i)[newSortColumnId - 1];
-						string val2 = data->at(i + 1)[newSortColumnId - 1];
+						string val1 = analyzerTableData->at(i)[newSortColumnId - 1];
+						string val2 = analyzerTableData->at(i + 1)[newSortColumnId - 1];
 						//
 						if (val1 < val2) {
-							array<std::string, 6> tmp = data->at(i);
-							data->at(i) = data->at(i + 1);
-							data->at(i + 1) = tmp;
+							array<std::string, 6> tmp = analyzerTableData->at(i);
+							analyzerTableData->at(i) = analyzerTableData->at(i + 1);
+							analyzerTableData->at(i + 1) = tmp;
 							//
 							changesFlag = true;
 						}
 					}
 					else
 					{
-						string val1 = data->at(i)[newSortColumnId - 1];
-						string val2 = data->at(i + 1)[newSortColumnId - 1];
+						string val1 = analyzerTableData->at(i)[newSortColumnId - 1];
+						string val2 = analyzerTableData->at(i + 1)[newSortColumnId - 1];
 						int compVal1 = -1;
 						int compVal2 = -1;
 						if (val1 != "-") compVal1 = stoi(val1);
 						if (val2 != "-") compVal2 = stoi(val2);
 						if (compVal1 < compVal2) {
-							array<std::string, 6> tmp = data->at(i);
-							data->at(i) = data->at(i + 1);
-							data->at(i + 1) = tmp;
+							array<std::string, 6> tmp = analyzerTableData->at(i);
+							analyzerTableData->at(i) = analyzerTableData->at(i + 1);
+							analyzerTableData->at(i + 1) = tmp;
 							//
 							changesFlag = true;
 						}
@@ -1249,29 +1249,29 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::sortOrderChanged(int newS
 				else
 				{
 					if (newSortColumnId == 1) {
-						string val1 = data->at(i)[newSortColumnId - 1];
-						string val2 = data->at(i + 1)[newSortColumnId - 1];
+						string val1 = analyzerTableData->at(i)[newSortColumnId - 1];
+						string val2 = analyzerTableData->at(i + 1)[newSortColumnId - 1];
 						//
 						if (val1 > val2) {
-							array<std::string, 6> tmp = data->at(i);
-							data->at(i) = data->at(i + 1);
-							data->at(i + 1) = tmp;
+							array<std::string, 6> tmp = analyzerTableData->at(i);
+							analyzerTableData->at(i) = analyzerTableData->at(i + 1);
+							analyzerTableData->at(i + 1) = tmp;
 							//
 							changesFlag = true;
 						}
 					}
 					else
 					{
-						string val1 = data->at(i)[newSortColumnId - 1];
-						string val2 = data->at(i + 1)[newSortColumnId - 1];
+						string val1 = analyzerTableData->at(i)[newSortColumnId - 1];
+						string val2 = analyzerTableData->at(i + 1)[newSortColumnId - 1];
 						int compVal1 = -1;
 						int compVal2 = -1;
 						if (val1 != "-") compVal1 = stoi(val1);
 						if (val2 != "-") compVal2 = stoi(val2);
 						if (compVal1 > compVal2) {
-							array<std::string, 6> tmp = data->at(i);
-							data->at(i) = data->at(i + 1);
-							data->at(i + 1) = tmp;
+							array<std::string, 6> tmp = analyzerTableData->at(i);
+							analyzerTableData->at(i) = analyzerTableData->at(i + 1);
+							analyzerTableData->at(i + 1) = tmp;
 							//
 							changesFlag = true;
 						}
@@ -1280,39 +1280,39 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::sortOrderChanged(int newS
 			}
 		}
 		//
-		box.updateContent();
+		analyzerTable.updateContent();
 		refreshRowsColoursMap();
 		setSelectedRow(selectedFunc);
 	}
 }
 //
 int MainComponent::PerformanceAnalyzer::ProfileTable::getNumRows() {
-	return (int)data->size();
+	return (int)analyzerTableData->size();
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::resized() {
 	//
-	box.setBounds(getLocalBounds());
+	analyzerTable.setBounds(getLocalBounds());
 	int width = getWidth();
 	int singleColumnWidth = width / 7;
 	//
-	for (int i = 0; i < box.getHeader().getNumColumns(true); i++) {
-		int columnId = box.getHeader().getColumnIdOfIndex(i, true);
-		if (columnId == 1) box.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth);
-		else box.getHeader().setColumnWidth(columnId, singleColumnWidth);
+	for (int i = 0; i < analyzerTable.getHeader().getNumColumns(true); i++) {
+		int columnId = analyzerTable.getHeader().getColumnIdOfIndex(i, true);
+		if (columnId == 1) analyzerTable.getHeader().setColumnWidth(columnId, 2 * singleColumnWidth);
+		else analyzerTable.getHeader().setColumnWidth(columnId, singleColumnWidth);
 	}
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::setSelectedRow(int index) {
 	SparseSet<int> sparseSet;
 	sparseSet.addRange(Range<int>(index, index + 1));
-	selectedRow = index;
-	box.setSelectedRows(sparseSet);
+	selectedRowNumber = index;
+	analyzerTable.setSelectedRows(sparseSet);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::setSelectedRow(const string& name) {
-	for (int i = 0; i < data->size(); i++) {
-		array<std::string, 6> row = data->at(i);
+	for (int i = 0; i < analyzerTableData->size(); i++) {
+		array<std::string, 6> row = analyzerTableData->at(i);
 		if (row.at(0) == name) {
 			selectedFunc = name;
 			setSelectedRow(i);
@@ -1323,7 +1323,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::setSelectedRow(const stri
 void MainComponent::PerformanceAnalyzer::ProfileTable::clearSelection() {
 	SparseSet<int> sparseSet;
 	sparseSet.addRange(Range<int>(0, 0));
-	box.setSelectedRows(sparseSet);
+	analyzerTable.setSelectedRows(sparseSet);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::refreshRowsColoursMap() {
@@ -1331,7 +1331,7 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::refreshRowsColoursMap() {
 	rowsColoursTempMap = *(new map<int, juce::Colour>());
 	//
 	int rowCtr = 0;
-	for (vector<array<std::string, 6>> ::iterator it = data->begin(); it != data->end(); it++) {
+	for (vector<array<std::string, 6>> ::iterator it = analyzerTableData->begin(); it != analyzerTableData->end(); it++) {
 		string funcName = it->at(0);
 		if ((funcColoursMap.size() != 0) && (funcColoursMap.find(funcName) != funcColoursMap.end())) {
 			rowsColoursMap.insert({ rowCtr, funcColoursMap.at(funcName) });
@@ -1349,12 +1349,12 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::setFontSize(const int siz
 	//
 	fontSize = size;
 	//
-	box.getHeader().setColumnName(1, TableNameColomnTitleText);
-	box.getHeader().setColumnName(2, TableTimeColomnTitleText);
-	box.getHeader().setColumnName(3, TableTimePrecentColomnTitleText);
-	box.getHeader().setColumnName(4, TableCalledColomnTitleText);
-	box.getHeader().setColumnName(5, TableChildrenColomnTitleText);
-	box.getHeader().setColumnName(6, TableSelfColomnTitleText);
+	analyzerTable.getHeader().setColumnName(1, TableNameColomnTitleText);
+	analyzerTable.getHeader().setColumnName(2, TableTimeColomnTitleText);
+	analyzerTable.getHeader().setColumnName(3, TableTimePrecentColomnTitleText);
+	analyzerTable.getHeader().setColumnName(4, TableCalledColomnTitleText);
+	analyzerTable.getHeader().setColumnName(5, TableChildrenColomnTitleText);
+	analyzerTable.getHeader().setColumnName(6, TableSelfColomnTitleText);
 }
 //
 MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::MyLookAndFeel(MainComponent& _mainComponent)
@@ -1400,12 +1400,12 @@ void MainComponent::PerformanceAnalyzer::ProfileTable::MyLookAndFeel::drawTableH
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::cellClicked(int rowNumber, int /*columnId*/, const MouseEvent&) {
 	setSelectedRow(rowNumber);
-	array<std::string, 6> row = data->at(rowNumber);
+	array<std::string, 6> row = analyzerTableData->at(rowNumber);
 	selectedFunc = row.at(0);
 }
 //
 void MainComponent::PerformanceAnalyzer::ProfileTable::selectedRowsChanged(int lastRowSelected) {
-	mainComponent->setSelectedFunc(data->at(lastRowSelected).at(0), 3);
+	mainComponent->setSelectedFunc(analyzerTableData->at(lastRowSelected).at(0), 3);
 }
 //
 MainComponent::TitlePanel::TitlePanel(juce::String& str) {
@@ -1438,14 +1438,14 @@ MainComponent::AsSubComponent::ScrollableWindow::ScrollableWindow(vector<TracePa
 	scrollBar->addListener(this);
 	addAndMakeVisible(scrollBar);
 	//
-	TraceWindow = new TraceComponent(vec, addrFuncMap, funcColours, funcColoursTemp, *scrollBar);
-	addAndMakeVisible(TraceWindow);
+	traceWindow = new TraceComponent(vec, addrFuncMap, funcColours, funcColoursTemp, *scrollBar);
+	addAndMakeVisible(traceWindow);
 	//
 	resized();
 }
 //
 MainComponent::AsSubComponent::ScrollableWindow::~ScrollableWindow() {
-	delete(TraceWindow);
+	delete(traceWindow);
 	delete(scrollBar);
 }
 //
@@ -1456,7 +1456,7 @@ void MainComponent::AsSubComponent::ScrollableWindow::resized() {
 	juce::Rectangle<int> mainArea(0, 0, width - scrollBarWidth, height);
 	juce::Rectangle<int> sliderArea(width - scrollBarWidth, 0, scrollBarWidth, height);
 	//
-	TraceWindow->setBounds(mainArea);
+	traceWindow->setBounds(mainArea);
 	if (scrollBar != nullptr) scrollBar->setBounds(sliderArea);
 }
 //
@@ -1465,36 +1465,36 @@ void MainComponent::AsSubComponent::ScrollableWindow::paint(Graphics& g) {
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::scrollToFunc(const string& funcName, int occuranceNum) {
-	vector<int> linesVector = TraceWindow->getFuncLines(funcName);
+	vector<int> linesVector = traceWindow->getFuncLines(funcName);
 	int index = 0;
 	if (linesVector.size() != 0) {
 		if (!(((occuranceNum) < 0) || ((occuranceNum) > linesVector.size()))) index = occuranceNum;
 		int line = linesVector.at(index);
-		TraceWindow->setSelectedLine(line);
+		traceWindow->setSelectedLine(line);
 	}
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::clearSelection() {
-	TraceWindow->clearSelections();
+	traceWindow->clearSelections();
 }
 //
 int MainComponent::AsSubComponent::ScrollableWindow::getNumberOfOccurances(const string& funcName) {
-	vector<int> linesVector = TraceWindow->getFuncLines(funcName);
+	vector<int> linesVector = traceWindow->getFuncLines(funcName);
 	return (int)linesVector.size();
 }
 //
 map<string, juce::Colour> MainComponent::AsSubComponent::ScrollableWindow::getFuncColoursMap() {
-	return TraceWindow->getFuncColoursMap();
+	return traceWindow->getFuncColoursMap();
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::setFontSize(const int size) {
 	if (size < 0) return;
 	//
-	TraceWindow->setFontSize(size);
+	traceWindow->setFontSize(size);
 }
 //
 void MainComponent::AsSubComponent::ScrollableWindow::scrollBarMoved(juce::ScrollBar* /*scrollBarThatHasMoved*/, double newRangeStart) {
-	TraceWindow->setSelectedLine((int)newRangeStart);
+	traceWindow->setSelectedLine((int)newRangeStart);
 }
 //
 MainComponent::AsSubComponent::OccurancesPanel::OccurancesPanel(AsSubComponent& asComp) {

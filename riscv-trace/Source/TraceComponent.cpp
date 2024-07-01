@@ -96,6 +96,14 @@ void TraceComponent::TraceLine::TraceFuncElement::paint(juce::Graphics& g) {
 	}
 }
 //
+void TraceComponent::TraceLine::TraceFuncElement::mouseEnter(const juce::MouseEvent& mouseEvent) {
+	if (text != "") traceComp->tooltipWindow->displayTip(mouseEvent.getScreenPosition(), text);
+}
+//
+void TraceComponent::TraceLine::TraceFuncElement::mouseExit(const juce::MouseEvent& mouseEvent) {
+	traceComp->tooltipWindow->hideTip();
+}
+//
 TraceComponent::TraceLine::TraceLine(TraceParser::TraceLineStruct& lineInfoIn, juce::Colour& curFuncColour, juce::Colour& curFuncTempColour, TraceComponent& _traceComp) {
 	traceComp = &_traceComp;
 	lineInfo = lineInfoIn;
@@ -235,11 +243,19 @@ TraceComponent::TraceComponent(vector<TraceParser::TraceLineStruct>& vec, map<st
 	//
 	setSize(getParentWidth(), getParentHeight());
 	setTopLine(0);
+	//
+	tooltipWindow = new juce::TooltipWindow(this, 0);
+	tooltipWindow->getLookAndFeel().setColour(juce::TooltipWindow::ColourIds::textColourId, juce::Colours::white);
+	tooltipWindow->getLookAndFeel().setColour(juce::TooltipWindow::ColourIds::backgroundColourId, juce::Colour(37, 11, 46));
+	tooltipWindow->getLookAndFeel().setColour(juce::TooltipWindow::ColourIds::outlineColourId, juce::Colour(37, 11, 46));
+	//
+	addAndMakeVisible(tooltipWindow);
 }
 //
 TraceComponent::~TraceComponent()
 {
 	delete(FTraceLines);
+	if (tooltipWindow != nullptr) delete(tooltipWindow);
 }
 //
 void TraceComponent::paint(juce::Graphics& g)

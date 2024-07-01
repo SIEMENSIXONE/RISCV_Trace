@@ -56,6 +56,9 @@ public:
             void paint (juce::Graphics&) override;
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceFuncElement)
         private:
+            void mouseEnter(const juce::MouseEvent&) override;
+            void mouseExit(const juce::MouseEvent&) override;
+            //
             TraceLine* traceLine;
         };
         //
@@ -88,6 +91,7 @@ public:
         bool shouldDisplayFuncName = false;
         TraceComponent* traceComp;
         //
+        //
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TraceLine)
     };
     //
@@ -104,7 +108,9 @@ public:
     void setFontSize(const int);
     map<string, juce::Colour> getFuncColoursMap();
     //
-    int fontSize = 5;
+    int fontSize = 5; 
+    //
+    juce::TooltipWindow* tooltipWindow = nullptr;
 private:
     void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     //
