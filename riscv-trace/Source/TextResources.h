@@ -29,6 +29,8 @@ static String GraphWindowTitle;
 static String ProjectInfoWindowTitle;
 //
 static String WelcomeText;
+static String WelcomeButtonOpenProject;
+static String WelcomeButtonCreateProject;
 //
 //Section Titles
 static String TraceSectionTitle;
@@ -134,6 +136,9 @@ static void setLang(String lang) {
         ProjectInfoWindowTitle = String((std::wstring(L"О проекте")).c_str());
         //
         WelcomeText = String((std::wstring(L"Создайте новый проект или откройте существующий!")).c_str());
+        WelcomeButtonCreateProject  = String((std::wstring(L"Создать проект")).c_str());
+        WelcomeButtonOpenProject  = String((std::wstring(L"Открыть проект")).c_str());
+
         //
         //Section Titles
         TraceSectionTitle = String((std::wstring(L"Трасса исполнения")).c_str());
@@ -147,7 +152,7 @@ static void setLang(String lang) {
         //
         //Menu dropdown options
             //File
-            FileNewButtonText = String((std::wstring(L"Новый")).c_str());
+            FileNewButtonText = String((std::wstring(L"Создать")).c_str());
             FileOpenButtonText = String((std::wstring(L"Открыть..")).c_str());
             FileAboutProjectButtonText = String((std::wstring(L"О проекте")).c_str());
             FileSaveButtonText = String((std::wstring(L"Сохранить...")).c_str());
@@ -242,6 +247,8 @@ static void setLang(String lang) {
         ProjectInfoWindowTitle = String((std::wstring(L"Project Info")).c_str());
         //
         WelcomeText = String((std::wstring(L"Create new project or open existing one!")).c_str());
+        WelcomeButtonCreateProject  = String((std::wstring(L"Create project")).c_str());
+        WelcomeButtonOpenProject  = String((std::wstring(L"Open project")).c_str());
         //
         //Section Titles
         TraceSectionTitle = String((std::wstring(L"Assembly Trace")).c_str());

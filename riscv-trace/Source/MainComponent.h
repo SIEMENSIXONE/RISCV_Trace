@@ -613,17 +613,27 @@ public:
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaceholderSubComponent)
 	};
 	//
-	class MainPlaceholderSubComponent : public Component
+	class MainPlaceholderSubComponent : public Component, Button::Listener
 	{
 	public:
 		//
-		MainPlaceholderSubComponent(const String&);
+		MainPlaceholderSubComponent(const String&, MainComponent&);
 		~MainPlaceholderSubComponent() override;
 		void paint(Graphics&) override;
 		void resized() override;
 	private:
+        void buttonClicked(Button* button) override;
+		//
+		MainComponent* mainComponent;
 		//
 		String placeholderPictureFilepath;
+		//
+		TextButton* createProjectButton = nullptr;
+		TextButton* openProjectButton = nullptr;
+		//
+		Rectangle<float> logoArea;
+		Rectangle<float> textArea;
+		Rectangle<int> buttonsArea;
 		//
 		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainPlaceholderSubComponent)
 	};
@@ -665,15 +675,15 @@ public:
 	void setSelectedFunc(const string&, int callerID);
 	void toggleSectionsVisibility(bool);
 	void darkenSections(bool);
+	void createProjectFile();
+	void chooseProjectFile();
 	//
 	TSettingsParser::Settings currentSettings;
 private:
 	//
 	void loadSettings();
-	void createProjectFile();
 	void openProjectFile(File);
 	void openProjectInfoWindow(TProjectParser::Project&);
-	void chooseProjectFile();
 	void saveProject();
 	void closeProjectFile();
 	void openSettingsWindow();

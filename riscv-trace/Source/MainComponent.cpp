@@ -1895,7 +1895,6 @@ void MainComponent::CodeSubComponent::setFontSize(const int size) {
 MainComponent::CodeSubComponent::MyTabbedComponent::MyTabbedComponent(vector<CodeComponent*>& codeComponents)
 	: TabbedComponent(TabbedButtonBar::TabsAtTop)
 {
-	//auto colour = findColour(ResizableWindow::backgroundColourId);
 	auto colour = Colour(37, 11, 46);
 	//
 	for (vector<CodeComponent*>::iterator it = codeComponents.begin(); it != codeComponents.end(); it++) {
@@ -1961,20 +1960,40 @@ void MainComponent::PlaceholderSubComponent::paint(Graphics& g) {
 //
 void MainComponent::PlaceholderSubComponent::resized() {}
 //
-MainComponent::MainPlaceholderSubComponent::MainPlaceholderSubComponent(const String& _placeholderPictureFilepath) {
+MainComponent::MainPlaceholderSubComponent::MainPlaceholderSubComponent(const String& _placeholderPictureFilepath, MainComponent& _mainComponent) :
+	logoArea(),
+	textArea(),
+	buttonsArea()
+{
 	placeholderPictureFilepath = _placeholderPictureFilepath;
+	mainComponent = &_mainComponent;
+	//
+	createProjectButton = new TextButton(WelcomeButtonCreateProject);
+	createProjectButton->setColour(TextButton::ColourIds::textColourOffId, Colours::white);
+	createProjectButton->setColour(TextButton::ColourIds::buttonColourId, Colour(37, 11, 46));
+	//
+	openProjectButton = new TextButton(WelcomeButtonOpenProject);
+	openProjectButton->setColour(TextButton::ColourIds::textColourOffId, Colours::white);
+	openProjectButton->setColour(TextButton::ColourIds::buttonColourId, Colour(37, 11, 46));
+	//
+	createProjectButton->addListener(this);
+	openProjectButton->addListener(this);
+	//
+	addAndMakeVisible(createProjectButton);
+	addAndMakeVisible(openProjectButton);
 }
 //
-MainComponent::MainPlaceholderSubComponent::~MainPlaceholderSubComponent() {}
+MainComponent::MainPlaceholderSubComponent::~MainPlaceholderSubComponent() {
+	if (createProjectButton != nullptr) delete(createProjectButton);
+	if (openProjectButton != nullptr) delete(openProjectButton);
+}
 //
 void MainComponent::MainPlaceholderSubComponent::paint(Graphics& g) {
 	g.fillAll(juce::Colour(187, 148, 174));
 	File pictureFile(placeholderPictureFilepath);
 	Image picture = ImageCache::getFromFile(pictureFile);
 	g.setOpacity(1.0f);
-	Rectangle<float> pictureArea((float)0, (float)(getHeight() / 4), (float)getWidth(), (float)(getHeight() / 2 - getHeight() / 4));
-	Rectangle<float> textArea((float)0, (float)(getHeight() / 2), (float)getWidth(), (float)(getHeight() / 2));
-	g.drawImage(picture, pictureArea, RectanglePlacement::doNotResize, false);
+	g.drawImage(picture, logoArea, RectanglePlacement::centred, false);
 	//
 	g.setColour(Colour(94, 60, 82));
 	juce::Font font("Courier New", 55.0f, juce::Font::FontStyleFlags::bold);
@@ -1982,7 +2001,36 @@ void MainComponent::MainPlaceholderSubComponent::paint(Graphics& g) {
 	g.drawText(WelcomeText, textArea, juce::Justification::horizontallyCentred);
 }
 //
-void MainComponent::MainPlaceholderSubComponent::resized() {}
+void MainComponent::MainPlaceholderSubComponent::resized() {
+	float logoAreaHeight = (float)(getHeight() / 2 - getHeight() / 4);
+	int buttonsAreaHeight = 180;
+	int textAreaHeight = 60;
+	int buttonsWidth = getWidth() / 4;
+	int buttonsDistance = 30;
+	//
+	logoArea = Rectangle<float>((float)0, (float)(getHeight() / 4), (float)getWidth(), logoAreaHeight);
+	buttonsArea = Rectangle<int>(getWidth() / 2 - buttonsWidth/2, logoArea.getBottom(), buttonsWidth, buttonsAreaHeight);
+	textArea = Rectangle<float>((float)0, buttonsArea.getBottom(), (float)getWidth(), textAreaHeight);
+	//
+	createProjectButton->setButtonText(WelcomeButtonCreateProject);
+	openProjectButton->setButtonText(WelcomeButtonOpenProject);
+	//
+	createProjectButton->setBounds(buttonsArea.getX(), buttonsArea.getY() + buttonsDistance, buttonsArea.getWidth(), (buttonsAreaHeight - buttonsDistance) / 2 - buttonsDistance);
+	openProjectButton->setBounds(buttonsArea.getX(), createProjectButton->getBottom() + buttonsDistance / 6, buttonsArea.getWidth(), (buttonsAreaHeight - buttonsDistance) / 2 - buttonsDistance);
+}
+//
+void MainComponent::MainPlaceholderSubComponent::buttonClicked(Button * button)
+{
+    if (button == openProjectButton)
+    {
+        mainComponent->chooseProjectFile();
+    }
+    //
+    if (button == createProjectButton)
+    {
+		mainComponent->createProjectFile();
+    }
+}
 //
 MainComponent::DarkeningComponent::DarkeningComponent() {}
 //
@@ -2032,7 +2080,7 @@ MainComponent::MainComponent()
 	//
 	File parentDir = File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
 	String pictureFileath = parentDir.getFullPathName() + "/Resources/Icons/placeholder.png";
-	mainPlaceholderPanel = new MainPlaceholderSubComponent(pictureFileath);
+	mainPlaceholderPanel = new MainPlaceholderSubComponent(pictureFileath, *this);
 	//
 	addAndMakeVisible(mainPlaceholderPanel);
 	//
@@ -2044,9 +2092,9 @@ MainComponent::MainComponent()
 	verticalLayout.setItemLayout(4, -0.1, -1.0, -0.65);
 	//
 	verticalDividerBarLeft.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 1, true, *this));
-	addAndMakeVisible(verticalDividerBarLeft.get());
+	addChildComponent(verticalDividerBarLeft.get());
 	verticalDividerBarRight.reset(new MyStretchableLayoutResizerBar(&verticalLayout, 3, true, *this));
-	addAndMakeVisible(verticalDividerBarRight.get());
+	addChildComponent(verticalDividerBarRight.get());
 	//
 	darkeningComponent = new DarkeningComponent();
 	if (darkeningComponent != nullptr) darkeningComponent->setBounds(0, menuHeight, getWidth(), getHeight() - menuHeight);
@@ -2155,11 +2203,6 @@ void MainComponent::darkenSections(bool flag) {
 	}
 }
 //
-void MainComponent::loadSettings() {
-	juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
-	currentSettings = TSettingsParser::getSettingsFromFile(workingDirectory.getFullPathName().toStdString() + "/config.JSON");
-}
-//
 void MainComponent::createProjectFile() {
 	if (createProjWindow != nullptr) delete(createProjWindow);
 	//
@@ -2167,6 +2210,21 @@ void MainComponent::createProjectFile() {
 	createProjWindow->setVisible(false);
 	createProjWindow->addComponentListener(this);
 	createProjWindow->setVisible(true);
+}
+//
+void MainComponent::chooseProjectFile() {
+	chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.JSON");
+	auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
+	chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
+		{
+			auto file = fc.getResult();
+			if (file != File{}) openProjectFile((file));
+		});
+}
+//
+void MainComponent::loadSettings() {
+	juce::File workingDirectory = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getParentDirectory();
+	currentSettings = TSettingsParser::getSettingsFromFile(workingDirectory.getFullPathName().toStdString() + "/config.JSON");
 }
 //
 void MainComponent::openProjectFile(File filepath) {
@@ -2282,16 +2340,6 @@ void MainComponent::openProjectInfoWindow(TProjectParser::Project& _project) {
 	projectInfoWindow->addComponentListener(this);
 	projectInfoWindow->setVisible(true);
 	projectInfoWindow->enterModalState();
-}
-//
-void MainComponent::chooseProjectFile() {
-	chooser = std::make_unique<FileChooser>(ChooseFileText, File(defaultFilepath), "*.JSON");
-	auto chooserFlags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
-	chooser->launchAsync(chooserFlags, [this](const FileChooser& fc)
-		{
-			auto file = fc.getResult();
-			if (file != File{}) openProjectFile((file));
-		});
 }
 //
 void MainComponent::saveProject() {
@@ -2437,8 +2485,8 @@ PopupMenu MainComponent::getMenuForIndex(int index, const String&) {
 			menu.addItem(FileOpenButtonText, chooseProjFunc);
 			//
 			if (projectOpened) {
-				menu.addItem(FileAboutProjectButtonText, aboutProjectFunc);
 				menu.addItem(FileSaveButtonText, saveProjFunc);
+				menu.addItem(FileAboutProjectButtonText, aboutProjectFunc);
 				menu.addItem(FileCloseButtonText, closeProjFunc);
 			}
 		}
